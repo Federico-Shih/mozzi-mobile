@@ -7,8 +7,8 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, Text, View} from 'react-native';
-import styles from './Styles.js';
+import {Platform, StyleSheet, Text, View} from 'react-native';
+import styles from './styles/styles.js'
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -18,24 +18,14 @@ const instructions = Platform.select({
 });
 
 type Props = {};
-
-class Title extends Component<Props> {
-  render() {
-    <View>
-      <Text style={{fontSize: 40},styles.title}>
-        {this.props.text}  
-      </Text>
-    </View>
-  }
-}
-
 export default class App extends Component<Props> {
   render() {
     return (
       <View style={styles.container}>
-        <Title text = "Mozzi"/>
+        <Text style={styles.welcome}>Welcome to React Native!</Text>
+        <Text style={styles.instructions}>To get started, edit App.js</Text>
+        <Text style={styles.instructions}>{instructions}</Text>
       </View>
     );
   }
 }
-
