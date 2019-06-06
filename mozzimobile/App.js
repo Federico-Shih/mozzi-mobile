@@ -1,14 +1,5 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
-
-import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
-import styles from './styles/styles.js'
+import {Platform, Text, View} from 'react-native';
+import styles from './styles/styles.js';
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -18,13 +9,22 @@ const instructions = Platform.select({
 });
 
 type Props = {};
+
+class Title extends Component<Props> {
+  render() {
+    return (
+      <Text style={styles.title}>
+        this.props.text;
+      </Text>
+    );
+  }
+}
+
 export default class App extends Component<Props> {
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>To get started, edit App.js</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
+        <Title text="Mozzi Project"/>
       </View>
     );
   }
