@@ -1,7 +1,5 @@
 import {Platform, StyleSheet} from 'react-native';
 
-
-
 let platformFont;
 switch (Platform.OS)
 {
@@ -32,10 +30,12 @@ export default StyleSheet.create({
     title: {
       textAlign: 'center',
       color: "#000000",
-      fontSize: "36",
+      fontSize: 36,
       fontFamily: platformFont,
       borderWidth: 2,
       margin: 2, 
+      padding: 8,
+      bottom: 70,
     }
   });
   

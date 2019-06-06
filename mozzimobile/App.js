@@ -1,4 +1,5 @@
 import {Platform, Text, View} from 'react-native';
+import React, {Component} from 'react';
 import styles from './styles/styles.js';
 
 const instructions = Platform.select({
@@ -14,7 +15,7 @@ class Title extends Component<Props> {
   render() {
     return (
       <Text style={styles.title}>
-        this.props.text;
+        {this.props.text}
       </Text>
     );
   }
