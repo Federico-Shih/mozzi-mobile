@@ -22,9 +22,15 @@ export default StyleSheet.create({
       color: "#000000",
       fontSize: 36,
       fontFamily: platformFont,
-      borderWidth: 2,
+      borderBottomWidth: 2,
       marginTop: 40, 
       padding: 8,
+    },
+    textTest: {
+      textAlign: 'center',
+      fontSize: 40,
+      top: '5%',
+      fontFamily: platformFont
     }
   });
   
