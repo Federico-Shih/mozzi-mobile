@@ -1,11 +1,11 @@
-import {Platform, Text, View, TouchableOpacity} from 'react-native';
+import {Text, View} from 'react-native';
 import React, {Component} from 'react';
 import styles from '../styles/styles';
 import {Title, Button} from '../props';
 
 type Props = {};
 
-class mainPage extends Component<Props> {
+export default class MainPage extends Component<Props> {
 
     state = {
       currentPage: 'initial'
@@ -29,12 +29,11 @@ class mainPage extends Component<Props> {
           </Text>
   
           <View style={{flexDirection: 'column', justifyContent:'space-around', top:80}}>
-            <Button onPress={()=>this.login()} text="Login" fontSize={30}/>
-            <Button onPress={()=>this.register()} text="Register" fontSize={30}/>
+            <Button hitSlop={{top:10, bottom:10, left:40, right:40}} onPress={()=>this.login()} text="Login" fontSize={30}/>
+            <Button hitSlop={{top:10, bottom:10, left:40, right:40}} onPress={()=>this.register()} text="Register" fontSize={30}/>
           </View>
         </View>
       );
     }
   }
 
-export const MainPage = mainPage;
