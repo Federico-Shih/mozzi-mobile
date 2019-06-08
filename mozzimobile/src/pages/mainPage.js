@@ -8,31 +8,31 @@ type Props = {};
 export default class MainPage extends Component<Props> {
 
     state = {
-      currentPage: 'initial'
+        currentPage: 'initial'
     }
   
     login = () =>{
-      this.setState({currentPage: 'login'});
+        this.setState({currentPage: 'login'});
     }
   
     register = () =>{
-      this.setState({currentPage:'register'});
+        this.setState({currentPage:'register'});
     }
   
     render() {
-      return (
-        <View style={styles.container}>
-          <Title text="Mozzi Project"/>
+        return (
+            <View style={styles.container}>
+                <Title text="Mozzi Project"/>
   
-          <Text style={styles.textTest}>
-              {this.state.currentPage}
-          </Text>
+                <Text style={styles.textTest}>
+                    {this.state.currentPage}
+                </Text>
   
-          <View style={{flexDirection: 'column', justifyContent:'space-around', top:80}}>
-            <Button hitSlop={{top:10, bottom:10, left:40, right:40}} onPress={()=>this.login()} text="Login" fontSize={30}/>
-            <Button hitSlop={{top:10, bottom:10, left:40, right:40}} onPress={()=>this.register()} text="Register" fontSize={30}/>
-          </View>
-        </View>
+            <View style={{flexDirection: 'column', justifyContent:'space-around', top:80}}>
+                <Button hitSlop={{top:10, bottom:10, left:40, right:40}} onPress={()=>this.login()} text="Login" fontSize={30}/>
+                <Button hitSlop={{top:10, bottom:10, left:40, right:40}} onPress={()=>this.register()} text="Register" fontSize={30}/>
+            </View>
+            </View>
       );
     }
   }
