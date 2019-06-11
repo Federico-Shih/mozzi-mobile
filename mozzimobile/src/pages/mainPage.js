@@ -3,6 +3,7 @@ import React, {Component} from 'react';
 import styles from '../styles/styles';
 import {Title, Button} from '../props';
 import {connect} from 'react-redux';
+import {changePage} from '../actions'
 
 type Props = {};
 
@@ -22,9 +23,9 @@ class MainPage extends Component<Props> {
             <Button hitSlop={{top:10, bottom:10, left:40, right:40}} onPress={()=>this.props.changePage('Register')} text="Register" fontSize={30}/>
           </View>
         </View>
-      );
+    );
     }
-  }
+}
 
 function mapStateToProps(state) {
     return {
@@ -34,7 +35,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        changePage: (newPage) => dispatch({ type:'CHANGE_PAGE', currentPage: newPage}),
+        changePage: (newPage) => dispatch(changePage(newPage)),
     }
 }
 
