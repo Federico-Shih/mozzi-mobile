@@ -3,28 +3,14 @@ import {MainPage, Register, Login} from './src/pages/pages.js';
 import {createStackNavigator, createAppContainer} from 'react-navigation';
 import {createStore} from 'redux';
 import {Provider} from 'react-redux';
-import { CHANGE_PAGE } from './src/actions'
+import reducer from './src/reducers';
 
 type Props = {};
 
-const initialState = {
-    currentPage:'initial'
-}
-
-//Reducer construct
-const reducer = (state = initialState, action) => {
-    switch(action.type) {
-        case CHANGE_PAGE:
-            return {...state, currentPage: action.currentPage};
-        
-        default:
-            return state;
-    }
-}
-
-
+//Store creation
 const store = createStore(reducer);
 
+//Navigation
 const AppNavigator = createStackNavigator({
     Home: {
         screen: MainPage,
@@ -33,6 +19,7 @@ const AppNavigator = createStackNavigator({
 
 const AppContainer = createAppContainer(AppNavigator);
 
+//Application creation
 export default class App extends Component<Props> {
     render() {
         return (

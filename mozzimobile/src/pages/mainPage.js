@@ -34,6 +34,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
+
     return {
         changePage: (newPage) => dispatch(changePage(newPage)),
     }
