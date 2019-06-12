@@ -3,7 +3,8 @@ import {MainPage, Register, Login} from './src/pages/pages.js';
 import {createStackNavigator, createAppContainer} from 'react-navigation';
 import {createStore} from 'redux';
 import {Provider} from 'react-redux';
-import reducer from './src/reducers';
+import reducer from './src/reducer';
+//import console = require('console');
 
 type Props = {};
 
@@ -19,7 +20,7 @@ const AppNavigator = createStackNavigator({
 
 const AppContainer = createAppContainer(AppNavigator);
 
-//Application creation
+//Application creationW
 export default class App extends Component<Props> {
     render() {
         return (
