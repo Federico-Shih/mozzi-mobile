@@ -14,8 +14,6 @@ const store = createStore(reducer);
 
 //Grating permissions
 
-//NOT YET DONEDONEIT --> hay que agregar tus permisos a Android.xml que seyo y lo mismo para IOS 
-//https://stackoverflow.com/questions/54819865/how-do-i-request-multiple-permissions-at-once-in-react-native
 
 const grantingPermissions = Platform.select({
     ios: () => {
@@ -23,12 +21,29 @@ const grantingPermissions = Platform.select({
     },
     android: async () => {
         try {
-
+            /*
+            PermissionsAndroid.requestMultiple(
+                //modificar permisos aca
+                [PermissionsAndroid.PERMISSIONS.READ_CALENDAR,
+                PermissionsAndroid.PERMISSIONS.WRITE_CALENDAR]
+                ).then((result) => {
+                  if (result['android.permission.READ_CALENDAR']
+                  && result['android.permission.WRITE_CALENDAR'] === 'granted') {
+                    this.setState({
+                      permissionsGranted: true
+                    });
+                  } else if (result['android.permission.READ_CALENDAR'] || result['android.permission.WRITE_CALENDAR'] === 'never_ask_again') {
+                    this.refs.toast.show('Please Go into Settings -> Applications -> Mozzi -> Permissions and Allow permissions to continue');
+                  }
+                });
+            */
         } catch (err) {
             console.warn(err);
         }
     } 
 });
+
+//grantingPermissions();
 
 //Navigation
 const AppNavigator = createStackNavigator(
