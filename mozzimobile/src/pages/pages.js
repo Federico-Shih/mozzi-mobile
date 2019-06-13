@@ -5,9 +5,9 @@ import buscador from './buscador';
 import business from './business';
 import calendar from './calendartemp';
 
-export const Business = business;
-export const MainPage = mainPage;
-export const Register = register;
-export const Login = login;
-export const Buscador = buscador;
-export const CalendarTemp = calendar;
+export const BusinessScreen = business;
+export const MainPageScreen = mainPage;
+export const RegisterScreen = register;
+export const LoginScreen = login;
+export const BuscadorScreen = buscador;
+export const CalendarTempScreen = calendar;

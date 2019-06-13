@@ -16,7 +16,6 @@ class TitleProp extends Component<Props> {
 
 
 class ButtonProp extends Component<Props> {
-
     render() {
       return(
         <TouchableOpacity onPress={this.props.onPress} hitSlop={this.props.hitSlop} style={{margin:5}}>
