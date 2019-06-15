@@ -18,15 +18,20 @@ class MainPage extends Component<Props> {
             <View style={styles.container}>
                 <Title text="Mozzi Project"/>
   
-          <Text style={styles.textTest}>
-              {this.props.currentPage}
-          </Text>
+                <Text style={styles.textTest}>
+                    {this.props.currentPage}
+                </Text>
   
-          <View style={{flexDirection: 'column', justifyContent:'space-around', top:80}}>
-            <Button hitSlop={{top:10, bottom:10, left:40, right:40}} onPress={()=>this.changePage('Login')} text="Login" fontSize={30}/>
-            <Button hitSlop={{top:10, bottom:10, left:40, right:40}} onPress={()=>this.changePage('Register')} text="Register" fontSize={30}/>
-          </View>
-        </View>
+                <View style={{flexDirection: 'column', justifyContent:'space-around', top:80}}>
+                    <Button hitSlop={{top:10, bottom:10, left:40, right:40}} 
+                        onPress={()=>this.changePage('Login')} 
+                        text="Login" styles={{fontSize: 35, textAlign: 'center'}}/>
+
+                    <Button hitSlop={{top:10, bottom:10, left:40, right:40}} 
+                        onPress={()=>this.changePage('Register')} 
+                        text="Register" styles={{fontSize: 35, textAlign: 'center'}}/>
+                </View>
+            </View>
     );
     }
 }

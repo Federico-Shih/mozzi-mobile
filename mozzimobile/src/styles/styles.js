@@ -31,6 +31,11 @@ export default StyleSheet.create({
       fontSize: 40,
       top: '5%',
       fontFamily: platformFont
+    },
+    backButton: {
+      textAlign: 'left',
+      fontSize: 30,
+      fontFamily: platformFont,
     }
   });
   

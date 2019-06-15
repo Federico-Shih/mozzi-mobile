@@ -54,6 +54,9 @@ const AppNavigator = createStackNavigator(
     },
     {
         initialRouteName: "Main",
+        defaultNavigationOptions: {
+            header: null,
+        }
     }
 );
 

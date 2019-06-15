@@ -12,6 +12,9 @@ class Register extends Component<Props> {
            <Text style={styles.textTest}>
                 Login
           </Text>
+          <View style = {{alignSelf: 'stretch', marginBottom: '0%', justifyContent: 'flex-end', flex: 1}}>         
+              <Button styles={styles.backButton} text="Back" onPress = {()=> { this.props.navigation.goBack()}} />
+           </View>
         </View>
       );
     }

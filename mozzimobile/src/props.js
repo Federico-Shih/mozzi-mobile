@@ -19,7 +19,7 @@ class ButtonProp extends Component<Props> {
     render() {
       return(
         <TouchableOpacity onPress={this.props.onPress} hitSlop={this.props.hitSlop} style={{margin:5}}>
-            <Text style={{fontSize: this.props.fontSize, textAlign: 'center'}}>
+            <Text style={this.props.styles}>
               {this.props.text}
             </Text>
           </TouchableOpacity>
