@@ -1,7 +1,7 @@
 import {Text, View, TextInput} from 'react-native';
 import React, {Component} from 'react';
 import styles from '../libraries/styles/styles';
-import {Title, Button} from '../libraries/props';
+import {Title, Button, InputWithIcon} from '../libraries/props';
 import {ADD_REGISTER, REGISTER_JSON} from '../actions';
 import DatePicker from 'react-native-datepicker'
 
@@ -30,8 +30,8 @@ export default class Register extends Component<Props> {
                         </Text>
                     </View>
     
-                    <View style = {{width: '80%', alignContent:'center', alignItems: 'center', flex: 4}}>
-                        <TextInput 
+                    <View style = {{width: '80%', alignContent:'center', alignItems: 'center', flex: 10}}>
+                        <InputWithIcon 
                             style= {{width: '80%', backgroundColor: '#FFFFFF', margin: 20}} 
                             placeholder= 'Username' 
                             onChangeText={(text) => {this.setState({username: text})}}
@@ -58,10 +58,17 @@ export default class Register extends Component<Props> {
                                 }
                             }} 
                             onDateChange={(date) => {this.setState({date: date})}}
-
                             />
-                        <TextInput keyboardType='email-address' style= {{width: '80%', backgroundColor: '#FFFFFF', margin: 20}} placeholder= 'e-mail address' />
-                        <TextInput secureTextEntry= {true} style= {{width: '80%', backgroundColor: '#FFFFFF'}} placeholder= 'password' />
+                        <InputWithIcon 
+                            keyboardType='email-address' 
+                            style= {{width: '80%', backgroundColor: '#FFFFFF', margin: 20}} 
+                            placeholder= 'e-mail address' 
+                            />
+                        <InputWithIcon 
+                            secureTextEntry= {true} 
+                            style= {{width: '80%', backgroundColor: '#FFFFFF'}} 
+                            placeholder= 'password' 
+                            />
 
                     </View>
                     <View style = {{alignSelf: 'stretch', marginBottom: '0%', justifyContent: 'flex-end', flex: 1}}>         
