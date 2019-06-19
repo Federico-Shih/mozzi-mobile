@@ -1,16 +1,18 @@
-import {Text, View} from 'react-native';
+import {Text, View, Dimensions} from 'react-native';
 import React, {Component} from 'react';
 import styles from '../libraries/styles/styles';
-import {Title, Button} from '../libraries/props';
+import {Title} from '../libraries/props';
+import { Button } from 'react-native-elements';
 import {connect} from 'react-redux';
 
 type Props = {};
+
+const ButtonWidth = (Math.round((200*411/Dimensions.get('window').width)));
 
 class MainPage extends Component<Props> {
 
     changePage(newPage) {
         this.props.navigation.navigate(newPage);
-        //this.props.changePage(newPage);
     }
 
     render() {
@@ -18,18 +20,23 @@ class MainPage extends Component<Props> {
             <View style={styles.container}>
                 <Title text="Mozzi Project"/>
   
-                <Text style={styles.textTest}>
-                    {this.props.currentPage}
-                </Text>
-  
-                <View style={{flexDirection: 'column', justifyContent:'space-around', top:80}}>
+                <View style={{alignItems:'center', top:50, width: '80%', height: '50%'}}>
                     <Button hitSlop={{top:10, bottom:10, left:40, right:40}} 
                         onPress={()=>this.changePage('Login')} 
-                        text="Login" styles={{fontSize: 35, textAlign: 'center'}}/>
+                        title='Login'
+                        titleStyle= {{fontSize: 30}}
+                        type='outline'
+                        buttonStyle = {{borderWidth: 3, width: ButtonWidth}}
+                        />
 
                     <Button hitSlop={{top:10, bottom:10, left:40, right:40}} 
                         onPress={()=>this.changePage('Register')} 
-                        text="Register" styles={{fontSize: 35, textAlign: 'center'}}/>
+                        title="Register" 
+                        titleStyle= {{fontSize: 30}}
+                        type='outline'
+                        containerStyle= {{top: '5%'}}
+                        buttonStyle = {{borderWidth: 3, width: ButtonWidth}}
+                        />
                 </View>
             </View>
     );

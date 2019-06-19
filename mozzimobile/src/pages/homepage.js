@@ -1,7 +1,7 @@
 import {Text, View} from 'react-native';
 import React, {Component} from 'react';
-import styles from '../styles/styles';
-import {Title, Button} from '../props';
+import styles from '../libraries/styles/styles';
+import {Title, Button} from '../libraries/props';
 
 type Props = {};
 

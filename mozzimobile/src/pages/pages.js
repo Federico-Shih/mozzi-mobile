@@ -4,7 +4,9 @@ import login from './login';
 import buscador from './buscador';
 import business from './business';
 import calendar from './calendartemp';
+import homepage from './homepage';
 
+export const HomePageScreen = homepage;
 export const BusinessScreen = business;
 export const MainPageScreen = mainPage;
 export const RegisterScreen = register;

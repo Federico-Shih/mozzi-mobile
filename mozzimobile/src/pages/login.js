@@ -9,7 +9,7 @@ class Register extends Component<Props> {
     render() {
       return (
         <View style={styles.container}>
-           <Text style={styles.textTest}>
+           <Text style={styles.titleText}>
                 Login
           </Text>
           <View style = {{alignSelf: 'stretch', marginBottom: '0%', justifyContent: 'flex-end', flex: 1}}>         

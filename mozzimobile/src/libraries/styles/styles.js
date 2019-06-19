@@ -17,6 +17,7 @@ export default StyleSheet.create({
       alignItems: 'center',
       backgroundColor: '#F5FCFF',
     },
+    
     title: {
       textAlign: 'center',
       color: "#000000",
@@ -26,16 +27,29 @@ export default StyleSheet.create({
       marginTop: 40, 
       padding: 8,
     },
-    textTest: {
-      textAlign: 'center',
-      fontSize: 40,
+
+    logregTitle: {
+      textAlign: 'left',
+      fontSize: 28,
+      fontWeight: '500',
+      lineHeight: 35,
+      marginTop: 100,
+      marginLeft: 30,
+      display: 'flex',
+      alignItems: 'flex-start',
       top: '5%',
       fontFamily: platformFont
     },
+
     backButton: {
       textAlign: 'left',
       fontSize: 30,
       fontFamily: platformFont,
+    },
+    
+    inputText: {
+        width: '100%', 
+        backgroundColor: '#FFFFFF'
     }
   });
   

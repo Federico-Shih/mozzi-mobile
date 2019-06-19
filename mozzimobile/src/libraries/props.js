@@ -5,6 +5,8 @@ import styles from './styles/styles';
 
 type Props = {};
 
+
+
 class TitleProp extends Component<Props> {
     render() {
         return (
@@ -28,6 +30,19 @@ class ButtonProp extends Component<Props> {
     }
 };
 
+
+class LogRegTitleProp extends Component<Props> {
+    render() {
+        return(
+            <View style= {{alignSelf: 'flex-start'}}>
+                <Text style={this.props.style}>
+                    {this.props.text}
+                </Text>
+            </View>
+        );
+    }
+}
+
 /*
 <Icon
                     name='person'
@@ -38,10 +53,7 @@ class ButtonProp extends Component<Props> {
 class InputProp extends Component<Props> {
     render() {
         return(
-            <View>
-              
-                
-              
+            <View style = {{width: '100%', alignItems:'center', margin: 10}}>
                 <TextInput 
                     style= {this.props.style} 
                     placeholder= {this.props.placeholder}
@@ -59,3 +71,4 @@ class InputProp extends Component<Props> {
 export const InputWithIcon = InputProp;
 export const Title = TitleProp;
 export const Button = ButtonProp;
+export const StyledTitle = LogRegTitleProp;

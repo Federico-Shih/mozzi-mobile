@@ -9,7 +9,7 @@ export default class Business extends Component<Props> {
     render() {
       return (
         <View style={styles.container}>
-           <Text style={styles.textTest}>
+           <Text style={styles.titleText}>
                 Business
           </Text>
         </View>

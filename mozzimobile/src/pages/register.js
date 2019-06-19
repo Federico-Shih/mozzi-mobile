@@ -1,75 +1,59 @@
-import {Text, View, TextInput} from 'react-native';
+import {Text, View, TextInput, Dimensions} from 'react-native';
 import React, {Component} from 'react';
 import styles from '../libraries/styles/styles';
-import {Title, Button, InputWithIcon} from '../libraries/props';
-import {ADD_REGISTER, REGISTER_JSON} from '../actions';
-import DatePicker from 'react-native-datepicker'
+import {Title, Button, InputWithIcon, StyledTitle} from '../libraries/props';
+import { LOGGING_IN } from '../actions';
+import {connect} from 'react-redux';
 
 
 type Props = {};
 const date = (new Date()).toISOString().split('T')[0];
 
-export default class Register extends Component<Props> {
+const InputTextWidth = (Math.round((1 - 60/Dimensions.get('window').width)*100)).toString() + '%';
+
+class Register extends Component<Props> {
     constructor(props){
         super(props);
     }
 
     state = {
-        username: '',
+        name: '',
+        surname: '',
         date: date,
         email: '',
         password: ''
     };
     
+
+
     render() {
         return (
                 <View style={styles.container}>
-                    <View style = {{flex: 1}}>
-                        <Text style={styles.textTest}>
-                            Register
-                        </Text>
-                    </View>
+                    <StyledTitle text='Registrate' style={styles.logregTitle} />
     
-                    <View style = {{width: '80%', alignContent:'center', alignItems: 'center', flex: 10}}>
+                    <View style = {{width: InputTextWidth, alignContent:'center', alignItems: 'center', flex: 10, marginTop: '5%'}}>
                         <InputWithIcon 
-                            style= {{width: '80%', backgroundColor: '#FFFFFF', margin: 20}} 
-                            placeholder= 'Username' 
-                            onChangeText={(text) => {this.setState({username: text})}}
-                            value = {this.state.username}
+                            style= {styles.inputText} 
+                            placeholder= 'Name' 
+                            onChangeText={(text) => {this.setState({name: text})}}
+                            value = {this.state.name}
                             />
-                        <DatePicker
-                            style={{width: '80%'}}
-                            date={this.state.date}
-                            mode="date"
-                            placeholder="select birthday"
-                            format="YYYY-MM-DD"
-                            maxDate= {date}
-                            confirmBtnText="Confirm"
-                            cancelBtnText="Cancel"
-                            customStyles={{
-                                dateIcon: {
-                                    position: 'absolute',
-                                    left: 0,
-                                    top: 4,
-                                    marginLeft: 0
-                                },
-                                dateInput: {
-                                        marginLeft: 0
-                                }
-                            }} 
-                            onDateChange={(date) => {this.setState({date: date})}}
+                        <InputWithIcon 
+                            style= {styles.inputText} 
+                            placeholder= 'Surname' 
+                            onChangeText={(text) => {this.setState({surname: text})}}
+                            value = {this.state.surname}
                             />
                         <InputWithIcon 
                             keyboardType='email-address' 
-                            style= {{width: '80%', backgroundColor: '#FFFFFF', margin: 20}} 
+                            style= {styles.inputText} 
                             placeholder= 'e-mail address' 
                             />
                         <InputWithIcon 
                             secureTextEntry= {true} 
-                            style= {{width: '80%', backgroundColor: '#FFFFFF'}} 
+                            style= {styles.inputText} 
                             placeholder= 'password' 
                             />
-
                     </View>
                     <View style = {{alignSelf: 'stretch', marginBottom: '0%', justifyContent: 'flex-end', flex: 1}}>         
                         <Button styles={styles.backButton} text="Back" onPress = {()=> { this.props.navigation.goBack()}} />
@@ -79,3 +63,23 @@ export default class Register extends Component<Props> {
     }
 }
 
+function mapStateToProps(state) {
+    return {
+        loading: state.loading,
+        loggedIn: state.loggedIn,
+    }
+}
+
+
+function mapDispatchToProps(dispatch) {
+    return {
+        changeLogInState: (isLoggedIn) => {
+            dispatch({
+                type: LOGGING_IN,
+                login: isLoggedIn
+            });
+        },
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Register)

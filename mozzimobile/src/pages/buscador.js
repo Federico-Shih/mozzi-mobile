@@ -9,7 +9,7 @@ export default class Buscador extends Component<Props> {
     render() {
       return (
         <View style={styles.container}>
-           <Text style={styles.textTest}>
+           <Text style={styles.titleText}>
                 Buscador
           </Text>
         </View>
