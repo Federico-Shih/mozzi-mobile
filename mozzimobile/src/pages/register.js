@@ -1,9 +1,10 @@
-import {Text, View, TextInput, Dimensions} from 'react-native';
+import {Text, View, Dimensions} from 'react-native';
 import React, {Component} from 'react';
 import styles from '../libraries/styles/styles';
 import {Title, Button, InputWithIcon, StyledTitle} from '../libraries/props';
 import { LOGGING_IN } from '../actions';
 import {connect} from 'react-redux';
+import { Input } from 'react-native-elements';
 
 
 type Props = {};
@@ -32,24 +33,24 @@ class Register extends Component<Props> {
                     <StyledTitle text='Registrate' style={styles.logregTitle} />
     
                     <View style = {{width: InputTextWidth, alignContent:'center', alignItems: 'center', flex: 10, marginTop: '5%'}}>
-                        <InputWithIcon 
+                        <Input 
                             style= {styles.inputText} 
                             placeholder= 'Name' 
                             onChangeText={(text) => {this.setState({name: text})}}
                             value = {this.state.name}
                             />
-                        <InputWithIcon 
+                        <Input 
                             style= {styles.inputText} 
                             placeholder= 'Surname' 
                             onChangeText={(text) => {this.setState({surname: text})}}
                             value = {this.state.surname}
                             />
-                        <InputWithIcon 
+                        <Input 
                             keyboardType='email-address' 
                             style= {styles.inputText} 
                             placeholder= 'e-mail address' 
                             />
-                        <InputWithIcon 
+                        <Input 
                             secureTextEntry= {true} 
                             style= {styles.inputText} 
                             placeholder= 'password' 
