@@ -30,38 +30,38 @@ class Register extends Component<Props> {
         password: '',
         tempConfirmedPassword: '',
         style: {
-            name: {borderBottomWidth: 2, borderWidth: 2, borderRadius: 30, borderColor: 'black', marginVertical: 7},
-            surname: {borderBottomWidth: 2, borderWidth: 2, borderRadius:30, borderColor:'black', marginVertical:7},
-            email: {borderBottomWidth: 2, borderWidth: 2, borderRadius:30, borderColor:'black', marginVertical:7},
-            password: {borderBottomWidth: 2, borderWidth: 2, borderRadius:30, borderColor:'black', marginVertical:7},
-            confirmpassword: {borderBottomWidth: 2, borderWidth: 2, borderRadius:30, borderColor:'black', marginVertical:7}
+            name: styles.inputText,
+            surname: styles.inputText,
+            email: styles.inputText,
+            password: styles.inputText,
+            confirmpassword: styles.inputText
         }
     }; 
     
     checkIfValidEmailAndSet = (text = this.state.email) => {
         if(validateEmail(text)) {
             this.setState({email: text});
-            this.setState({style: {...this.state.style, email: {...this.state.style.email, borderColor:'black'}}});
+            this.setState({style: {...this.state.style, email: styles.inputText}});
         } else {
-            this.setState({style: {...this.state.style, email: {...this.state.style.email, borderColor:'red'}}});
+            this.setState({style: {...this.state.style, email: {...styles.inputText, borderColor:'red'}}});
         }
     };
 
     checkIfValidPasswordAndSet = (text = this.state.password) => {
         if(text.length >= 8) {
             this.setState({password: text});
-            this.setState({style: {...this.state.style, password: {...this.state.style.password, borderColor:'black'}}});
+            this.setState({style: {...this.state.style, password: styles.inputText}});
         } else {
-            this.setState({style: {...this.state.style, password: {...this.state.style.password, borderColor:'red'}}});
+            this.setState({style: {...this.state.style, password: {...styles.inputText, borderColor:'red'}}});
         }
     };
 
     checkIfPasswordsMatchAndSet = (t1 = this.state.password, t2 = this.state.tempConfirmedPassword) => {
-        if(t1 === t2) {
+        if(t1 === t2 && t2) {
             this.setState({password: t1});
-            this.setState({style: {...this.state.style, confirmpassword: {...this.state.style.confirmpassword, borderColor:'black'}}});
+            this.setState({style: {...this.state.style, confirmpassword: styles.inputText}});
         } else {
-            this.setState({style: {...this.state.style, confirmpassword: {...this.state.style.confirmpassword, borderColor:'red'}}});
+            this.setState({style: {...this.state.style, confirmpassword: {...styles.inputText, borderColor:'red'}}});
         }
     }
 

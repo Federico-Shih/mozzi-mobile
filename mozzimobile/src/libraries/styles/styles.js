@@ -48,8 +48,12 @@ export default StyleSheet.create({
     },
     
     inputText: {
-        width: '100%', 
-        backgroundColor: '#FFFFFF'
-    }
+        borderBottomWidth: 2, 
+        borderWidth: 2, 
+        borderRadius: 30, 
+        borderColor: 'black', 
+        marginVertical: 7
+    },
+
   });
   
