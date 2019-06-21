@@ -33,7 +33,7 @@ export default StyleSheet.create({
       fontSize: 28,
       fontWeight: '500',
       lineHeight: 35,
-      marginTop: 100,
+      marginTop: 75,
       marginLeft: 30,
       display: 'flex',
       alignItems: 'flex-start',
@@ -41,12 +41,6 @@ export default StyleSheet.create({
       fontFamily: platformFont
     },
 
-    backButton: {
-      textAlign: 'left',
-      fontSize: 30,
-      fontFamily: platformFont,
-    },
-    
     inputText: {
         borderBottomWidth: 2, 
         borderWidth: 2, 
