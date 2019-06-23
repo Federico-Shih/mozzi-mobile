@@ -43,13 +43,6 @@ class LogRegTitleProp extends Component<Props> {
     }
 }
 
-/*
-<Icon
-                    name='person'
-                    type='material'
-                    color='#517fa4'
-                />
-*/
 class InputProp extends Component<Props> {
     render() {
         return(

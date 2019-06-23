@@ -1,0 +1,7 @@
+{
+    "serverURL": "http://142.93.64.152:3000/api/",
+    "endpoints": {
+        "register": "/users/register",
+        "login": "/users/login"
+    }
+}

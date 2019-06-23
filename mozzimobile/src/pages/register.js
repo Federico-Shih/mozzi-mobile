@@ -23,7 +23,6 @@ class Register extends Component<Props> {
         super(props);
     }
 
-    //ACORDATE DE MOVER ESTOS ESTILOS A STYLESHEET ASI NO SE VUELVE REPETITIVO
     state = {
         name: '',
         surname: '',
@@ -40,123 +39,138 @@ class Register extends Component<Props> {
     }; 
     
     errorInput = (key) => {
-        this.setState({style: {...this.state.style, [key]: {...styles.inputText, borderColor: 'red'}}})
+        return new Promise(resolve => {
+            this.setState({style: {...this.state.style, [key]: {...styles.inputText, borderColor: 'red'}}});
+            resolve();
+        });
     };
 
+    validInput = (key, text) => {
+        return new Promise(resolve => {
+            this.setState({[key]: text});
+            this.setState({style: {...this.state.style, [key]: styles.inputText}});
+            resolve();
+        });
+    }
+
     checkIfValidEmailAndSet = (text = this.state.email) => {
-        if(validateEmail(text)) {
-            this.setState({email: text});
-            this.setState({style: {...this.state.style, email: styles.inputText}});
-            return true;
-        } else {
-            this.errorInput('email');
-        }
+        return new Promise(async resolve => {
+            if(validateEmail(text)) {
+                await this.validInput('email', text);
+                resolve();
+            } else {
+                console.log('wtf')
+                await this.errorInput('email');
+                resolve();
+            }
+        });
     };
 
     checkIfValidPasswordAndSet = (text = this.state.password) => {
-        if(text.length >= 8) {
-            this.setState({password: text});
-            this.setState({style: {...this.state.style, password: styles.inputText}});
-            return true;
-        } else {
-            this.errorInput('password');
-        }
+        return new Promise(async resolve =>{
+            if(text.length >= 8) {
+                await this.validInput('password', text);
+                resolve();
+            } else {
+                console.log('wtf')
+
+                await this.errorInput('password');
+                resolve();
+            }
+        });
     };
 
     checkIfPasswordsMatchAndSet = (t1 = this.state.password, t2 = this.state.tempConfirmedPassword) => {
-        if(t1 === t2 && t2) {
-            this.setState({password: t1});
-            this.setState({style: {...this.state.style, confirmpassword: styles.inputText}});
-            return true;
-        } else {
-            this.errorInput('confirmpassword');
-        }
+        return new Promise(async resolve =>{
+            if(t1 === t2 && t2) {
+                await this.validInput('password', t1);
+                resolve();
+            } else {
+                console.log('wtf')
+
+                await this.errorInput('confirmpassword');
+                resolve();
+            }
+        });
     };
 
-    checkAndRegister = (name = this.state.surname, surname = this.state.surname) => {
-        let email = this.checkIfValidEmailAndSet();
-        let password = this.checkIfPasswordsMatchAndSet();
-        if (name && surname && email && password){
-            //register
-        }
+    checkAndRegister = async (name = this.state.surname, surname = this.state.surname, pass = this.state.password, confp = this.state.tempConfirmedPassword, email = this.state.email) => {
+        await this.checkIfValidPasswordAndSet();
+        await this.checkIfPasswordsMatchAndSet();
+        await this.checkIfValidEmailAndSet();
+
+        console.log(this.state);
+
+        if (name && surname && email && pass){
+
+        } 
         if (!name) {
-            this.errorInput('name');
+            await this.errorInput('name');
         }
         if(!surname) {
-            this.errorInput('surname');
+            await this.errorInput('surname');
         }
     }
 
     render() {
         return (
-            <KeyboardAvoidingView style={styles.container}>
-                        <StyledTitle text='Registrate' style={styles.logregTitle} />
+            <View style={styles.container}>
+                <StyledTitle text='Registrate' style={styles.logregTitle} />
 
-                        <View style = {{width: InputTextWidth, alignContent:'center', alignItems: 'center', flex: 10, marginTop: '5%'}}>
-                            <Input 
-                                placeholder= 'Name' 
-                                onChangeText={(text) => {this.setState({name: text})}}
-                                value = {this.state.name}
-                                inputContainerStyle={this.state.style.name}
-                                leftIcon = {{ type: 'material', name: 'account-circle'}} 
-                                />
+                <View style = {{width: InputTextWidth, alignContent:'center', alignItems: 'center', marginTop: '5%'}}>
+                    <Input 
+                        placeholder= 'Name' 
+                        onChangeText={(text) => {this.setState({name: text})}}
+                        value = {this.state.name}
+                        inputContainerStyle={this.state.style.name}
+                        leftIcon = {{ type: 'material', name: 'account-circle'}} 
+                        />
 
-                            <Input 
-                                placeholder= 'Surname' 
-                                onChangeText={(text) => {this.setState({surname: text})}}
-                                value = {this.state.surname}
-                                inputContainerStyle={this.state.style.surname}
-                                leftIcon = {{ type: 'material', name: 'perm-identity'}} 
-                                />
+                    <Input 
+                        placeholder= 'Surname' 
+                        onChangeText={(text) => {this.setState({surname: text})}}
+                        value = {this.state.surname}
+                        inputContainerStyle={this.state.style.surname}
+                        leftIcon = {{ type: 'material', name: 'perm-identity'}} 
+                        />
 
-                            <Input 
-                                keyboardType='email-address' 
-                                placeholder= 'Email'
-                                onChangeText={(text) => {this.setState({email: text})}}
-                                onSubmitEditing= {()=> {this.checkIfValidEmailAndSet()}}
-                                inputContainerStyle={this.state.style.email}
-                                leftIcon = {{ type: 'material', name: 'email'}} 
-                                />
+                    <Input 
+                        keyboardType='email-address' 
+                        placeholder= 'Email'
+                        onChangeText={(text) => {this.setState({email: text})}}
+                        onSubmitEditing= {()=> {this.checkIfValidEmailAndSet()}}
+                        inputContainerStyle={this.state.style.email}
+                        leftIcon = {{ type: 'material', name: 'email'}} 
+                        />
 
-                            <Input 
-                                secureTextEntry= {true} 
-                                placeholder= 'Password' 
-                                onChangeText={(text) => {this.setState({password: text})}}
-                                onSubmitEditing= {()=> {this.checkIfValidPasswordAndSet()}}
-                                inputContainerStyle={this.state.style.password}
-                                leftIcon = {{ type: 'material', name: 'lock'}} 
-                                />
-                            
-                            <Input 
-                                secureTextEntry= {true} 
-                                placeholder= 'Confirm Password' 
-                                onChangeText={(text) => {this.setState({tempConfirmedPassword: text})}}
-                                onSubmitEditing= {()=> {this.checkIfPasswordsMatchAndSet()}}
-                                inputContainerStyle={this.state.style.confirmpassword}
-                                leftIcon = {{ type: 'material', name: 'lock'}} 
-                                />
-                            
-                            <Button 
-                                title="Crear cuenta"
-                                raised
-                                type="outline"
-                                onPress= {()=> {this.checkAndRegister()}}
-                                titleStyle= {buttonStyle.reglogButtonText}
-                                buttonStyle= {buttonStyle.reglogButton}
-                                containerStyle= {{top: '5%'}}
-                                />
-                            
-                        </View>
-                        <View style = {{alignSelf: 'stretch', marginBottom: '0%', justifyContent: 'flex-end', flex: 1}}>         
-                            <Button 
-                                title="Back" 
-                                onPress = {()=> { this.props.navigation.goBack()}} 
-                                type= 'clear'
-                                titleStyle= {{fontSize:25}}
-                                />
-                        </View>
+                    <Input 
+                        secureTextEntry= {true} 
+                        placeholder= 'Password' 
+                        onChangeText={(text) => {this.setState({password: text})}}
+                        onSubmitEditing= {() => {this.checkIfValidPasswordAndSet()}}
+                        inputContainerStyle={this.state.style.password}
+                        leftIcon = {{ type: 'material', name: 'lock'}} 
+                        />
                     
-            </KeyboardAvoidingView>
+                    <Input 
+                        secureTextEntry= {true} 
+                        placeholder= 'Confirm Password' 
+                        onChangeText={(text) => {this.setState({tempConfirmedPassword: text})}}
+                        onSubmitEditing= {() => {this.checkIfPasswordsMatchAndSet()}}
+                        inputContainerStyle={this.state.style.confirmpassword}
+                        leftIcon = {{ type: 'material', name: 'lock'}} 
+                        />
+                </View>
+                <Button 
+                    title="Crear cuenta"
+                    raised
+                    type="outline"
+                    onPress= {()=> {this.checkAndRegister()}}
+                    titleStyle= {buttonStyle.reglogButtonText}
+                    buttonStyle= {buttonStyle.reglogButton}
+                    containerStyle= {{marginTop:'5%'}}
+                    />         
+            </View>
                 
         );
     }

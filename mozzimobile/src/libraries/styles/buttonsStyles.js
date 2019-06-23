@@ -11,19 +11,14 @@ switch (Platform.OS)
 }
 
 export default StyleSheet.create({
-    backButton: {
-      textAlign: 'left',
-      fontSize: 30,
-      fontFamily: platformFont,
-    },
-    
+
     reglogButtonText: {
         fontSize: 25,
         fontFamily: platformFont
     },
     
     reglogButton: {
-        padding: 12
+        padding: 12,
     }
 
   });
