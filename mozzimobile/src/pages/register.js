@@ -59,7 +59,6 @@ class Register extends Component<Props> {
                 await this.validInput('email', text);
                 resolve();
             } else {
-                console.log('wtf')
                 await this.errorInput('email');
                 resolve();
             }
@@ -72,8 +71,6 @@ class Register extends Component<Props> {
                 await this.validInput('password', text);
                 resolve();
             } else {
-                console.log('wtf')
-
                 await this.errorInput('password');
                 resolve();
             }
@@ -84,25 +81,26 @@ class Register extends Component<Props> {
         return new Promise(async resolve =>{
             if(t1 === t2 && t2) {
                 await this.validInput('password', t1);
+                await new Promise((resolve => {
+                    this.setState({style: {...this.state.style, 'confirmpassword': styles.inputText}});
+                    resolve();
+                }));
                 resolve();
             } else {
-                console.log('wtf')
-
                 await this.errorInput('confirmpassword');
                 resolve();
             }
         });
     };
 
-    checkAndRegister = async (name = this.state.surname, surname = this.state.surname, pass = this.state.password, confp = this.state.tempConfirmedPassword, email = this.state.email) => {
+    checkAndRegister = async (name = this.state.name, surname = this.state.surname, pass = this.state.password, confp = this.state.tempConfirmedPassword, email = this.state.email) => {
         await this.checkIfValidPasswordAndSet();
         await this.checkIfPasswordsMatchAndSet();
         await this.checkIfValidEmailAndSet();
 
-        console.log(this.state);
-
         if (name && surname && email && pass){
-
+            await this.validInput('name', name);
+            await this.validInput('surname', surname);
         } 
         if (!name) {
             await this.errorInput('name');
