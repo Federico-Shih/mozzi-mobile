@@ -1,20 +1,17 @@
-import {Text, View, Dimensions, KeyboardAvoidingView} from 'react-native';
+import {View, Dimensions} from 'react-native';
 import React, {Component} from 'react';
 import styles from '../libraries/styles/styles';
 import buttonStyle from '../libraries/styles/buttonsStyles';
 import {StyledTitle} from '../libraries/props';
-import { LOGGING_IN } from '../actions';
+import {LOADING} from '../actions';
 import {connect} from 'react-redux';
 import { Input, Button} from 'react-native-elements';
-
+import {validateEmail} from '../libraries/helpers';
+import {register} from '../libraries/connect/auth';
 
 type Props = {};
 const date = (new Date()).toISOString().split('T')[0];
 
-function validateEmail(email) {
-    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(email);
-}
 
 const InputTextWidth = (Math.round((1 - 60/Dimensions.get('window').width)*100)).toString() + '%';
 
@@ -38,6 +35,7 @@ class Register extends Component<Props> {
         }
     }; 
     
+    //Changing colors of the input boxes
     errorInput = (key) => {
         return new Promise(resolve => {
             this.setState({style: {...this.state.style, [key]: {...styles.inputText, borderColor: 'red'}}});
@@ -53,6 +51,7 @@ class Register extends Component<Props> {
         });
     }
 
+    //Validating inputs
     checkIfValidEmailAndSet = (text = this.state.email) => {
         return new Promise(async resolve => {
             if(validateEmail(text)) {
@@ -93,6 +92,17 @@ class Register extends Component<Props> {
         });
     };
 
+    checkIfInputIsEmpty = (key) => {
+        return new Promise(async resolve => {
+            if (this.state[key]) {
+                await this.validInput(key, this.state[key]);
+            } else {
+                await this.errorInput(key);
+            }
+        });
+    };
+
+    //Create account function
     checkAndRegister = async (name = this.state.name, surname = this.state.surname, pass = this.state.password, confp = this.state.tempConfirmedPassword, email = this.state.email) => {
         await this.checkIfValidPasswordAndSet();
         await this.checkIfPasswordsMatchAndSet();
@@ -101,6 +111,13 @@ class Register extends Component<Props> {
         if (name && surname && email && pass){
             await this.validInput('name', name);
             await this.validInput('surname', surname);
+
+            //calling function
+            this.props.setLoading(true);
+
+            let authResult = await register(this.state.name, this.state.surname, this.state.email, this.state.password); 
+
+            console.log(authResult);
         } 
         if (!name) {
             await this.errorInput('name');
@@ -121,6 +138,7 @@ class Register extends Component<Props> {
                         onChangeText={(text) => {this.setState({name: text})}}
                         value = {this.state.name}
                         inputContainerStyle={this.state.style.name}
+                        onSubmitEditing= {() => {this.checkIfInputIsEmpty('name')}}
                         leftIcon = {{ type: 'material', name: 'account-circle'}} 
                         />
 
@@ -129,6 +147,7 @@ class Register extends Component<Props> {
                         onChangeText={(text) => {this.setState({surname: text})}}
                         value = {this.state.surname}
                         inputContainerStyle={this.state.style.surname}
+                        onSubmitEditing= {() => {this.checkIfInputIsEmpty('surname')}}
                         leftIcon = {{ type: 'material', name: 'perm-identity'}} 
                         />
 
@@ -189,6 +208,12 @@ function mapDispatchToProps(dispatch) {
                 type: LOGGING_IN,
                 login: isLoggedIn
             });
+        },
+        setLoading: (isLoading) => {
+            dispatch({
+                type: LOADING,
+                loading: isLoading,
+            })
         },
     }
 }
