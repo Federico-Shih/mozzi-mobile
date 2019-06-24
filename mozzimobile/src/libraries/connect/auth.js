@@ -1,26 +1,30 @@
 const axios = require('axios');
 const serverSettings = require('./server');
+const qs = require('qs');
 
 //Assuming parameters and returned successfully
+
 export const register = (name, surname, email, password) => {
     return new Promise((resolve, reject) => {
         axios({
             baseURL: serverSettings.serverURL,
-            timeout: 10000,
+            method: 'POST',
             url: serverSettings.endpoints.register,
-            method: 'post',
+            timeout: 10000,
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
-            data: {
+            data: qs.stringify({
                 name: name,
                 lastname: surname,
                 email: email,
-                password: password,
-            }
-        }).then((response) => {
+                password: password
+            }),
+        })
+        .then((response) => {
             resolve(response);
-        }).catch((error) => {
+        })
+        .catch((error) => {
             reject(error);
         });
     });

@@ -10,8 +10,6 @@ import {validateEmail} from '../libraries/helpers';
 import {register} from '../libraries/connect/auth';
 
 type Props = {};
-const date = (new Date()).toISOString().split('T')[0];
-
 
 const InputTextWidth = (Math.round((1 - 60/Dimensions.get('window').width)*100)).toString() + '%';
 
@@ -114,9 +112,9 @@ class Register extends Component<Props> {
 
             //calling function
             this.props.setLoading(true);
-
             let authResult = await register(this.state.name, this.state.surname, this.state.email, this.state.password); 
 
+            this.props.setLoading(false);
             console.log(authResult);
         } 
         if (!name) {
