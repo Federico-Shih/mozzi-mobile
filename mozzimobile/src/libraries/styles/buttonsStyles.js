@@ -13,12 +13,12 @@ switch (Platform.OS)
 export default StyleSheet.create({
 
     reglogButtonText: {
-        fontSize: 25,
+        fontSize: 20,
         fontFamily: platformFont
     },
     
     reglogButton: {
-        padding: 12,
+        paddingVertical: 12,
     }
 
   });

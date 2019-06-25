@@ -1,4 +1,4 @@
-import {View, Dimensions} from 'react-native';
+import {View, Text, Dimensions, KeyboardAvoidingView, Platform} from 'react-native';
 import React, {Component} from 'react';
 import styles from '../libraries/styles/styles';
 import buttonStyle from '../libraries/styles/buttonsStyles';
@@ -33,6 +33,19 @@ class Register extends Component<Props> {
         }
     }; 
     
+    error = {
+        name: '',
+        surname: '',
+        email: '',
+        password: '',
+        confirmedpassword: ''
+    }
+    
+    setErrorState = (incomingJson) => {
+        error = {...this.error, incomingJson};
+    }
+
+
     //Changing colors of the input boxes
     errorInput = (key) => {
         return new Promise(resolve => {
@@ -113,7 +126,7 @@ class Register extends Component<Props> {
             //calling function
             this.props.setLoading(true);
             let authResult = await register(this.state.name, this.state.surname, this.state.email, this.state.password); 
-
+        
             this.props.setLoading(false);
             console.log(authResult);
         } 
@@ -127,65 +140,75 @@ class Register extends Component<Props> {
 
     render() {
         return (
-            <View style={styles.container}>
+            <KeyboardAvoidingView style={styles.avoidContainer} behavior={Platform.OS === 'ios' ? 'padding':''} enabled>
                 <StyledTitle text='Registrate' style={styles.logregTitle} />
+                <Input 
+                    placeholder= 'Name' 
+                    onChangeText={(text) => {this.setState({name: text})}}
+                    value = {this.state.name}
+                    inputContainerStyle={{...this.state.style.name, width: InputTextWidth, alignSelf:'center', marginTop:20}}
+                    onSubmitEditing= {() => {this.checkIfInputIsEmpty('name')}}
+                    leftIcon = {{ type: 'material', name: 'account-circle'}} 
+                    />
+                <Input 
+                    placeholder= 'Surname' 
+                    onChangeText={(text) => {this.setState({surname: text})}}
+                    value = {this.state.surname}
+                    inputContainerStyle={{...this.state.style.name, width: InputTextWidth, alignSelf:'center'}}
+                    onSubmitEditing= {() => {this.checkIfInputIsEmpty('surname')}}
+                    leftIcon = {{ type: 'material', name: 'perm-identity'}} 
+                    />
 
-                <View style = {{width: InputTextWidth, alignContent:'center', alignItems: 'center', marginTop: '5%'}}>
-                    <Input 
-                        placeholder= 'Name' 
-                        onChangeText={(text) => {this.setState({name: text})}}
-                        value = {this.state.name}
-                        inputContainerStyle={this.state.style.name}
-                        onSubmitEditing= {() => {this.checkIfInputIsEmpty('name')}}
-                        leftIcon = {{ type: 'material', name: 'account-circle'}} 
-                        />
+                <Input 
+                    keyboardType='email-address' 
+                    placeholder= 'Email'
+                    onChangeText={(text) => {this.setState({email: text})}}
+                    onSubmitEditing= {()=> {this.checkIfValidEmailAndSet()}}
+                    inputContainerStyle={{...this.state.style.name, width: InputTextWidth, alignSelf:'center'}}
+                    leftIcon = {{ type: 'material', name: 'email'}} 
+                    />
 
-                    <Input 
-                        placeholder= 'Surname' 
-                        onChangeText={(text) => {this.setState({surname: text})}}
-                        value = {this.state.surname}
-                        inputContainerStyle={this.state.style.surname}
-                        onSubmitEditing= {() => {this.checkIfInputIsEmpty('surname')}}
-                        leftIcon = {{ type: 'material', name: 'perm-identity'}} 
-                        />
-
-                    <Input 
-                        keyboardType='email-address' 
-                        placeholder= 'Email'
-                        onChangeText={(text) => {this.setState({email: text})}}
-                        onSubmitEditing= {()=> {this.checkIfValidEmailAndSet()}}
-                        inputContainerStyle={this.state.style.email}
-                        leftIcon = {{ type: 'material', name: 'email'}} 
-                        />
-
-                    <Input 
-                        secureTextEntry= {true} 
-                        placeholder= 'Password' 
-                        onChangeText={(text) => {this.setState({password: text})}}
-                        onSubmitEditing= {() => {this.checkIfValidPasswordAndSet()}}
-                        inputContainerStyle={this.state.style.password}
-                        leftIcon = {{ type: 'material', name: 'lock'}} 
-                        />
-                    
-                    <Input 
-                        secureTextEntry= {true} 
-                        placeholder= 'Confirm Password' 
-                        onChangeText={(text) => {this.setState({tempConfirmedPassword: text})}}
-                        onSubmitEditing= {() => {this.checkIfPasswordsMatchAndSet()}}
-                        inputContainerStyle={this.state.style.confirmpassword}
-                        leftIcon = {{ type: 'material', name: 'lock'}} 
-                        />
-                </View>
+                <Input 
+                    secureTextEntry= {true} 
+                    placeholder= 'Password' 
+                    onChangeText={(text) => {this.setState({password: text})}}
+                    onSubmitEditing= {() => {this.checkIfValidPasswordAndSet()}}
+                    inputContainerStyle={{...this.state.style.name, width: InputTextWidth, alignSelf:'center'}}
+                    leftIcon = {{ type: 'material', name: 'lock'}} 
+                    />
+                
+                <Input 
+                    secureTextEntry= {true} 
+                    placeholder= 'Confirm Password' 
+                    onChangeText={(text) => {this.setState({tempConfirmedPassword: text})}}
+                    onSubmitEditing= {() => {this.checkIfPasswordsMatchAndSet()}}
+                    inputContainerStyle={{...this.state.style.name, width: InputTextWidth, alignSelf:'center'}}
+                    leftIcon = {{ type: 'material', name: 'lock'}} 
+                    />
                 <Button 
                     title="Crear cuenta"
                     raised
                     type="outline"
                     onPress= {()=> {this.checkAndRegister()}}
                     titleStyle= {buttonStyle.reglogButtonText}
-                    buttonStyle= {buttonStyle.reglogButton}
-                    containerStyle= {{marginTop:'5%'}}
-                    />         
-            </View>
+                    buttonStyle= {{...buttonStyle.reglogButton}}
+                    containerStyle= {{marginTop:'5%', width: '60%', alignSelf:'center', width: '70%'}}
+                    /> 
+                
+                <View style = {{flexDirection: 'row', marginTop: 10, alignSelf: 'center'}}>
+                    <Text style={{...styles.smallLogInText, alignSelf:'center'}}>
+                        ¿Ya tenés una cuenta registrada?
+                    </Text>
+                    <Button
+                        title= "Inicia sesión."
+                        type="clear"
+                        titleStyle={styles.smallLogInText}
+                        containerStyle={{}}
+                        onPress={() => {this.props.navigation.navigate('Login')}}
+                        />
+                </View>
+                <View style={{flex:1}}/> 
+            </KeyboardAvoidingView>
                 
         );
     }

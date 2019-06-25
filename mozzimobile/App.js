@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
-import {MainPageScreen, RegisterScreen, LoginScreen} from './src/pages/pages.js';
+import {MainPageScreen, RegisterScreen, LoginScreen, } from './src/pages/pages.js';
+
 import {createStackNavigator, createAppContainer} from 'react-navigation';
 import {createStore} from 'redux';
 import {Provider} from 'react-redux';
@@ -29,9 +30,7 @@ const grantingPermissions = Platform.select({
                 ).then((result) => {
                   if (result['android.permission.READ_CALENDAR']
                   && result['android.permission.WRITE_CALENDAR'] === 'granted') {
-                    this.setState({
-                      permissionsGranted: true
-                    });
+                    //avisar que tenes los permisos
                   } else if (result['android.permission.READ_CALENDAR'] || result['android.permission.WRITE_CALENDAR'] === 'never_ask_again') {
                     this.refs.toast.show('Please Go into Settings -> Applications -> Mozzi -> Permissions and Allow permissions to continue');
                   }

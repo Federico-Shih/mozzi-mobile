@@ -7,7 +7,7 @@ switch (Platform.OS)
     platformFont = "San Francisco";
     break;
   case 'android':
-    platformFont = "monospace";
+    platformFont = "Montserrat";
 }
 
 export default StyleSheet.create({
@@ -17,7 +17,11 @@ export default StyleSheet.create({
       alignItems: 'center',
       backgroundColor: '#F5FCFF',
     },
-    
+    avoidContainer: {
+      backgroundColor: '#F5FCFF',
+      flex: 1,
+      justifyContent: 'flex-end',
+    },
     title: {
       textAlign: 'center',
       color: "#000000",
@@ -27,6 +31,12 @@ export default StyleSheet.create({
       marginTop: 40, 
       padding: 8,
     },
+    smallLogInText: {
+      fontSize: 15,
+      fontFamily: platformFont,
+      fontWeight: '100',
+      letterSpacing: 0,
+    },
 
     logregTitle: {
       textAlign: 'left',
@@ -35,8 +45,6 @@ export default StyleSheet.create({
       lineHeight: 35,
       marginTop: 75,
       marginLeft: 30,
-      display: 'flex',
-      alignItems: 'flex-start',
       top: '5%',
       fontFamily: platformFont
     },
