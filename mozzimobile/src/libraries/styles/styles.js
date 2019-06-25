@@ -54,7 +54,7 @@ export default StyleSheet.create({
         borderWidth: 2, 
         borderRadius: 30, 
         borderColor: 'black', 
-        marginVertical: 7
+        marginTop: 7
     },
 
   });
