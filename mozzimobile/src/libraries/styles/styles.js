@@ -1,6 +1,8 @@
-import {Platform, StyleSheet} from 'react-native';
+import {Platform, StyleSheet, Dimensions} from 'react-native';
 
 let platformFont;
+let platformBackColor = '#F5FCFF';
+
 switch (Platform.OS)
 {
   case 'ios':
@@ -15,10 +17,10 @@ export default StyleSheet.create({
       flex: 1,
       justifyContent: 'flex-start',
       alignItems: 'center',
-      backgroundColor: '#F5FCFF',
+      backgroundColor: platformBackColor,
     },
     avoidContainer: {
-      backgroundColor: '#F5FCFF',
+      backgroundColor: platformBackColor,
       flex: 1,
       justifyContent: 'flex-end',
     },
@@ -57,5 +59,20 @@ export default StyleSheet.create({
         marginTop: 7
     },
 
+    popup: {
+      flexDirection: 'row',
+      alignItems:'center',
+      borderRadius: 10, 
+      shadowColor: '#000', 
+      shadowOffset: { width: 0, height: 0 }, 
+      shadowOpacity: 0.5, 
+      shadowRadius: 2, 
+      elevation: 10, 
+      position: 'absolute', 
+      marginHorizontal: 50, 
+      height:50, 
+      width: Dimensions.get('window').width-100, 
+      backgroundColor: platformBackColor,
+    }
   });
   
