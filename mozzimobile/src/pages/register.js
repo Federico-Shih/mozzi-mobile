@@ -3,36 +3,20 @@ import {View, Text, Dimensions, KeyboardAvoidingView, Platform} from 'react-nati
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import { Input, Button} from 'react-native-elements';
+import NetInfo from '@react-native-community/netinfo';
 
 //codes
-import {validateEmail} from '../libraries/helpers';
+import {validateEmail, storeData, errorMessages} from '../libraries/helpers';
 import {register} from '../libraries/connect/auth';
 import styles from '../libraries/styles/styles';
 import buttonStyle from '../libraries/styles/buttonsStyles';
 import {StyledTitle, Popup} from '../libraries/props';
 import {LOADING} from '../actions';
-import errorCodes from '../libraries/codes'
 
 type Props = {};
 
 const InputTextWidth = (Math.round((1 - 40/Dimensions.get('window').width)*100)).toString() + '%';
 
-const errorMessages = {
-    name: {
-        empty: 'No haz ingresado un nombre.',
-        spaces: 'Tu nombre contiene espacios.',
-    },
-    surname: {
-        empty: 'No haz ingresado un apellido.',
-        spaces: 'Tu apellido contiene espacios.',
-    },
-    email: 'El e-mail no es válido.',
-    password: 'La contraseña es menor a 8 carácteres.',
-    confirmpassword: {
-        nomatch: 'Las contraseñas no coinciden.',
-        empty: 'No haz ingresado la confirmación de tu contraseña.',
-    }   
-}
 
 class Register extends Component<Props> {
     constructor(props){
@@ -45,6 +29,7 @@ class Register extends Component<Props> {
         email: '',
         password: '',
         tempConfirmedPassword: '',
+        connection: null,
     }; 
     
     error = {
@@ -52,7 +37,7 @@ class Register extends Component<Props> {
         surname: '',
         email: '',
         password: '',
-        confirmpassword: ''
+        confirmpassword: '',
     }
     
     style = {
@@ -60,9 +45,10 @@ class Register extends Component<Props> {
         surname: styles.inputText,
         email: styles.inputText,
         password: styles.inputText,
-        confirmpassword: styles.inputText
+        confirmpassword: styles.inputText,
     }
 
+    //Error and Style handlers
     setErrorState = (incomingJson) => {
         this.error = {...this.error, ...incomingJson};
         this.forceUpdate();
@@ -156,6 +142,13 @@ class Register extends Component<Props> {
 
         if (checkPass && checkMatch && checkEmail && checkName && checkLastname){
             
+            await this.checkConnectivity();
+
+            if(!this.state.connection) {
+                this.sendPopup('Intenet connection failure', errorMessages.noConnection);
+                return;
+            }
+
             //calling function
             this.props.setLoading(true);
             let response = await register(this.state.name, this.state.surname, this.state.email, this.state.password); 
@@ -163,17 +156,58 @@ class Register extends Component<Props> {
 
             switch (response.data.code) {
                 case 'duplicateAccount':
-                    this.sendPopup('Duplicate account','Esta cuenta ya fue creada');
+                    this.sendPopup('Duplicate account', errorMessages.duplicateAccount);
                     return;
                 case 500:
-                    this.sendPopup('Server errors','Hubo un problema del servidor');
+                    this.sendPopup('Server errors', errorMessages.internalServerError);
                     return;
             }
 
-            //Save JWT and navigate to homepage
-            
-            //console.log(authResult);
+            if(response.headers.connection == 'Close') {
+                this.sendPopup('Certificate failure', errorMessages.certificateError);
+                return;
+            }
+
+            if (response.data.code === 0) {
+                storeData('@jwt', response.data.token);
+                this.props.navigation.navigate('Home');
+            }
+
         } 
+    };
+
+
+    checkConnectivity = () => {
+        return new Promise(resolve => {
+            if (Platform.OS === 'android') {
+                NetInfo.isConnected.fetch().then(isConnected => {
+                    if (isConnected) {
+                        this.setState({connection: true});
+                        resolve();
+                    } else {
+                        this.sendPopup('Not connected', errorMessages.noConnection);
+                        this.setState({connection: false});
+                        resolve();
+                    }
+                });
+            } else {
+                NetInfo.isConnected.addEventListener('connectionChange', this.handleFirstConnectivityChange);
+                resolve();
+            }
+        });
+    }
+
+    handleFirstConnectivityChange = isConnected => {
+        NetInfo.isConnected.removeEventListener(
+            'connectionChange', 
+            this.handleFirstConnectivityChange
+        );
+
+        if (isConnected === false) { 
+            this.setState({connection: false});
+        } else {
+            this.setState({connection: true});
+        }
     };
 
     //Popup Section
@@ -189,17 +223,23 @@ class Register extends Component<Props> {
         }
     };
 
-    resetErrorPopup = () => {
-        this.popupMessage = {...this.popupMessage, title: '', message: ''};
-        this.forceUpdate();
-        
-    }
+    resetErrorPopup = (touched) => {
+        if (this.popupMessage.message != ''){
+            this.popupMessage = {...this.popupMessage, title: '', message: ''};
+            this.forceUpdate();
+        }
+        if (this.time) {
+            clearTimeout(this.time);
+        }
+    };
+
+    time = '';
 
     sendPopup = (title, message) => {
         this.popupMessage = {title: title, message: message, previousMessage: message};
         this.forceUpdate();
-        setTimeout(this.resetErrorPopup, 2000);
-    }
+        this.time = setTimeout(this.resetErrorPopup, 2000);
+    };
 
     //Input Error section
     displayErrorMessage = (key) => {
@@ -213,10 +253,45 @@ class Register extends Component<Props> {
         }
     };
 
+    //Create account button
+    displayCreateButton = () => {
+        if (this.props.loading == true)
+        {
+            return <Button 
+                        title="Crear cuenta"
+                        raised
+                        type="outline"
+                        loading = {true}
+                        onPress= {()=> {this.checkAndRegister()}}
+                        titleStyle= {buttonStyle.reglogButtonText}
+                        buttonStyle= {{...buttonStyle.reglogButton}}
+                        containerStyle= {{marginTop:'5%', width: '60%', alignSelf:'center', width: '70%'}}
+                        /> 
+        } else {
+            return <Button 
+                        title="Crear cuenta"
+                        raised
+                    // loading = {true}
+                        type="outline"
+                        onPress= {()=> {this.checkAndRegister()}}
+                        titleStyle= {buttonStyle.reglogButtonText}
+                        buttonStyle= {{...buttonStyle.reglogButton}}
+                        containerStyle= {{marginTop:'5%', width: '60%', alignSelf:'center', width: '70%'}}
+                        /> 
+        }
+    }
+
+    componentWillUnmount = () =>{
+        if (time) {
+            clearTimeout(this.time);
+        }
+    }
+
+    //Main render
     render() {
         return (
             <KeyboardAvoidingView style={styles.avoidContainer} behavior={Platform.OS === 'ios' ? 'padding':''} enabled onStartShouldSetResponder = {() => {
-                this.resetErrorPopup();
+                this.resetErrorPopup(true);
             }}>
                 <StyledTitle text='Registrate' style={styles.logregTitle} />
                 <Input 
@@ -279,15 +354,9 @@ class Register extends Component<Props> {
                     {this.displayErrorMessage('confirmpassword')}
                 </View>
 
-                <Button 
-                    title="Crear cuenta"
-                    raised
-                    type="outline"
-                    onPress= {()=> {this.checkAndRegister()}}
-                    titleStyle= {buttonStyle.reglogButtonText}
-                    buttonStyle= {{...buttonStyle.reglogButton}}
-                    containerStyle= {{marginTop:'5%', width: '60%', alignSelf:'center', width: '70%'}}
-                    /> 
+                <View>
+                    {this.displayCreateButton()}
+                </View>
                 
                 <View style = {{flexDirection: 'row', marginTop: 10, alignSelf: 'center'}}>
                     <Text style={{...styles.smallLogInText, alignSelf:'center'}}>
