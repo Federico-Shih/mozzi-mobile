@@ -2,6 +2,8 @@ import {Platform, StyleSheet, Dimensions} from 'react-native';
 
 let platformFont;
 let platformBackColor = '#F5FCFF';
+const InputTextWidth = (Math.round((1 - 40/Dimensions.get('window').width)*100)).toString() + '%';
+
 
 switch (Platform.OS)
 {
@@ -56,7 +58,10 @@ export default StyleSheet.create({
         borderWidth: 2, 
         borderRadius: 30, 
         borderColor: 'black', 
-        marginTop: 7
+        marginTop: 7,
+        width: InputTextWidth, 
+        alignSelf:'center',
+
     },
 
     popup: {

@@ -15,9 +15,6 @@ import {LOADING} from '../actions';
 
 type Props = {};
 
-const InputTextWidth = (Math.round((1 - 40/Dimensions.get('window').width)*100)).toString() + '%';
-
-
 class Register extends Component<Props> {
     constructor(props){
         super(props);
@@ -60,30 +57,28 @@ class Register extends Component<Props> {
     }
 
     //Changing colors of the input boxes
-    errorInput = (key, errorMessage) => {
-        return new Promise(resolve => {
-            this.setStyle({[key]: {...styles.inputText, borderColor: 'red'}});
-            this.setErrorState({[key]: errorMessage});
-            resolve();
-        });
+    errorInput = (object) => {
+        for (let i = 0; i < object.length; i++) {
+            this.setStyle({[object[i].key]: {...styles.inputText, borderColor: 'red'}});
+            this.setErrorState({[object[i].key]: object[i].message});
+        }
     };
 
-    validInput = (key) => {
-        return new Promise(resolve => {
-            this.setStyle({[key]: styles.inputText});
-            this.setErrorState({[key]: ''});
-            resolve();
-        });
+    validInput = (keyList) => {
+        for (let i = 0; i < keyList.length; i++) {
+            this.setStyle({[keyList[i]]: styles.inputText});
+            this.setErrorState({[keyList[i]]: ''});
+        }
     }
 
     //Validating inputs
     checkIfValidEmailAndSet = (text = this.state.email) => {
         return new Promise(async resolve => {
             if(validateEmail(text)) {
-                await this.validInput('email');
+                this.validInput(['email']);
                 resolve(true);
             } else {
-                await this.errorInput('email', errorMessages.email);
+                this.errorInput([{key:'email', message: errorMessages.email}]);
                 resolve(false);
             }
         });
@@ -92,10 +87,10 @@ class Register extends Component<Props> {
     checkIfValidPasswordAndSet = (text = this.state.password) => {
         return new Promise(async resolve =>{
             if(text.length >= 8) {
-                await this.validInput('password');
+                this.validInput(['password']);
                 resolve(true);
             } else {
-                await this.errorInput('password', errorMessages.password);
+                this.errorInput([{key:'password', message: errorMessages.password}]);
                 resolve(false);
             }
         });
@@ -104,14 +99,13 @@ class Register extends Component<Props> {
     checkIfPasswordsMatchAndSet = (t1 = this.state.password, t2 = this.state.tempConfirmedPassword) => {
         return new Promise(async resolve =>{
             if(t1 === t2 && t2) {
-                await this.validInput('password');
-                await this.validInput('confirmpassword');
+                this.validInput(['password', 'confirmpassword']);
                 resolve(true);
             } else if (!t2) {
-                await this.errorInput('confirmpassword', errorMessages.confirmpassword.empty);
+                this.errorInput([{key:'confirmpassword', message: errorMessages.confirmpassword.empty}]);
                 resolve(false);
             } else {
-                await this.errorInput('confirmpassword', errorMessages.confirmpassword.nomatch);
+                this.errorInput([{key:'confirmpassword', message: errorMessages.confirmpassword.nomatch}]);
                 resolve(false);
             }
         });
@@ -120,20 +114,20 @@ class Register extends Component<Props> {
     checkIfInputIsEmpty = (key) => {
         return new Promise(async resolve => {
             if(/\s/.test(this.state[key])){
-                await this.errorInput(key, errorMessages[key].spaces);
+                this.errorInput([{key: key, message: errorMessages[key].spaces}]);
                 resolve(false);
             }  else if (this.state[key]) {
-                await this.validInput(key);
+                this.validInput([key]);
                 resolve(true);
             } else {
-                await this.errorInput(key, errorMessages[key].empty);
+                this.errorInput([{key: key, message: errorMessages[key].empty}]);
                 resolve(false);
             }
         });
     };
 
     //Create account function
-    checkAndRegister = async (name = this.state.name, surname = this.state.surname, pass = this.state.password, email = this.state.email) => {
+    checkAndRegister = async () => {
         let checkPass = await this.checkIfValidPasswordAndSet();
         let checkMatch = await this.checkIfPasswordsMatchAndSet();
         let checkEmail = await this.checkIfValidEmailAndSet();
@@ -223,7 +217,7 @@ class Register extends Component<Props> {
         }
     };
 
-    resetErrorPopup = (touched) => {
+    resetErrorPopup = () => {
         if (this.popupMessage.message != ''){
             this.popupMessage = {...this.popupMessage, title: '', message: ''};
             this.forceUpdate();
@@ -281,8 +275,8 @@ class Register extends Component<Props> {
         }
     }
 
-    componentWillUnmount = () =>{
-        if (time) {
+    componentWillUnmount = () => {
+        if (this.time) {
             clearTimeout(this.time);
         }
     }
@@ -298,7 +292,7 @@ class Register extends Component<Props> {
                     placeholder= 'Name' 
                     onChangeText={(text) => {this.setState({name: text})}}
                     value = {this.state.name}
-                    inputContainerStyle={{...this.style.name, width: InputTextWidth, alignSelf:'center', marginTop:20}}
+                    inputContainerStyle={{...this.style.name, marginTop:20}}
                     onSubmitEditing= {() => {this.checkIfInputIsEmpty('name')}}
                     leftIcon = {{ type: 'material', name: 'account-circle'}} 
                     />
@@ -310,7 +304,7 @@ class Register extends Component<Props> {
                     placeholder= 'Surname' 
                     onChangeText={(text) => {this.setState({surname: text})}}
                     value = {this.state.surname}
-                    inputContainerStyle={{...this.style.surname, width: InputTextWidth, alignSelf:'center'}}
+                    inputContainerStyle={{...this.style.surname}}
                     onSubmitEditing= {() => {this.checkIfInputIsEmpty('surname')}}
                     leftIcon = {{ type: 'material', name: 'perm-identity'}} 
                     />
@@ -323,7 +317,7 @@ class Register extends Component<Props> {
                     placeholder= 'Email'
                     onChangeText={(text) => {this.setState({email: text.trim()})}}
                     onSubmitEditing= {()=> {this.checkIfValidEmailAndSet()}}
-                    inputContainerStyle={{...this.style.email, width: InputTextWidth, alignSelf:'center'}}
+                    inputContainerStyle={{...this.style.email}}
                     leftIcon = {{ type: 'material', name: 'email'}} 
                     />
                 <View style= {{height: 20}}>
@@ -335,7 +329,7 @@ class Register extends Component<Props> {
                     placeholder= 'Password' 
                     onChangeText={(text) => {this.setState({password: text})}}
                     onSubmitEditing= {() => {this.checkIfValidPasswordAndSet()}}
-                    inputContainerStyle={{...this.style.password, width: InputTextWidth, alignSelf:'center'}}
+                    inputContainerStyle={{...this.style.password}}
                     leftIcon = {{ type: 'material', name: 'lock'}} 
                     />
                 <View style= {{height: 20}}>
@@ -347,7 +341,7 @@ class Register extends Component<Props> {
                     placeholder= 'Confirm Password' 
                     onChangeText={(text) => {this.setState({tempConfirmedPassword: text})}}
                     onSubmitEditing= {() => {this.checkIfPasswordsMatchAndSet()}}
-                    inputContainerStyle={{...this.style.confirmpassword, width: InputTextWidth, alignSelf:'center'}}
+                    inputContainerStyle={{...this.style.confirmpassword}}
                     leftIcon = {{ type: 'material', name: 'lock'}} 
                     />
                 <View style= {{height: 20}}>

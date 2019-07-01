@@ -41,4 +41,5 @@ export const errorMessages = {
     internalServerError: 'Hubo un problema del servidor',
     certificateError: 'Hubo problema con tu WIFI, prueba con otra conexión.',
     noConnection: 'No tienes conexión de Internet. ',
+    wrongPassword: 'La contraseña ingresada es incorrecta.',
 }
