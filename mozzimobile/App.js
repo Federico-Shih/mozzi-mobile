@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {MainPageScreen, RegisterScreen, LoginScreen, HomePageScreen} from './src/pages/pages.js';
+import {MainPageScreen, RegisterScreen, LoginScreen, HomePageScreen, ForgotScreen} from './src/pages/pages.js';
 
 import {createStackNavigator, createAppContainer} from 'react-navigation';
 import {createStore} from 'redux';
@@ -51,6 +51,7 @@ const AppNavigator = createStackNavigator(
         Register: RegisterScreen,
         Login: LoginScreen,
         Home: HomePageScreen,
+        Forgot: ForgotScreen,
     },
     {
         initialRouteName: "Main",

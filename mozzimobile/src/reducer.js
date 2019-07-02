@@ -1,19 +1,19 @@
-import {LOGGING_IN, LOADING} from './actions';
+import {LOGGING_IN, LOADING, GET_TOKEN} from './actions';
 
 const initialState = {
-    loggedIn: 'false',
-    loading: 'false'
+    loading: 'false',
+    token:'',
 }
 
 export default function reducer(state = initialState, action)
 {
     switch(action.type)
     {
-        case LOGGING_IN:
-            return {...state, loggedIn:action.login};
-        
         case LOADING:
             return {...state, loading:action.loading};
+        
+        case GET_TOKEN:
+            return {...state, token:action.token};
 
         default:
             return state;

@@ -11,7 +11,7 @@ import {register} from '../libraries/connect/auth';
 import styles from '../libraries/styles/styles';
 import buttonStyle from '../libraries/styles/buttonsStyles';
 import {StyledTitle, Popup} from '../libraries/props';
-import {LOADING} from '../actions';
+import {LOADING, GET_TOKEN} from '../actions';
 
 type Props = {};
 
@@ -163,7 +163,7 @@ class Register extends Component<Props> {
             }
 
             if (response.data.code === 0) {
-                storeData('@jwt', response.data.token);
+                this.props.setToken(response.data.token);
                 this.props.navigation.navigate('Home');
             }
 
@@ -379,25 +379,25 @@ class Register extends Component<Props> {
 function mapStateToProps(state) {
     return {
         loading: state.loading,
-        loggedIn: state.loggedIn,
+        token: state.token,
     }
 }
 
 
 function mapDispatchToProps(dispatch) {
     return {
-        changeLogInState: (isLoggedIn) => {
-            dispatch({
-                type: LOGGING_IN,
-                login: isLoggedIn
-            });
-        },
         setLoading: (isLoading) => {
             dispatch({
                 type: LOADING,
                 loading: isLoading,
             })
         },
+        setToken: (token) => {
+            dispatch({
+                type: GET_TOKEN,
+                token: token,
+            })
+        }
     }
 }
 

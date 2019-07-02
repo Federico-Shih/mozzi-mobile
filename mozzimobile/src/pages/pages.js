@@ -5,6 +5,7 @@ import buscador from './buscador';
 import business from './business';
 import calendar from './calendartemp';
 import homepage from './homepage';
+import forgotPassword from './forgotPassword';
 
 export const HomePageScreen = homepage;
 export const BusinessScreen = business;
@@ -13,3 +14,4 @@ export const RegisterScreen = register;
 export const LoginScreen = login;
 export const BuscadorScreen = buscador;
 export const CalendarTempScreen = calendar;
+export const ForgotScreen = forgotPassword;

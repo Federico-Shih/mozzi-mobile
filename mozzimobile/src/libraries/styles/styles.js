@@ -41,7 +41,11 @@ export default StyleSheet.create({
       fontWeight: '100',
       letterSpacing: 0,
     },
-
+    forgotPassword: {
+      fontSize: 15,
+      fontFamily: platformFont,
+      letterSpacing: 0,
+    },
     logregTitle: {
       textAlign: 'left',
       fontSize: 28,

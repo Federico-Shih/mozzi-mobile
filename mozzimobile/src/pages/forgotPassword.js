@@ -6,8 +6,8 @@ import { Input, Button} from 'react-native-elements';
 import NetInfo from '@react-native-community/netinfo';
 
 //codes
-import {validateEmail, storeData, errorMessages} from '../libraries/helpers';
-import {login} from '../libraries/connect/auth';
+import {validateEmail, errorMessages} from '../libraries/helpers';
+import {recoverPassword} from '../libraries/connect/auth';
 import styles from '../libraries/styles/styles';
 import buttonStyle from '../libraries/styles/buttonsStyles';
 import {StyledTitle, Popup} from '../libraries/props';
@@ -15,7 +15,7 @@ import {LOADING, GET_TOKEN} from '../actions';
 
 type Props = {};
 
-class Register extends Component<Props> {
+class ForgotPassword extends Component<Props> {
     constructor(props){
         super(props);
     }
@@ -75,40 +75,11 @@ class Register extends Component<Props> {
         });
     };
 
-    checkIfValidPasswordAndSet = (text = this.state.password) => {
-        return new Promise(async resolve =>{
-            if(text.length >= 8) {
-                this.validInput(['password']);
-                resolve(true);
-            } else {
-                this.errorInput([{key:'password', message: errorMessages.password}]);
-                resolve(false);
-            }
-        });
-    };
-
-    checkIfInputIsEmpty = (key) => {
-        return new Promise(async resolve => {
-            if(/\s/.test(this.state[key])){
-                this.errorInput([{key: key, message: errorMessages[key].spaces}]);
-                resolve(false);
-            }  else if (this.state[key]) {
-                this.validInput([key]);
-                resolve(true);
-            } else {
-                this.errorInput([{key: key, message: errorMessages[key].empty}]);
-                resolve(false);
-            }
-        });
-    };
-
     //Create account function
     checkAndRegister = async () => {
-        let checkPass = await this.checkIfValidPasswordAndSet();
         let checkEmail = await this.checkIfValidEmailAndSet();
 
-        
-        if (checkPass && checkEmail){
+        if (checkEmail){
             
             await this.checkConnectivity();
 
@@ -118,9 +89,10 @@ class Register extends Component<Props> {
             }
 
             this.props.setLoading(true);
-            let response = await login(this.state.email, this.state.password); 
+            //let response = await recoverPassword(this.state.email); 
             this.props.setLoading(false);
 
+            /*
             switch (response.data.code) {
                 case 'wrongPassword':
                     this.sendPopup('Wrong Password', errorMessages.wrongPassword);
@@ -143,7 +115,7 @@ class Register extends Component<Props> {
             if (response.data.code == 'hasSession') {
                 this.props.navigation.navigate('Home');
             }
-
+            */
         } 
     };
 
@@ -229,7 +201,7 @@ class Register extends Component<Props> {
         if (this.props.loading == true)
         {
             return <Button 
-                        title="Iniciar Sesión"
+                        title="Recuperar Contraseña"
                         raised
                         type="outline"
                         loading = {true}
@@ -240,7 +212,7 @@ class Register extends Component<Props> {
                         /> 
         } else {
             return <Button 
-                        title="Iniciar Sesión"
+                        title="Recuperar Contraseña"
                         raised
                     // loading = {true}
                         type="outline"
@@ -264,7 +236,7 @@ class Register extends Component<Props> {
             <KeyboardAvoidingView style={styles.avoidContainer} behavior={Platform.OS === 'ios' ? 'padding':''} enabled onStartShouldSetResponder = {() => {
                 this.resetErrorPopup(true);
             }}>
-                <StyledTitle text='Iniciar Sesión' style={styles.logregTitle} />
+                <StyledTitle text='Recuperar Contraseña' style={styles.logregTitle} />
 
                 <Input 
                     keyboardType='email-address' 
@@ -277,32 +249,18 @@ class Register extends Component<Props> {
                 <View style= {{height: 20}}>
                     {this.displayErrorMessage('email')}
                 </View>
-
-                <Input 
-                    secureTextEntry= {true} 
-                    placeholder= 'Password' 
-                    onChangeText={(text) => {this.setState({password: text})}}
-                    onSubmitEditing= {() => {this.checkIfValidPasswordAndSet()}}
-                    inputContainerStyle={{...this.style.password}}
-                    leftIcon = {{ type: 'material', name: 'lock'}} 
-                    />
-                <View style= {{height: 20}}>
-                    {this.displayErrorMessage('password')}
-                </View>                
+               
                 <View style = {{flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'flex-end', marginTop: -10, marginRight: '7%'}}>
                     <Button
-                        title= "¿Olvidaste tu contraseña?"
+                        title= "Inicia Sesión"
                         type="clear"
                         titleStyle={styles.forgotPassword}
                         containerStyle={{}}
-                        onPress={() => {this.props.navigation.navigate('Forgot')}}
+                        onPress={() => {this.props.navigation.navigate('Login')}}
                         />
                 </View>
-                <View>
-                    {this.displayCreateButton()}
-                </View>
                 
-                <View style = {{flexDirection: 'row', marginTop: 10, alignSelf: 'center'}}>
+                <View style = {{flexDirection: 'row', marginTop: -10, alignSelf: 'flex-end', marginRight: '7%'}}>
                     <Text style={{...styles.smallLogInText, alignSelf:'center'}}>
                         ¿No tienes cuenta?
                     </Text>
@@ -314,7 +272,11 @@ class Register extends Component<Props> {
                         onPress={() => {this.props.navigation.navigate('Register')}}
                         />
                 </View>
-                <View style={{flex:1}}/> 
+                <View>
+                    {this.displayCreateButton()}
+                </View>
+
+                <View style={{flex:1}}/>                 
 
                 {/*Popup component*/}
                 <View>
@@ -329,7 +291,7 @@ class Register extends Component<Props> {
 function mapStateToProps(state) {
     return {
         loading: state.loading,
-        token: state.token,
+        //token: state.token,
     }
 }
 
@@ -342,13 +304,14 @@ function mapDispatchToProps(dispatch) {
                 loading: isLoading,
             })
         },
+        /*
         setToken: (token) => {
             dispatch({
                 type: GET_TOKEN,
                 token: token,
             })
-        }
+        }*/
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Register)
+export default connect(mapStateToProps, mapDispatchToProps)(ForgotPassword)
