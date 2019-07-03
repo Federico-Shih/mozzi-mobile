@@ -22,7 +22,7 @@ const grantingPermissions = Platform.select({
     },
     android: async () => {
         try {
-            /*
+            
             PermissionsAndroid.requestMultiple(
                 //modificar permisos aca
                 [PermissionsAndroid.PERMISSIONS.READ_CALENDAR,
@@ -35,7 +35,7 @@ const grantingPermissions = Platform.select({
                     this.refs.toast.show('Please Go into Settings -> Applications -> Mozzi -> Permissions and Allow permissions to continue');
                   }
                 });
-            */
+            
         } catch (err) {
             console.warn(err);
         }
@@ -66,6 +66,7 @@ const AppContainer = createAppContainer(AppNavigator);
 //Application creation
 export default class App extends Component<Props> {
     render() {
+        grantingPermissions();
         return (
             <Provider store={store}>
                 <AppContainer />
