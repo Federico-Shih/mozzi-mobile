@@ -1,3 +1,6 @@
+import {PermissionsAndroid} from 'react-native';
+import {Platform} from 'react-native';
+
 export const validateEmail = function validateEmail(email) {
     var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(email);
@@ -24,3 +27,30 @@ export const errorMessages = {
     noConnection: 'No tienes conexión de Internet. ',
     wrongPassword: 'La contraseña ingresada es incorrecta.',
 }
+
+export const grantingPermissions = Platform.select({
+    ios: () => {
+
+    },
+    android: () => {
+        return new Promise((resolve) => {
+            try {
+                PermissionsAndroid.requestMultiple(
+                    //modificar permisos aca
+                    [PermissionsAndroid.PERMISSIONS.READ_CALENDAR,
+                    PermissionsAndroid.PERMISSIONS.WRITE_CALENDAR]
+                    ).then((result) => {
+                      if (result['android.permission.READ_CALENDAR']
+                      && result['android.permission.WRITE_CALENDAR'] === 'granted') {
+                        resolve('Thank you very much!');
+                      } else if (result['android.permission.READ_CALENDAR'] || result['android.permission.WRITE_CALENDAR'] === 'never_ask_again') {
+                        resolve('Please Go into Settings -> Applications -> Mozzi -> Permissions and Allow permissions to continue');
+                      }
+                    });
+                
+            } catch (err) {
+                resolve(err);
+            }
+        });
+    } 
+});
