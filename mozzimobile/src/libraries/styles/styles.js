@@ -67,7 +67,6 @@ export default StyleSheet.create({
         alignSelf:'center',
 
     },
-
     popup: {
       flexDirection: 'row',
       alignItems:'center',
@@ -82,6 +81,6 @@ export default StyleSheet.create({
       height:50, 
       width: Dimensions.get('window').width-100, 
       backgroundColor: platformBackColor,
-    }
+    },
   });
   

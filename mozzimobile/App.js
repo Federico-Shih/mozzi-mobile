@@ -3,8 +3,6 @@ import {MainPageScreen, RegisterScreen, LoginScreen, HomePageScreen, ForgotScree
 import {createStackNavigator, createAppContainer} from 'react-navigation';
 import {createStore} from 'redux';
 import {Provider} from 'react-redux';
-import {Platform} from 'react-native';
-import {PermissionsAndroid} from 'react-native';
 import Toast from 'react-native-easy-toast'
 
 import reducer from './src/reducer';
@@ -25,7 +23,7 @@ const AppNavigator = createStackNavigator(
         Forgot: ForgotScreen,
     },
     {
-        initialRouteName: "Main",
+        initialRouteName: "Home",
         defaultNavigationOptions: {
             header: null,
         },
