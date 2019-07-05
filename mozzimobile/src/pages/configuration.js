@@ -9,7 +9,7 @@ export default class Buscador extends Component<Props> {
       return (
         <View style={styles.container}>
           <Text>
-                Buscador
+                Configuración
           </Text>
         </View>
       );

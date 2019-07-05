@@ -10,7 +10,6 @@ export default class Register extends Component<Props> {
     state = {
       
    }
-
     render() {
       return (
         <View style={styles.container}>
@@ -20,10 +19,10 @@ export default class Register extends Component<Props> {
                   <Button 
                       containerStyle = {{bottom: '50%'}}
                       icon = {
-                              <Icon
-                                  name="menu"
-                                  size={30}
-                              />
+                            <Icon
+                                name="menu"
+                                size={30}
+                            />
                           }
                       type = 'clear'
                       onPress = {() => {}}

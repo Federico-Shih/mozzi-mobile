@@ -6,7 +6,7 @@ import { Input, Button} from 'react-native-elements';
 import NetInfo from '@react-native-community/netinfo';
 
 //codes
-import {validateEmail, storeData, errorMessages} from '../libraries/helpers';
+import {validateEmail, errorMessages} from '../libraries/helpers';
 import {register} from '../libraries/connect/auth';
 import styles from '../libraries/styles/styles';
 import buttonStyle from '../libraries/styles/buttonsStyles';
