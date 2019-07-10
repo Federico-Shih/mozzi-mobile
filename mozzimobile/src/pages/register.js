@@ -146,27 +146,33 @@ class Register extends Component<Props> {
             //calling function
             this.props.setLoading(true);
             let response = await register(this.state.name, this.state.surname, this.state.email, this.state.password); 
+            
+
+            if (response.data) {
+                switch (response.data.code) {
+                    case 'duplicateAccount':
+                        this.sendPopup('Duplicate account', errorMessages.duplicateAccount);
+                        return;
+                    case 500:
+                        this.sendPopup('Server errors', errorMessages.internalServerError);
+                        return;
+                }
+    
+                if(response.headers.connection == 'Close') {
+                    this.sendPopup('Certificate failure', errorMessages.certificateError);
+                    return;
+                }
+    
+                if (response.data.code === 0) {
+                    this.props.setToken(response.data.token);
+                    this.props.navigation.navigate('Home');
+                }
+            } else {
+                this.sendPopup('Device error', response);
+            }
+
+
             this.props.setLoading(false);
-
-            switch (response.data.code) {
-                case 'duplicateAccount':
-                    this.sendPopup('Duplicate account', errorMessages.duplicateAccount);
-                    return;
-                case 500:
-                    this.sendPopup('Server errors', errorMessages.internalServerError);
-                    return;
-            }
-
-            if(response.headers.connection == 'Close') {
-                this.sendPopup('Certificate failure', errorMessages.certificateError);
-                return;
-            }
-
-            if (response.data.code === 0) {
-                this.props.setToken(response.data.token);
-                this.props.navigation.navigate('Home');
-            }
-
         } 
     };
 
