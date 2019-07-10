@@ -69,56 +69,92 @@ export default class Register extends Component<Props> {
     }
 }
 
+const buttons = [
+    {
+      title: 'Tus Turnos',
+      nav: 'Turns',
+      id: 'turns',
+      icon: 'event',
+    },
+    {
+      title: 'Mi Perfil',
+      nav: 'Profile',
+      id: 'profile',
+      icon: 'person',
+    },
+    {
+      title: 'Recientes',
+      nav: 'Recent',
+      id: 'recent',
+      icon: 'event',
+    },
+    {
+      title: 'Favoritos',
+      nav: 'Favs',
+      id: 'favs',
+      icon: 'restore',
+    },
+    {
+      title: 'Configuración',
+      nav: 'Config',
+      id: 'config',
+      icon: 'settings',
+    }
+
+]
+
+function SideMenuButtons (props) {
+    const listButtons = props.buttons.map((btn) => {
+        return <Button
+              title = {btn.title}
+              key = {btn.id}
+              type = 'clear'
+              containerStyle = {menuStyles.itemContainer}
+              titleStyle = {menuStyles.item}
+              onPress={() => props.navigation.navigate(btn.nav)}
+              buttonStyle = {menuStyles.itemButton}
+              icon = {
+                <Icon
+                    name= {btn.icon}
+                    size={25}
+                />
+              }
+            />    
+  });
+    return (listButtons);
+}
+
+const User = {
+    image: 'https://pickaface.net/gallery/avatar/Opi51c74d0125fd4.png',
+    name: 'Federico Shih',
+}
 
 function Menu ({navigation}) {
     return(
-        <ScrollView scrollsToTop = {false} style = {menuStyles.menu} contentContainerStyle = {{justifyContent: 'flex-end'}}>
+        <ScrollView scrollsToTop = {false} style = {menuStyles.menu} contentContainerStyle = {{height: '100%', justifyContent: 'flex-end'}}>
             <View style={menuStyles.avatarContainer}>
                 <Image
                   style={menuStyles.avatar}
-                  source={{ uri: 'https://pickaface.net/gallery/avatar/Opi51c74d0125fd4.png' }}
+                  source={{ uri: User.image}}
                 />
-                <Text style={menuStyles.name}>Your name</Text>
+                <Text style={menuStyles.name}>{User.name}</Text>
             </View>
 
-            <Button
-                title = 'Tus Turnos'
+            <SideMenuButtons buttons= {buttons} navigation = {navigation}/>
+            <View style = {{flex: 1}}></View>
+            <Button 
+                containerStyle = {{alignItems: 'flex-start', width: '100%'}}
+                icon = {
+                      <Icon
+                          name="exit-to-app"
+                          size={25}
+                      />
+                    }
+                buttonStyle = {{width: '100%', paddingRight: '50%'}}
                 type = 'clear'
-                containerStyle = {menuStyles.itemContainer}
-                titleStyle = {menuStyles.item}
-                onPress={() => navigation.navigate('Turns')}
-            >
-
-            </Button>
-
-            <Text
-              onPress={() => navigation.navigate('Profile')}
-              style={menuStyles.item}
-            >
-              Mi Perfil
-            </Text>
-
-            <Text
-              onPress={() => navigation.navigate('Recent')}
-              style={menuStyles.item}
-            >
-              Recientes
-            </Text>
-            
-
-            <Text
-              onPress={() => navigation.navigate('Favs')}
-              style={menuStyles.item}
-            >
-              Favoritos
-            </Text>
-
-            <Text
-              onPress={() => navigation.navigate('Config')}
-              style={{...menuStyles.item, justifyContent: 'flex-end'}}
-            >
-              Configurar
-            </Text>
+                onPress = {() => {}}
+                title = 'Cerrar Sesión'
+                />
             
         </ScrollView>
     );
@@ -146,14 +182,25 @@ const menuStyles = StyleSheet.create({
       left: 20
     },
     item: {
-      fontSize: 17,
+      fontSize: 15,
       fontWeight: 'normal',
+      fontFamily: "monospace",
+      paddingTop: 0,
+      margin: 0,
       color: 'grey',
       textAlign: 'left',
+      paddingLeft: 10,
     },
-
     itemContainer: {
       width: '100%',
       justifyContent: 'flex-start',
+      margin: 0,
+      padding: 0,
+      paddingTop: 0,
+    },
+    itemButton: {
+      justifyContent: 'flex-start',
+      margin: 0,
+      paddingVertical: 10,
     }
 });
