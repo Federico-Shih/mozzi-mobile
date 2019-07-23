@@ -1,4 +1,4 @@
-import {LOGGING_IN, LOADING, GET_TOKEN} from './actions';
+import {LOGGING_IN, LOADING, GET_TOKEN, REMOVE_TOKEN} from './actions';
 
 const initialState = {
     loading: 'false',
@@ -14,6 +14,9 @@ export default function reducer(state = initialState, action)
         
         case GET_TOKEN:
             return {...state, token:action.token};
+
+        case REMOVE_TOKEN:
+            return {...state, token: ''};
 
         default:
             return state;

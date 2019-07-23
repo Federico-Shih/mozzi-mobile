@@ -311,7 +311,7 @@ class Register extends Component<Props> {
                         type="clear"
                         titleStyle={styles.smallLogInText}
                         containerStyle={{}}
-                        onPress={() => {this.props.navigation.navigate('Register')}}
+                        onPress={() => {this.props.navigation.replace('Register')}}
                         />
                 </View>
                 <View style={{flex:1}}/> 

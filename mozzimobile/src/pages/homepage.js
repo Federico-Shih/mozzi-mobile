@@ -4,16 +4,21 @@ import {
   View,
   Image,
   Text,
+  KeyboardAvoidingView
 } from 'react-native';
 import React, {Component} from 'react';
 import styles from '../libraries/styles/styles';
-import { Input, Button, Header, Icon} from 'react-native-elements';
+import { SearchBar, Button, Header, Icon} from 'react-native-elements';
 import { ScrollView } from 'react-native-gesture-handler';
 import SideMenu from 'react-native-side-menu-over';
+import {connect} from 'react-redux';
  
+import {LOADING, REMOVE_TOKEN} from '../actions';
+
+const devMode = true;
 type Props = {};
 
-export default class Register extends Component<Props> {
+class Homepage extends Component<Props> {
     state = {
         isOpen: false,    
     };
@@ -30,14 +35,20 @@ export default class Register extends Component<Props> {
         })
     }
 
+    componentDidMount() {
+        if (this.props.token == '' && !devMode) {
+            this.props.navigation.replace('Login');
+        }
+    }
+
     render() {
           return (
             <SideMenu 
-                menu={<Menu navigation={this.props.navigation}/>} 
+                menu={<Menu navigation={this.props.navigation} removeToken = {this.props}/>} 
                 isOpen={this.state.isOpen}
                 onChange= {isOpen => this.updateMenuState(isOpen)}
             >
-                <View style={styles.container}>
+                <KeyboardAvoidingView style={styles.avoidContainer}>
                     <Header
                         leftComponent=
                         {
@@ -57,17 +68,60 @@ export default class Register extends Component<Props> {
                         centerComponent= {{text: 'Mozzi', style: {bottom: '50%', fontSize: 25}}}
                         placement= 'left'
                     />
+
+                    <Button
+                        icon={
+                          <Icon
+                            name="search"
+                            size={22}
+                            color="white"
+                          />
+                        }
+                        iconContainerStyle = {{}}
+                        title= '¿A dónde querés comprar?'
+                        titleStyle = {{fontSize: 13, left: 10}}
+                        containerStyle = {{borderRadius: 50, justifyContent: 'flex-start', width: '90%'}}
+                        buttonStyle = {{borderRadius: 50, justifyContent: 'flex-start', paddingVertical: 8}}
+                    />
                     <ScrollView style= {{width: '100%'}}>
                       {
                           
                       }
                     </ScrollView>
-                </View>  
-            </SideMenu>
+                    <View style = {{flex: 1}}/>
+                </KeyboardAvoidingView>  
+            </SideMenu> 
           
           );
     }
 }
+
+function mapStateToProps(state) {
+  return {
+      loading: state.loading,
+      token: state.token,
+  }
+}
+
+
+function mapDispatchToProps(dispatch) {
+  return {
+      setLoading: (isLoading) => {
+          dispatch({
+              type: LOADING,
+              loading: isLoading,
+          })
+      },
+      removeToken: () => {
+          dispatch({
+              type: REMOVE_TOKEN,
+          });
+      },
+
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Homepage)
 
 const buttons = [
     {
@@ -86,13 +140,13 @@ const buttons = [
       title: 'Recientes',
       nav: 'Recent',
       id: 'recent',
-      icon: 'event',
+      icon: 'restore',
     },
     {
       title: 'Favoritos',
       nav: 'Favs',
       id: 'favs',
-      icon: 'restore',
+      icon: 'star',
     },
     {
       title: 'Configuración',
@@ -129,7 +183,7 @@ const User = {
     name: 'Federico Shih',
 }
 
-function Menu ({navigation}) {
+function Menu ({navigation, props}) {
     return(
         <ScrollView scrollsToTop = {false} style = {menuStyles.menu} contentContainerStyle = {{height: '100%', justifyContent: 'flex-end'}}>
             <View style={menuStyles.avatarContainer}>
@@ -152,7 +206,10 @@ function Menu ({navigation}) {
                     }
                 buttonStyle = {{width: '100%', paddingRight: '50%'}}
                 type = 'clear'
-                onPress = {() => {}}
+                onPress = {() => {
+                    props.removeToken();
+                    navigation.replace('Login');
+                }}
                 title = 'Cerrar Sesión'
                 />
             
@@ -165,31 +222,35 @@ const menuStyles = StyleSheet.create({
       flex: 1,
       width: '100%',
       backgroundColor: 'white',
-      padding: 20,
+      padding: 0,
+      paddingLeft: 0,
     },
     avatarContainer: {
       marginBottom: 20,
       marginTop: 20,
-      flexDirection: 'row',
+      flexDirection: 'column',
       alignItems:'center'
     },
     avatar: {
-      width: 48,
-      height: 48,
-      borderRadius: 24,
+      width: 140,
+      height: 140,
+      borderRadius: 100,
     },
     name: {
-      left: 20
+      left: 0,
+      paddingTop: 20,
+      fontSize: 25, 
+      color: 'black',
     },
     item: {
-      fontSize: 15,
+      fontSize: 18,
       fontWeight: 'normal',
       fontFamily: "monospace",
       paddingTop: 0,
       margin: 0,
-      color: 'grey',
+      color: 'black',
       textAlign: 'left',
-      paddingLeft: 10,
+      paddingLeft: 30,
     },
     itemContainer: {
       width: '100%',
@@ -202,5 +263,6 @@ const menuStyles = StyleSheet.create({
       justifyContent: 'flex-start',
       margin: 0,
       paddingVertical: 10,
+      paddingLeft: 15,
     }
 });

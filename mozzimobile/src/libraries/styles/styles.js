@@ -25,6 +25,7 @@ export default StyleSheet.create({
       backgroundColor: platformBackColor,
       flex: 1,
       justifyContent: 'flex-end',
+      alignItems: 'center',
     },
     title: {
       textAlign: 'center',
