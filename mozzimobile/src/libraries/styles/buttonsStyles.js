@@ -1,20 +1,11 @@
-import {Platform, StyleSheet} from 'react-native';
-
-let platformFont;
-switch (Platform.OS)
-{
-  case 'ios':
-    platformFont = "San Francisco";
-    break;
-  case 'android':
-    platformFont = "monospace";
-}
+import {StyleSheet} from 'react-native';
+import {fontType} from './constants';
 
 export default StyleSheet.create({
 
     reglogButtonText: {
         fontSize: 20,
-        fontFamily: platformFont
+        fontFamily: fontType
     },
     
     reglogButton: {

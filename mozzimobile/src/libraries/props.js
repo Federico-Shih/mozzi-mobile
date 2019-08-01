@@ -4,8 +4,6 @@ import styles from './styles/styles';
 
 type Props = {};
 
-
-
 class TitleProp extends Component<Props> {
     render() {
         return (
@@ -61,6 +59,45 @@ class InputProp extends Component<Props> {
 }
 
 const popupDuration = 200;
+
+/* To implement Popup */
+/*
+    popupMessage = {title: '', message: '', previousMessage: ''};
+
+    displayPopup = () => {
+        if (this.popupMessage.message) {
+            return <Popup message={this.popupMessage.message} init/>
+        } else if(!this.popupMessage.message && this.popupMessage.previousMessage) {
+            return <Popup message={this.popupMessage.previousMessage} init = {false}/>
+        } else {
+            return null;
+        }
+    };
+
+    resetErrorPopup = () => {
+        if (this.popupMessage.message != ''){
+            this.popupMessage = {...this.popupMessage, title: '', message: ''};
+            this.forceUpdate();
+        }
+        if (this.time) {
+            clearTimeout(this.time);
+        }
+    };
+
+    time = '';
+
+    sendPopup = (title, message) => {
+        this.popupMessage = {title: title, message: message, previousMessage: message};
+        this.forceUpdate();
+        this.time = setTimeout(this.resetErrorPopup, 2000);
+    };
+
+    ADD A <View> 
+        {this.displayPopup()}
+    </View>
+    
+    in render
+*/
 
 export class Popup extends Component<Props> {
 

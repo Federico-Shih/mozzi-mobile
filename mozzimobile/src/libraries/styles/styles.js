@@ -1,18 +1,7 @@
 import {Platform, StyleSheet, Dimensions} from 'react-native';
+import {fontType, platformBackColor} from './constants';
 
-let platformFont;
-let platformBackColor = '#F5FCFF';
 const InputTextWidth = (Math.round((1 - 40/Dimensions.get('window').width)*100)).toString() + '%';
-
-
-switch (Platform.OS)
-{
-  case 'ios':
-    platformFont = "San Francisco";
-    break;
-  case 'android':
-    platformFont = "Montserrat";
-}
 
 export default StyleSheet.create({
     container: {
@@ -21,30 +10,31 @@ export default StyleSheet.create({
       alignItems: 'center',
       backgroundColor: platformBackColor,
     },
+
     avoidContainer: {
       backgroundColor: platformBackColor,
       flex: 1,
       justifyContent: 'flex-end',
-      alignItems: 'center',
     },
+    
     title: {
       textAlign: 'center',
       color: "#000000",
       fontSize: 36,
-      fontFamily: platformFont,
+      fontFamily: fontType,
       borderBottomWidth: 2,
       marginTop: 40, 
       padding: 8,
     },
     smallLogInText: {
       fontSize: 15,
-      fontFamily: platformFont,
+      fontFamily: fontType,
       fontWeight: '100',
       letterSpacing: 0,
     },
     forgotPassword: {
       fontSize: 15,
-      fontFamily: platformFont,
+      fontFamily: fontType,
       letterSpacing: 0,
     },
     logregTitle: {
@@ -55,7 +45,7 @@ export default StyleSheet.create({
       marginTop: 75,
       marginLeft: 30,
       top: '5%',
-      fontFamily: platformFont
+      fontFamily: fontType
     },
 
     inputText: {

@@ -6,7 +6,7 @@ import { Input, Button} from 'react-native-elements';
 import NetInfo from '@react-native-community/netinfo';
 
 //codes
-import {validateEmail, storeData, errorMessages} from '../libraries/helpers';
+import {validateEmail, errorMessages} from '../libraries/helpers';
 import {login} from '../libraries/connect/auth';
 import styles from '../libraries/styles/styles';
 import buttonStyle from '../libraries/styles/buttonsStyles';
@@ -107,7 +107,6 @@ class Register extends Component<Props> {
         let checkPass = await this.checkIfValidPasswordAndSet();
         let checkEmail = await this.checkIfValidEmailAndSet();
 
-        
         if (checkPass && checkEmail){
             
             await this.checkConnectivity();
@@ -118,9 +117,24 @@ class Register extends Component<Props> {
             }
 
             this.props.setLoading(true);
-            let response = await login(this.state.email, this.state.password); 
-            this.props.setLoading(false);
+            try {
+                let res = await login(this.state.email, this.state.password);                 
+                if (!res.data.login) {
+                    for (let i = 0; i < res.errors.length; i++) {
+                        this.sendPopup(res.errors[i].extensions.code, res.errors[i].message);
+                    }
+                } else {
+                    this.props.setToken(res.data.login);
+                    this.props.navigation.navigate('Home');
+                }
+                this.props.setLoading(false);
+            } catch (error) {
+                this.sendPopup('CatchAllErrors', error);
+                this.props.setLoading(false);
 
+            }
+
+            /*
             switch (response.data.code) {
                 case 'wrongPassword':
                     this.sendPopup('Wrong Password', errorMessages.wrongPassword);
@@ -130,6 +144,7 @@ class Register extends Component<Props> {
                     return;                    
             }
 
+            /*
             if(response.headers.connection == 'Close') {
                 this.sendPopup('Certificate failure', errorMessages.certificateError);
                 return;
@@ -143,7 +158,8 @@ class Register extends Component<Props> {
             if (response.data.code == 'hasSession') {
                 this.props.navigation.navigate('Home');
             }
-
+            */
+            
         } 
     };
 
@@ -236,7 +252,7 @@ class Register extends Component<Props> {
                         onPress= {()=> {this.checkAndRegister()}}
                         titleStyle= {buttonStyle.reglogButtonText}
                         buttonStyle= {{...buttonStyle.reglogButton}}
-                        containerStyle= {{marginTop:'20%', width: '60%', alignSelf:'center', width: '70%'}}
+                        containerStyle= {{marginTop:'20%', width: '60%', alignSelf:'center', width: '50%'}}
                         /> 
         } else {
             return <Button 
@@ -247,7 +263,7 @@ class Register extends Component<Props> {
                         onPress= {()=> {this.checkAndRegister()}}
                         titleStyle= {buttonStyle.reglogButtonText}
                         buttonStyle= {{...buttonStyle.reglogButton}}
-                        containerStyle= {{marginTop:'20%', width: '60%', alignSelf:'center', width: '70%'}}
+                        containerStyle= {{marginTop:'20%', width: '60%', alignSelf:'center', width: '50%'}}
                         /> 
         }
     }

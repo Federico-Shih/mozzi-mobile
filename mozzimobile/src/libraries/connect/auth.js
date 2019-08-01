@@ -6,6 +6,38 @@ const qs = require('qs');
 
 export const register = (name, surname, email, password) => {
     return new Promise((resolve, reject) => {
+        axios.post(serverSettings.serverURL + '/graphql', {
+            query: `
+                mutation Register($creds: registerInput) {
+                    register(input: $creds)
+                }
+            `,
+            variables: {
+                creds: {
+                    email,
+                    password,
+                    name,
+                    lastname: surname
+                }
+            }
+        }, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+        .then((response) => {
+            resolve(response.data);
+        })
+        .catch((error) => {
+            throw new Error(error);
+        });
+    });
+}
+
+
+/* REST API
+const register = (name, surname, email, password) => {
+    return new Promise((resolve, reject) => {
         axios({
             baseURL: serverSettings.serverURL,
             method: 'POST',
@@ -30,7 +62,39 @@ export const register = (name, surname, email, password) => {
     });
 }
 
+*/
+
+
 export const login = (email, password) => {
+    return new Promise((resolve, reject) => {
+            axios.post(serverSettings.serverURL + '/graphql', {
+                query: `
+                    query Login($creds: loginInput) {
+                        login(input: $creds)
+                    }
+                `,
+                variables: {
+                    creds: {
+                        email,
+                        password
+                    }
+                }
+            }, {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+            .then((response) => {
+                resolve(response.data);
+            })
+            .catch((error) => {
+                throw new Error(error);
+            });
+        });
+};
+
+/* LOGIN REST API
+const login = (email, password) => {
     return new Promise((resolve, reject) => {
             axios({
                 baseURL: serverSettings.serverURL,
@@ -53,6 +117,7 @@ export const login = (email, password) => {
             });
         });
 };
+*/
 
 export const recoverPassword = (email) => {
     return new Promise((resolve, reject) => {
