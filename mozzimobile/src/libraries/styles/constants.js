@@ -1,13 +1,16 @@
-import {Platform} from 'react-native';
+import { Platform } from 'react-native';
 
 let platformFont;
-switch (Platform.OS)
-{
+switch (Platform.OS) {
   case 'ios':
-    platformFont = "San Francisco";
+    platformFont = 'San Francisco';
     break;
   case 'android':
-    platformFont = "Montserrat";
+    platformFont = 'Montserrat';
+    break;
+  default:
+    platformFont = 'Montserrat';
+    break;
 }
 
 export const fontType = platformFont;

@@ -77,13 +77,15 @@ class Homepage extends Component<Props> {
                               onPress = {() => {this.toggle()}}
                               />
                         }
-                        containerStyle= {{height: '7%', backgroundColor: '#F5FCFF', borderWidth: 0}}
+                        containerStyle= {{height: 60, backgroundColor: '#F5FCFF', borderWidth: 0}}
                         centerComponent= {{text: 'Mozzi', style: {bottom: '50%', fontSize: 25}}}
                         placement= 'left'
                     />
 
-                    
-                    <Button
+                    <ScrollView style= {{width: '100%'}}
+                      scrollEnabled = {true}
+                      >
+                      <Button
                         icon={
                           <Icon
                             name="search"
@@ -99,12 +101,9 @@ class Homepage extends Component<Props> {
                         titleStyle = {{fontSize: 13, left: 10, color: 'grey'}}
                         containerStyle = {{justifyContent: 'flex-start', width: '100%', alignItems: 'center'}}
                         buttonStyle = {{borderRadius: 50, justifyContent: 'flex-start', paddingVertical: 10, backgroundColor: '#E0E0E0', width: '90%'}}
-                    />
-                    <ScrollView style= {{width: '100%'}}
-                      scrollEnabled = {true}
-                      >
-                    <MainSection /> 
-                      
+                      />  
+                      <MainSection /> 
+                    
                     </ScrollView>                    
                 </KeyboardAvoidingView>  
                 <SearchBarSlideUp open = {this.state.searchBarIsOpen} toggle = {() => {this.toggleSearchBar()}}/>
@@ -238,7 +237,41 @@ const structure = [
     items: [
 
     ],
-  }
+  } ,
+  {
+    title: 'Recientes',
+    items: [
+      {
+        title: 'tienda 1',
+        desc: 'no se'
+      },
+      {
+        title: 'tienda 1',
+        desc: 'no se'
+      },
+      {
+        title: 'tienda 1',
+        desc: 'no se'
+      },
+    ],
+  }, 
+  {
+    title: 'Recientes',
+    items: [
+      {
+        title: 'tienda 1',
+        desc: 'no se'
+      },
+      {
+        title: 'tienda 1',
+        desc: 'no se'
+      },
+      {
+        title: 'tienda 1',
+        desc: 'no se'
+      },
+    ],
+  },
 ]
 
 //TO CHANGE ELEMENTS THAT WILL BE DISPLAYED ON THE MAINSECTION OF THE MAINPAGE

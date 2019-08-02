@@ -1,56 +1,59 @@
-import {PermissionsAndroid} from 'react-native';
-import {Platform} from 'react-native';
+import { PermissionsAndroid, Platform } from 'react-native';
 
 export const validateEmail = function validateEmail(email) {
-    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(email);
-}
+  const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(email);
+};
 
 export const errorMessages = {
-    name: {
-        empty: 'No haz ingresado un nombre.',
-        spaces: 'Tu nombre contiene espacios.',
-    },
-    surname: {
-        empty: 'No haz ingresado un apellido.',
-        spaces: 'Tu apellido contiene espacios.',
-    },
-    email: 'El e-mail no es válido.',
-    password: 'La contraseña es menor a 8 carácteres.',
-    confirmpassword: {
-        nomatch: 'Las contraseñas no coinciden.',
-        empty: 'No haz ingresado la confirmación de tu contraseña.',
-    },
-    duplicateAccount: 'Esta cuenta ya fue creada',
-    internalServerError: 'Hubo un problema del servidor',
-    certificateError: 'Hubo problema con tu WIFI, prueba con otra conexión.',
-    noConnection: 'No tienes conexión de Internet. ',
-    wrongPassword: 'La contraseña ingresada es incorrecta.',
-}
+  name: {
+    empty: 'No haz ingresado un nombre.',
+    spaces: 'Tu nombre contiene espacios.',
+  },
+  surname: {
+    empty: 'No haz ingresado un apellido.',
+    spaces: 'Tu apellido contiene espacios.',
+  },
+  email: 'El e-mail no es válido.',
+  password: 'La contraseña es menor a 8 carácteres.',
+  confirmpassword: {
+    nomatch: 'Las contraseñas no coinciden.',
+    empty: 'No haz ingresado la confirmación de tu contraseña.',
+  },
+  duplicateAccount: 'Esta cuenta ya fue creada',
+  internalServerError: 'Hubo un problema del servidor',
+  certificateError: 'Hubo problema con tu WIFI, prueba con otra conexión.',
+  noConnection: 'No tienes conexión de Internet. ',
+  wrongPassword: 'La contraseña ingresada es incorrecta.',
+};
 
 export const grantingPermissions = Platform.select({
-    ios: () => {
-
-    },
-    android: () => {
-        return new Promise((resolve) => {
-            try {
-                PermissionsAndroid.requestMultiple(
-                    //modificar permisos aca
-                    [PermissionsAndroid.PERMISSIONS.READ_CALENDAR,
-                    PermissionsAndroid.PERMISSIONS.WRITE_CALENDAR]
-                    ).then((result) => {
-                      if (result['android.permission.READ_CALENDAR']
-                      && result['android.permission.WRITE_CALENDAR'] === 'granted') {
-                        resolve('Thank you very much!');
-                      } else if (result['android.permission.READ_CALENDAR'] || result['android.permission.WRITE_CALENDAR'] === 'never_ask_again') {
-                        resolve('Please Go into Settings -> Applications -> Mozzi -> Permissions and Allow permissions to continue');
-                      }
-                    });
-                
-            } catch (err) {
-                resolve(err);
-            }
-        });
-    } 
+  ios: () => {},
+  android: () => new Promise((resolve) => {
+    try {
+      PermissionsAndroid.requestMultiple(
+        // modificar permisos aca
+        [
+          PermissionsAndroid.PERMISSIONS.READ_CALENDAR,
+          PermissionsAndroid.PERMISSIONS.WRITE_CALENDAR,
+        ],
+      ).then((result) => {
+        if (
+          result['android.permission.READ_CALENDAR']
+            && result['android.permission.WRITE_CALENDAR'] === 'granted'
+        ) {
+          resolve('Thank you very much!');
+        } else if (
+          result['android.permission.READ_CALENDAR']
+            || result['android.permission.WRITE_CALENDAR'] === 'never_ask_again'
+        ) {
+          resolve(
+            'Please Go into Settings -> Applications -> Mozzi -> Permissions and Allow permissions to continue',
+          );
+        }
+      });
+    } catch (err) {
+      resolve(err);
+    }
+  }),
 });

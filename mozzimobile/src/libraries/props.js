@@ -1,62 +1,31 @@
-import {View, Text, TouchableOpacity, TextInput, Animated} from 'react-native';
-import React, {Component} from 'react';
+import { View, Text, Animated } from 'react-native';
+import PropTypes from 'prop-types';
+import React, { Component } from 'react';
 import styles from './styles/styles';
 
 type Props = {};
 
-class TitleProp extends Component<Props> {
-    render() {
-        return (
-          <Text style={styles.title}>
-            {this.props.text}
-          </Text>
-        );
-    }
+const TitleProp = (props) => {
+  const { text } = props;
+  return <Text style={styles.title}>{text}</Text>;
 };
 
-
-class ButtonProp extends Component<Props> {
-    render() {
-        return(
-            <TouchableOpacity onPress={this.props.onPress} hitSlop={this.props.hitSlop} style={{margin:5}}>
-                <Text style={this.props.styles}>
-                  {this.props.text}
-                </Text>
-            </TouchableOpacity>
-        );
-    }
+TitleProp.propTypes = {
+  text: PropTypes.string.isRequired,
 };
 
+const LogRegTitleProp = (props) => {
+  const { style, text } = props;
+  return (
+    <View style={{ alignSelf: 'flex-start' }}>
+      <Text style={style}>{text}</Text>
+    </View>
+  );
+};
 
-class LogRegTitleProp extends Component<Props> {
-    render() {
-        return(
-            <View style= {{alignSelf: 'flex-start'}}>
-                <Text style={this.props.style}>
-                    {this.props.text}
-                </Text>
-            </View>
-        );
-    }
-}
-
-class InputProp extends Component<Props> {
-    render() {
-        return(
-            <View style = {{width: '100%', alignItems:'center', margin: 10}}>
-                <TextInput 
-                    style= {this.props.style} 
-                    placeholder= {this.props.placeholder}
-                    onChangeText={this.props.onChangeText}
-                    value = {this.props.username}
-                    secureTextEntry = {this.props.secureTextEntry}
-                    keyboardType = {this.props.keyboardType = 'default'}
-                />
-            </View>
-            
-        );
-    }
-}
+LogRegTitleProp.propTypes = {
+  text: PropTypes.string.isRequired,
+};
 
 const popupDuration = 200;
 
@@ -92,66 +61,66 @@ const popupDuration = 200;
         this.time = setTimeout(this.resetErrorPopup, 2000);
     };
 
-    ADD A <View> 
+    ADD A <View>
         {this.displayPopup()}
     </View>
-    
+
     in render
 */
 
 export class Popup extends Component<Props> {
+  static propTypes = {
+    init: PropTypes.bool.isRequired,
+    message: PropTypes.string.isRequired,
+  };
 
-    state = {
-        anim: (this.props.init) ? new Animated.Value(-50) : new Animated.Value(20), 
+  constructor() {
+    super();
+    this.state = {
+      anim: new Animated.Value(-50),
+    };
+  }
+
+  componentDidMount() {
+    const { init } = this.props;
+    const { anim } = this.state;
+    if (init) {
+      Animated.timing(anim, {
+        toValue: 20,
+        duration: popupDuration,
+      }).start();
     }
+  }
 
-    componentDidMount() {
-        if (this.props.init) {
-            Animated.timing(
-                this.state.anim, 
-                {
-                    toValue: 20,
-                    duration: popupDuration,
-                }
-            ).start();
-        } 
+  componentDidUpdate(prevProps) {
+    const { init } = this.props;
+    const { anim } = this.state;
+    if (init !== prevProps.init) {
+      if (init) {
+        Animated.timing(anim, {
+          toValue: 20,
+          duration: popupDuration,
+        }).start();
+      } else {
+        Animated.timing(anim, {
+          toValue: -50,
+          duration: popupDuration,
+        }).start();
+      }
     }
+  }
 
-    componentDidUpdate(prevProps) {
-        if(this.props.init !== prevProps.init){
-            if (this.props.init) {
-                Animated.timing(
-                    this.state.anim, 
-                    {
-                        toValue: 20,
-                        duration: popupDuration,
-                    }
-                ).start();
-            } else {
-                Animated.timing(
-                    this.state.anim,
-                    {
-                        toValue: -50,
-                        duration: popupDuration,
-                    }
-                ).start();
-            }
-        }
-    }
-
-    render() {
-        let { anim } = this.state;
-
-        return(
-            <Animated.View style={{...styles.popup, bottom: anim, }}>
-                <View style= {{height: '100%', backgroundColor: 'red', width: 10}}></View>
-                <Text style ={{paddingLeft: 20, fontSize: 15}}>{this.props.message}</Text>
-            </Animated.View>
-        );
-    }
+  render() {
+    const { anim } = this.state;
+    const { message } = this.props;
+    return (
+      <Animated.View style={{ ...styles.popup, bottom: anim }}>
+        <View style={{ height: '100%', backgroundColor: 'red', width: 10 }} />
+        <Text style={{ paddingLeft: 20, fontSize: 15 }}>{message}</Text>
+      </Animated.View>
+    );
+  }
 }
 
-export const InputWithIcon = InputProp;
 export const Title = TitleProp;
-export const Button = ButtonProp;
 export const StyledTitle = LogRegTitleProp;
