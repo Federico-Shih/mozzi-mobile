@@ -26,6 +26,7 @@ const AppNavigator = createStackNavigator(
     Profile: scr.Profile,
     Config: scr.Config,
     Favs: scr.Favs,
+    Business: scr.Business,
   },
   {
     initialRouteName: 'Home',

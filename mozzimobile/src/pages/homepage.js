@@ -5,14 +5,15 @@ import {
   Image,
   Text,
   KeyboardAvoidingView,
-  SafeAreaView,
   Animated,
   Platform,
   Keyboard,
+  TouchableOpacity,
+  TouchableNativeFeedback,
 } from 'react-native';
 import React, { Component } from 'react';
 import {
-  SearchBar, Button, Header, Icon, Card, ListItem,
+  SearchBar, Button, Header, Icon, Card, ListItem, Divider,
 } from 'react-native-elements';
 import PropTypes from 'prop-types';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -20,8 +21,9 @@ import SideMenu from 'react-native-side-menu-over';
 import { connect } from 'react-redux';
 
 import { platformBackColor } from '../libraries/styles/constants';
-import { LOADING, REMOVE_TOKEN } from '../actions';
+import { LOADING, REMOVE_TOKEN, ADD_BUSINESS_UUID } from '../actions';
 import styles from '../libraries/styles/styles';
+import { getStores } from '../libraries/connect/businessCalls';
 
 const devMode = true;
 type Props = {};
@@ -39,6 +41,7 @@ class Homepage extends Component<Props> {
         replace: PropTypes.func.isRequired,
       }).isRequired,
       token: PropTypes.string.isRequired,
+      navigateToBusiness: PropTypes.func.isRequired,
     }
 
     componentDidMount() {
@@ -70,7 +73,7 @@ class Homepage extends Component<Props> {
     }
 
     render() {
-      const { navigation } = this.props;
+      const { navigation, token, navigateToBusiness } = this.props;
       const { isOpen, searchBarIsOpen } = this.state;
       return (
         <SideMenu
@@ -127,7 +130,13 @@ class Homepage extends Component<Props> {
 
             </ScrollView>
           </KeyboardAvoidingView>
-          <SearchBarSlideUp open={searchBarIsOpen} toggle={() => { this.toggleSearchBar(); }} />
+          <SearchBarSlideUp
+            open={searchBarIsOpen}
+            navigation={navigation}
+            token={token}
+            toggle={() => { this.toggleSearchBar(); }}
+            navigateToBusiness={navigateToBusiness}
+          />
         </SideMenu>
 
       );
@@ -141,11 +150,15 @@ class SearchBarSlideUp extends Component<Props> {
       anim: new Animated.Value(20),
       search: '',
       loading: false,
+      searchResults: [],
     }
 
     static propTypes = {
       open: PropTypes.bool.isRequired,
       toggle: PropTypes.func.isRequired,
+      token: PropTypes.string.isRequired,
+      navigateToBusiness: PropTypes.func.isRequired,
+      navigation: PropTypes.object.isRequired,
     }
 
     componentDidMount() {
@@ -193,9 +206,21 @@ class SearchBarSlideUp extends Component<Props> {
       this.setState({ search });
     }
 
+    resetSearch = () => {
+      this.setState({ searchResults: [], search: '' });
+    }
+
+    sendToPage = (uuid) => {
+      const { navigateToBusiness, navigation } = this.props;
+      navigateToBusiness(uuid);
+      navigation.navigate('Business');
+    }
+
     render() {
-      const { anim, search, loading } = this.state;
-      const { toggle } = this.props;
+      const {
+        anim, search, loading, searchResults,
+      } = this.state;
+      const { toggle, token } = this.props;
       return (
         <Animated.View
           style={{
@@ -220,6 +245,7 @@ class SearchBarSlideUp extends Component<Props> {
             onPress={() => {
               Keyboard.dismiss();
               toggle();
+              this.resetSearch();
             }}
             containerStyle={{
               borderRadius: 50, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', width: '100%', height: 50,
@@ -231,14 +257,15 @@ class SearchBarSlideUp extends Component<Props> {
           <SearchBar
             ref={(ref) => { this.textInput = ref; }}
             placeholder="Buscar..."
-            onChangeText={this.updateSearch}
+            onChangeText={text => this.updateSearch(text)}
             value={search}
-          // platform = {Platform.select({ios: 'ios', android: 'android'})}
             lightTheme
             showLoading={loading}
             onSubmitEditing={() => {
               this.setState({ loading: true });
 
+              // CHANGE WHEN API IS HERE
+              this.setState({ searchResults: getStores(search, token) });
               this.setState({ loading: false });
             }}
             round
@@ -246,13 +273,96 @@ class SearchBarSlideUp extends Component<Props> {
               width: '90%', height: 60, backgroundColor: platformBackColor, borderWidth: 0, borderBottomWidth: 0, borderTopWidth: 0,
             }}
           />
+          <Divider style={{ backgroundColor: '#DDDDDD', width: '100%', height: 2 }} />
+          <ScrollView
+            style={
+              {
+                width: '100%',
+                marginTop: 10,
+              }
+            }
+          >
+
+            {
+              searchResults.map((el, o) => (
+                <View key={o}>
+                  {
+                    Platform.select({
+                      ios: (
+                        <TouchableOpacity
+                          onPress={() => {
+                            this.sendToPage(el.uuid);
+                          }}
+                        >
+                          <SearchElement el={el} />
+                        </TouchableOpacity>
+                      ),
+                      android: (
+                        <TouchableNativeFeedback
+                          background={TouchableNativeFeedback.Ripple('#DDD')}
+                          onPress={() => {
+                            this.sendToPage(el.uuid);
+                          }}
+                        >
+                          <View>
+                            <SearchElement el={el} />
+                          </View>
+                        </TouchableNativeFeedback>
+                      ),
+                    })
+                  }
+                  <Divider style={{
+                    backgroundColor: '#DDDDDD',
+                    width: 300,
+                    height: 0.9,
+                    alignSelf: 'flex-end',
+                  }}
+                  />
+                </View>
+              ))
+            }
+          </ScrollView>
         </Animated.View>
       );
     }
 }
 
+function SearchElement({ el }) {
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        paddingLeft: 30,
+        paddingVertical: 20,
+        alignItems: 'center',
+      }}
+    >
+      <Image
+        source={{ uri: el.image }}
+        style={{ width: 60, height: 60, borderRadius: 10 }}
+      />
+      <View style={{ flexDirection: 'column', left: 20 }}>
+        <Text style={{ fontSize: 20 }}>
+          {el.name}
+        </Text>
+        <Text style={{ fontSize: 15 }}>
+          {el.description}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+SearchElement.propTypes = {
+  el: PropTypes.shape({
+    image: PropTypes.string,
+    name: PropTypes.string,
+    description: PropTypes.string,
+  }).isRequired,
+};
+
 // STRUCTURE OF THE MAIN SECTION OF THE MAINPAGE. THINGS LIKE RECENT STORES, CHANGE structure ONLOAD TO LOAD THE API DATA
-const structure = [
+let structure = [
   {
     title: 'Recientes',
     items: [
@@ -463,7 +573,6 @@ function Menu({ navigation, props }) {
 }
 
 Menu.propTypes = {
-  removeToken: PropTypes.func.isRequired,
   props: PropTypes.shape({
     removeToken: PropTypes.func,
   }).isRequired,
@@ -517,7 +626,12 @@ function mapDispatchToProps(dispatch) {
         type: REMOVE_TOKEN,
       });
     },
-
+    navigateToBusiness: (uuid) => {
+      dispatch({
+        type: ADD_BUSINESS_UUID,
+        uuid,
+      });
+    },
   };
 }
 

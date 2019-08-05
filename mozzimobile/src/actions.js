@@ -3,3 +3,5 @@ export const LOGGING_IN = 'LOGGING_IN';
 export const LOADING = 'LOADING';
 export const GET_TOKEN = 'GET_TOKEN';
 export const REMOVE_TOKEN = 'REMOVE_TOKEN';
+export const ADD_BUSINESS_UUID = 'ADD_BUSINESS_UUID';
+export const REMOVE_BUSINESS_UUID = 'REMOVE_BUSINESS_UUID';

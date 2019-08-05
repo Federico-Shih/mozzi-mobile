@@ -105,11 +105,14 @@ class Register extends Component<Props> {
 
     checkIfPasswordsMatchAndSet = ({ password, tempConfirmedPassword } = this.state) => (
       new Promise(async (resolve) => {
-        if (password === tempConfirmedPassword && tempConfirmedPassword) {
+        if (password === tempConfirmedPassword && tempConfirmedPassword && tempConfirmedPassword.length >= 8) {
           this.validInput(['password', 'confirmpassword']);
           resolve(true);
         } else if (!tempConfirmedPassword) {
           this.errorInput([{ key: 'confirmpassword', message: errorMessages.confirmpassword.empty }]);
+          resolve(false);
+        } else if (tempConfirmedPassword.length < 8) {
+          this.errorInput([{ key: 'password', message: errorMessages.password }, { key: 'confirmpassword', message: errorMessages.password }]);
           resolve(false);
         } else {
           this.errorInput([{ key: 'confirmpassword', message: errorMessages.confirmpassword.nomatch }]);

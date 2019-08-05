@@ -22,10 +22,9 @@ import { LOADING } from '../actions';
 type Props = {};
 
 class ForgotPassword extends Component<Props> {
-  state = {
-    email: '',
-    password: '',
-    connection: null,
+  static propTypes = {
+    setLoading: PropTypes.func.isRequired,
+    loading: PropTypes.bool.isRequired,
   };
 
   error = {
@@ -47,10 +46,14 @@ class ForgotPassword extends Component<Props> {
 
   time = '';
 
-  static propTypes = {
-    setLoading: PropTypes.func.isRequired,
-    loading: PropTypes.bool.isRequired,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      email: '',
+      password: '',
+      connection: null,
+    };
+  }
 
   // Error and Style handlers
   setErrorState = (incomingJson) => {
