@@ -149,7 +149,7 @@ class Login extends Component<Props> {
         }
         setLoading(false);
       } catch (error) {
-        this.sendPopup('CatchAllErrors', error);
+        this.sendPopup('CatchAllErrors', error.message);
         setLoading(false);
       }
 

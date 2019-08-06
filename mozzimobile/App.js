@@ -29,7 +29,7 @@ const AppNavigator = createStackNavigator(
     Business: scr.Business,
   },
   {
-    initialRouteName: 'Home',
+    initialRouteName: 'Business',
     defaultNavigationOptions: {
       header: null,
     },

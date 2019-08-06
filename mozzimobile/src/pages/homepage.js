@@ -24,6 +24,7 @@ import { platformBackColor } from '../libraries/styles/constants';
 import { LOADING, REMOVE_TOKEN, ADD_BUSINESS_UUID } from '../actions';
 import styles from '../libraries/styles/styles';
 import { getStores } from '../libraries/connect/businessCalls';
+import { getProfile } from '../libraries/connect/auth';
 
 const devMode = true;
 type Props = {};
@@ -33,6 +34,10 @@ class Homepage extends Component<Props> {
     state = {
       isOpen: false,
       searchBarIsOpen: false,
+      profile: {
+        name: '',
+        image: null,
+      }
     };
 
     static propTypes = {
@@ -49,6 +54,12 @@ class Homepage extends Component<Props> {
 
       if (token === '' && !devMode) {
         navigation.replace('Login');
+      } else {
+        /*
+        GET PROFILE LOGIC
+        */
+        const user = getProfile(token);
+        this.setState({ profile: user });
       }
     }
 
@@ -77,7 +88,7 @@ class Homepage extends Component<Props> {
       const { isOpen, searchBarIsOpen } = this.state;
       return (
         <SideMenu
-          menu={<Menu navigation={navigation} props={this.props} />}
+          menu={<Menu navigation={navigation} props={this.props} state={this.state} />}
           isOpen={isOpen}
           onChange={open => this.updateMenuState(open)}
         >
@@ -447,10 +458,6 @@ SIDEBAR MENU SECTION
 */
 
 // PROFILE DISPLAYED ON SIDEBAR MENU
-const User = {
-  image: 'https://pickaface.net/gallery/avatar/Opi51c74d0125fd4.png',
-  name: 'Federico Shih',
-};
 
 const buttons = [
   {
@@ -538,15 +545,15 @@ const menuStyles = StyleSheet.create({
 });
 
 // MENU DISPLAYED ON SIDEBAR MENU
-function Menu({ navigation, props }) {
+function Menu({ navigation, props, state }) {
   return (
     <ScrollView scrollsToTop={false} style={menuStyles.menu} contentContainerStyle={{ height: '100%', justifyContent: 'flex-end' }}>
       <View style={menuStyles.avatarContainer}>
         <Image
           style={menuStyles.avatar}
-          source={{ uri: User.image }}
+          source={{ uri: state.profile.image }}
         />
-        <Text style={menuStyles.name}>{User.name}</Text>
+        <Text style={menuStyles.name}>{state.profile.name}</Text>
       </View>
 
       <SideMenuButtons buttons={buttons} navigation={navigation} />
@@ -579,6 +586,9 @@ Menu.propTypes = {
   navigation: PropTypes.shape({
     replace: PropTypes.func,
     navigate: PropTypes.func,
+  }).isRequired,
+  state: PropTypes.shape({
+    profile: PropTypes.object,
   }).isRequired,
 };
 

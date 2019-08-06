@@ -33,7 +33,7 @@ export const register = (name, surname, email, password) => new Promise((resolve
       resolve(response.data);
     })
     .catch((error) => {
-      throw new Error(error);
+      reject(new Error(error.message));
     });
 });
 
@@ -72,9 +72,9 @@ export const login = (email, password) => new Promise((resolve, reject) => {
       `${serverSettings.serverURL}/graphql`,
       {
         query: `
-                    query Login($creds: loginInput) {
-                        login(input: $creds)
-                    }
+                query Login($creds: loginInput) {
+                    login(input: $creds)
+                }
                 `,
         variables: {
           creds: {
@@ -93,7 +93,7 @@ export const login = (email, password) => new Promise((resolve, reject) => {
       resolve(response.data);
     })
     .catch((error) => {
-      throw new Error(error);
+      reject(new Error(error.message));
     });
 });
 
@@ -143,3 +143,12 @@ export const recoverPassword = email => new Promise((resolve, reject) => {
       reject(error);
     });
 });
+
+const User = {
+  image: 'https://pickaface.net/gallery/avatar/Opi51c74d0125fd4.png',
+  name: 'Federico Shih',
+};
+
+export const getProfile = ({ token }) => {
+  return User;
+};

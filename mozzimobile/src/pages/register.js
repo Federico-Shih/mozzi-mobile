@@ -160,6 +160,7 @@ class Register extends Component<Props> {
         setLoading(true);
         try {
           const res = await register(name, surname, email, password);
+          console.log(res);
           if (!res.data.register) {
             for (let i = 0; i < res.errors.length; i += 1) {
               this.sendPopup(res.errors[i].extensions.code, res.errors[i].message);
@@ -170,7 +171,8 @@ class Register extends Component<Props> {
           }
           setLoading(false);
         } catch (error) {
-          this.sendPopup('CatchAllErrors', error);
+          console.log(error);
+          this.sendPopup('CatchAllErrors', error.message);
           setLoading(false);
         }
       }
