@@ -1,4 +1,10 @@
-import { Text, View } from 'react-native';
+import {
+  Text,
+  View,
+  TouchableOpacity,
+  TouchableNativeFeedback,
+  Platform,
+} from 'react-native';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -12,6 +18,26 @@ import { LOADING, REMOVE_BUSINESS_UUID } from '../actions';
 import { getBusiness } from '../libraries/connect/businessCalls';
 
 type Props = {};
+
+function Services({ el }) {
+  return (
+    <View
+      style={{ color: 'black' }}
+    >
+      <Text
+        style={{ fontSize: 16 }}
+      >
+        {el.name}
+      </Text>
+    </View>
+  );
+}
+
+Services.propTypes = {
+  el: PropTypes.shape({
+    name: PropTypes.string,
+  }).isRequired,
+}
 
 class Business extends Component<Props> {
   state = {
@@ -38,12 +64,12 @@ class Business extends Component<Props> {
     const { token, uuid } = this.props;
     const business = getBusiness({ token, uuid });
     this.setState({ business });
-    console.log(this.state);
   };
 
   render() {
     const { business } = this.state;
     const { token, uuid } = this.props;
+    const { street, zone, number } = business;
     return (
       <View style={styles.container}>
         <View
@@ -65,33 +91,79 @@ class Business extends Component<Props> {
           />
           <View
             style={{
-              marginTop: 10,
-              alignItems: 'flex-start',
+              marginTop: 30,
               width: '100%',
-              marginLeft: 20,
             }}
           >
-            <Text style={{ fontSize: 20, fontWeight: '800' }}> Servicios </Text>
+            <Text style={{ 
+              fontSize: 20,
+              fontWeight: '800',
+              color: 'black',
+              marginLeft: 10,
+            }}
+            >
+              Servicios
+            </Text>
             <Divider
               style={{
-                marginBottom: 8,
                 height: 1,
                 width: '100%',
                 marginTop: 5,
+                marginLeft: 10,
               }}
             />
 
             <ScrollView
               style={{
                 width: '100%',
-                backgroundColor: 'yellow',
               }}
             >
-              <Text> hola </Text>
               {business.services.map((el, i) => (
-                <View key={i}>
-                  <Text>{el.name}</Text>
-                </View>
+                Platform.select({
+                  ios: (
+                    <TouchableOpacity
+                      key={i}
+                      onPress={() => {
+                      }}
+                    >
+                      <View style={{ }}>
+                        <View style={{ paddingVertical: 20, marginLeft: 20 }}>
+                          <Services el={el} />
+                        </View>
+                        <Divider
+                          style={{
+                            height: 1,
+                            width: '100%',
+                            backgroundColor: 'grey',
+                          }}
+                        />
+                      </View>
+                    </TouchableOpacity>
+                  ),
+                  android: (
+                    <TouchableNativeFeedback
+                      key={i}
+                      background={TouchableNativeFeedback.Ripple('#DDD')}
+                      conta
+                      onPress={() => {
+                      }}
+                    >
+                      <View style={{  }}>
+                        <View style={{ paddingVertical: 20, marginLeft: 20 }}>
+                          <Services el={el} />
+                        </View>
+                        <Divider
+                          style={{
+                            height: 1,
+                            width: '100%',
+                            backgroundColor: 'grey',
+                            marginLeft: 10,
+                          }}
+                        />
+                      </View>
+                    </TouchableNativeFeedback>
+                  ),
+                })
               ))}
             </ScrollView>
           </View>
@@ -102,7 +174,7 @@ class Business extends Component<Props> {
           style={{
             position: 'absolute',
             alignItems: 'flex-start',
-            left: 10,
+            left: 20,
             paddingTop: 65,
           }}
         >
@@ -150,6 +222,30 @@ class Business extends Component<Props> {
               alert(`${street} ${number}, ${zone}.`);
             }}
             buttonStyle={{ backgroundColor: 'transparent' }}
+          />
+        </View>
+        <View
+          style={{
+            position: 'absolute',
+            alignSelf: 'flex-start',
+          }}
+        >
+          <Icon
+            name={Platform.select({ ios: 'arrow-back-ios', android: 'arrow-back' })}
+            size={25}
+            onPress={() => {}}
+            color="white"
+            containerStyle={{
+              borderRadius: 50,
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              marginLeft: 5,
+              marginTop: 5,
+            }}
+            iconStyle={{
+              padding: 5,
+            }}
+            underlayColor="rgba(1,1,1, 0.2)"
           />
         </View>
       </View>
