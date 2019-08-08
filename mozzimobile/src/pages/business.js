@@ -14,7 +14,7 @@ import {
 
 import { ScrollView } from 'react-native-gesture-handler';
 import styles from '../libraries/styles/styles';
-import { LOADING, REMOVE_BUSINESS_UUID } from '../actions';
+import { LOADING, REMOVE_BUSINESS_UUID, SELECT_SERVICE, REMOVE_SERVICE } from '../actions';
 import { getBusiness } from '../libraries/connect/businessCalls';
 
 type Props = {};
@@ -37,7 +37,7 @@ Services.propTypes = {
   el: PropTypes.shape({
     name: PropTypes.string,
   }).isRequired,
-}
+};
 
 class Business extends Component<Props> {
   state = {
@@ -55,6 +55,12 @@ class Business extends Component<Props> {
   static propTypes = {
     token: PropTypes.string.isRequired,
     uuid: PropTypes.string.isRequired,
+    navigation: PropTypes.shape({
+      goBack: PropTypes.func,
+      navigate: PropTypes.func,
+    }).isRequired,
+    navigateToSearcher: PropTypes.func.isRequired,
+    addService: PropTypes.func.isRequired,
   };
 
   componentDidMount = () => {
@@ -66,9 +72,15 @@ class Business extends Component<Props> {
     this.setState({ business });
   };
 
+  navToCalendar = (id) => {
+    const { addService, navigation } = this.props;
+    addService(id);
+    navigation.navigate('Calendar');
+  }
+
   render() {
     const { business } = this.state;
-    const { token, uuid } = this.props;
+    const { token, uuid, navigation, navigateToSearcher } = this.props;
     const { street, zone, number } = business;
     return (
       <View style={styles.container}>
@@ -95,7 +107,7 @@ class Business extends Component<Props> {
               width: '100%',
             }}
           >
-            <Text style={{ 
+            <Text style={{
               fontSize: 20,
               fontWeight: '800',
               color: 'black',
@@ -124,6 +136,7 @@ class Business extends Component<Props> {
                     <TouchableOpacity
                       key={i}
                       onPress={() => {
+                        this.navToCalendar(el.id);
                       }}
                     >
                       <View style={{ }}>
@@ -146,9 +159,10 @@ class Business extends Component<Props> {
                       background={TouchableNativeFeedback.Ripple('#DDD')}
                       conta
                       onPress={() => {
+                        this.navToCalendar(el.id);
                       }}
                     >
-                      <View style={{  }}>
+                      <View style={{ }}>
                         <View style={{ paddingVertical: 20, marginLeft: 20 }}>
                           <Services el={el} />
                         </View>
@@ -233,7 +247,7 @@ class Business extends Component<Props> {
           <Icon
             name={Platform.select({ ios: 'arrow-back-ios', android: 'arrow-back' })}
             size={25}
-            onPress={() => {}}
+            onPress={() => { navigateToSearcher(); navigation.goBack(); }}
             color="white"
             containerStyle={{
               borderRadius: 50,
@@ -269,9 +283,18 @@ function mapDispatchToProps(dispatch) {
         loading: isLoading,
       });
     },
-    navigateToBusiness: () => {
+    navigateToSearcher: () => {
       dispatch({
         type: REMOVE_BUSINESS_UUID,
+      });
+      dispatch({
+        type: REMOVE_SERVICE,
+      });
+    },
+    addService: (id) => {
+      dispatch({
+        type: SELECT_SERVICE,
+        id,
       });
     },
   };

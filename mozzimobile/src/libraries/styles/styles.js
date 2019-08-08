@@ -74,4 +74,11 @@ export default StyleSheet.create({
     width: Dimensions.get('window').width - 100,
     backgroundColor: platformBackColor,
   },
+  dateStyle: {
+    backgroundColor: '#E4EBEE',
+    marginHorizontal: 7,
+    marginVertical: 15,
+    width: 80,
+    borderRadius: 20,
+  },
 });
