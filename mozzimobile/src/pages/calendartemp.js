@@ -9,12 +9,14 @@ import {
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Icon } from 'react-native-elements';
-import uuid from 'uuid';
+import { Icon, Button } from 'react-native-elements';
+import keyUUID from 'uuid';
+import Timeline from 'react-native-timeline-listview';
 
 import { platformBackColor } from '../libraries/styles/constants';
 import { REMOVE_SERVICE } from '../actions';
 import styles from '../libraries/styles/styles';
+import { getServiceTimes } from '../libraries/connect/businessCalls';
 
 type Props = {};
 
@@ -34,7 +36,9 @@ function Box(props) {
   return (
     <View style={{ width: '100%', height: '100%', alignItems: 'center' }}>
       <Text style={{ paddingTop: 20 }}>{toDateString(element.date)}</Text>
-      <Text style={{ marginTop: 5, fontSize: 20, color: 'black' }}>{element.date.getDate()}</Text>
+      <Text style={{ marginTop: 5, fontSize: 20, color: 'black' }}>
+        {element.date.getDate()}
+      </Text>
     </View>
   );
 }
@@ -47,6 +51,13 @@ class CalendarPage extends Component<Props> {
   state = {
     dates: [],
     selectedDate: '',
+    data: [
+      { time: '09:00', title: 'Event 1', description: 'Event 1 Description' },
+      { time: '10:45', title: 'Event 2', description: 'Event 2 Description' },
+      { time: '12:00', title: 'Event 3', description: 'Event 3 Description' },
+      { time: '14:00', title: 'Event 4', description: 'Event 4 Description' },
+      { time: '16:30', title: 'Event 5', description: 'Event 5 Description' },
+    ],
   };
 
   static propTypes = {
@@ -54,31 +65,48 @@ class CalendarPage extends Component<Props> {
       goBack: PropTypes.func,
       navigate: PropTypes.func,
     }).isRequired,
-  }
+    uuid: PropTypes.string.isRequired,
+    token: PropTypes.string.isRequired,
+    service: PropTypes.string.isRequired,
+  };
   // { title: 'Title Text', key: 'item5', style: styles.dateStyle },
 
   componentDidMount = () => {
+    const { uuid, service, token } = this.props;
     const dates = [];
+
+    let initialDate;
     for (let i = 0; i < 30; i += 1) {
-      const date = getNextDay(i);
-      dates.push({ date, key: uuid(), style: styles.dateStyle });
+      const date = getNextDay(i + 1);
+      const objectDate = { date, key: keyUUID(), selected: (i === 0) };
+      if (i === 0) initialDate = objectDate;
+      dates.push(objectDate);
     }
-    this.setState({ dates });
+
+    this.setState({ dates, selectedDate: initialDate });
+    const { selectedDate } = this.state;
+
+    const data = getServiceTimes({
+      service,
+      uuid,
+      token,
+      selectedDate,
+    });
+    alert(data[0].time)
+    this.setState({ data });
   };
 
   selectDate = (newDate) => {
     const { dates, selectedDate } = this.state;
 
-    if (selectedDate !== newDate) {
+    if (selectedDate.key !== newDate.key) {
       const index = dates.findIndex(obj => obj.key === newDate.key);
       const newDates = dates;
-      newDates[index] = { ...dates[index], style: styles.dateStyleSelected };
-      console.log(index);
+      newDates[index] = { ...dates[index], selected: true };
 
       if (selectedDate !== '') {
         const oldIndex = dates.findIndex(obj => obj.key === selectedDate.key);
-        console.log(oldIndex);
-        newDates[oldIndex] = { ...dates[oldIndex], style: styles.dateStyle };
+        newDates[oldIndex] = { ...dates[oldIndex], selected: false };
       }
       this.setState({ selectedDate: newDate, dates: newDates });
     }
@@ -86,7 +114,7 @@ class CalendarPage extends Component<Props> {
 
   render() {
     const { navigation } = this.props;
-    const { dates } = this.state;
+    const { dates, data } = this.state;
     return (
       <View
         style={{
@@ -96,9 +124,12 @@ class CalendarPage extends Component<Props> {
         }}
       >
         <Icon
-          name={Platform.select({ ios: 'arrow-back-ios', android: 'arrow-back' })}
+          name={Platform.select({
+            ios: 'arrow-back-ios',
+            android: 'arrow-back',
+          })}
           size={25}
-          onPress={navigation.goBack}
+          onPress={() => navigation.goBack()}
           color="black"
           containerStyle={{
             borderRadius: 50,
@@ -124,28 +155,60 @@ class CalendarPage extends Component<Props> {
             showsHorizontalScrollIndicator={false}
             horizontal
             style={{}}
-            renderItem={({ item }) => Platform.select({
+            renderItem={({ item }) => {
+              const style = (item.selected) ? styles.dateStyleSelected : styles.dateStyle;
+              return Platform.select({
+                ios: (
+                  <TouchableOpacity onPress={() => this.selectDate(item.date)}>
+                    <View style={item.style}>
+                      <Box element={item} />
+                    </View>
+                  </TouchableOpacity>
+                ),
+                android: (
+                  <TouchableNativeFeedback
+                    background={TouchableNativeFeedback.Ripple('#CCC')}
+                    onPress={() => this.selectDate(item)}
+                  >
+                    <View style={style}>
+                      <Box element={item} />
+                    </View>
+                  </TouchableNativeFeedback>
+                ),
+              });
+            }
+            }
+          />
+        </View>
+        <Timeline
+          data={data}
+          style={{ top: 20, alignSelf: 'center', width: '100%' }}
+          rowContainerStyle={{ width: '95%' }}
+          renderDetail={(rowData, sectionID, rowID) => {
+            return Platform.select({
               ios: (
-                <TouchableOpacity onPress={() => this.selectDate(item.date)}>
-                  <View style={item.style}>
-                    <Box element={item} />
-                  </View>
+                <TouchableOpacity
+                  style={styles.timeSelectorButton}
+                  onPress={() => {}}
+                >
+                  <Text> lol </Text>
                 </TouchableOpacity>
               ),
               android: (
                 <TouchableNativeFeedback
                   background={TouchableNativeFeedback.Ripple('#CCC')}
-                  onPress={() => this.selectDate(item)}
+                  onPress={() => {}}
                 >
-                  <View style={item.style}>
-                    <Box element={item} />
+                  <View
+                    style={{ backgroundColor: 'rgba(0,0,0, .05)', height: 100 }}
+                  >
+                    <Text style={{}}> lol </Text>
                   </View>
                 </TouchableNativeFeedback>
               ),
-            })
-            }
-          />
-        </View>
+            });
+          }}
+        />
       </View>
     );
   }

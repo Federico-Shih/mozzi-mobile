@@ -49,6 +49,17 @@ const business = {
   image: 'https://pickaface.net/gallery/avatar/Opi51c74d0125fd4.png',
 };
 
+const newTime = (hours, minutes) => {
+  const nah = new Date(0).setTime(1000 * 60 * minutes + 1000 * 60 * 60 * hours);
+  return new Date(nah).toLocaleTimeString('en-US', {
+    dateStyle: 'short',
+    hour12: false,
+    timeZone: 'Etc/GMT',
+    hour: 'numeric',
+    minute: 'numeric',
+  });
+};
+
 export const getStores = ({ search, token }) => res;
 export const getSomething = () => {};
 export const getBusiness = ({ uuid, token }) => business;
@@ -58,3 +69,16 @@ export const getBusiness = ({ uuid, token }) => business;
   resolve(business);
 });
 */
+export const getServiceTimes = ({
+  service, token, uuid, day,
+}) => {
+  const start = 8;
+  const end = 20;
+  const uff = (end - start) * 4;
+  const returnVal = [];
+  for (let i = 0; i <= uff; i += 1) {
+    returnVal.push({ time: newTime(start, i * 15), occupied: false });
+  }
+
+  return returnVal;
+};

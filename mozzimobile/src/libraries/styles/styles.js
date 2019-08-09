@@ -90,4 +90,8 @@ export default StyleSheet.create({
     borderWidth: 4,
     borderColor: 'purple',
   },
+  timeSelectorButton: {
+    top: -40,
+    backgroundColor: 'black',
+  },
 });
