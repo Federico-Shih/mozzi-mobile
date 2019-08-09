@@ -81,4 +81,13 @@ export default StyleSheet.create({
     width: 80,
     borderRadius: 20,
   },
+  dateStyleSelected: {
+    backgroundColor: '#E4EBEE',
+    marginHorizontal: 7,
+    marginVertical: 15,
+    width: 80,
+    borderRadius: 20,
+    borderWidth: 4,
+    borderColor: 'purple',
+  },
 });
