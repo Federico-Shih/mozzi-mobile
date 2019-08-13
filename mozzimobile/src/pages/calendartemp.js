@@ -9,10 +9,11 @@ import {
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Icon, Button } from 'react-native-elements';
+import { Icon, Button, Divider } from 'react-native-elements';
 import keyUUID from 'uuid';
-import Timeline from 'react-native-timeline-listview';
+import Timeline from 'react-native-timeline-feed';
 
+import { Preset } from 'react-native-timeline-feed/lib/Types';
 import { platformBackColor } from '../libraries/styles/constants';
 import { REMOVE_SERVICE } from '../actions';
 import styles from '../libraries/styles/styles';
@@ -51,13 +52,8 @@ class CalendarPage extends Component<Props> {
   state = {
     dates: [],
     selectedDate: '',
-    data: [
-      { time: '09:00', title: 'Event 1', description: 'Event 1 Description' },
-      { time: '10:45', title: 'Event 2', description: 'Event 2 Description' },
-      { time: '12:00', title: 'Event 3', description: 'Event 3 Description' },
-      { time: '14:00', title: 'Event 4', description: 'Event 4 Description' },
-      { time: '16:30', title: 'Event 5', description: 'Event 5 Description' },
-    ],
+    data: [],
+    selectedTime: '',
   };
 
   static propTypes = {
@@ -73,54 +69,70 @@ class CalendarPage extends Component<Props> {
 
   componentDidMount = () => {
     const { uuid, service, token } = this.props;
-    const dates = [];
+    const dates = new Map();
 
     let initialDate;
     for (let i = 0; i < 30; i += 1) {
       const date = getNextDay(i + 1);
-      const objectDate = { date, key: keyUUID(), selected: (i === 0) };
+      const thisUuid = keyUUID();
+      const objectDate = { date, key: thisUuid, selected: i === 0 };
       if (i === 0) initialDate = objectDate;
-      dates.push(objectDate);
+      dates.set(thisUuid, objectDate);
     }
-
-    this.setState({ dates, selectedDate: initialDate });
-    const { selectedDate } = this.state;
 
     const data = getServiceTimes({
       service,
       uuid,
       token,
-      selectedDate,
+      selectedDate: initialDate,
     });
-    alert(data[0].time)
-    this.setState({ data });
+    this.setState({ dates, selectedDate: initialDate, data });
   };
 
   selectDate = (newDate) => {
     const { dates, selectedDate } = this.state;
 
     if (selectedDate.key !== newDate.key) {
-      const index = dates.findIndex(obj => obj.key === newDate.key);
       const newDates = dates;
-      newDates[index] = { ...dates[index], selected: true };
+      newDates.set(newDate.key, {
+        ...newDates.get(newDate.key),
+        selected: true,
+      });
 
-      if (selectedDate !== '') {
-        const oldIndex = dates.findIndex(obj => obj.key === selectedDate.key);
-        newDates[oldIndex] = { ...dates[oldIndex], selected: false };
-      }
+      newDates.set(selectedDate.key, {
+        ...newDates.get(selectedDate.key),
+        selected: false,
+      });
       this.setState({ selectedDate: newDate, dates: newDates });
+    }
+  };
+
+  selectTime = (newTime) => {
+    const { data, selectedTime } = this.state;
+
+    if (!newTime.selected && !newTime.occupied && !(newTime.key === selectedTime.key)) {
+      const newTimes = data;
+      data.set(newTime.key, { ...data.get(newTime.key), selected: true });
+
+      if (selectedTime.time) {
+        data.set(selectedTime.key, { ...data.get(selectedTime.key), selected: false });
+      }
+      this.setState({ selectedTime: newTime, data: newTimes });
     }
   };
 
   render() {
     const { navigation } = this.props;
     const { dates, data } = this.state;
+    const mapDates = Array.from(dates.values());
+    const mapTimes = Array.from(data.values());
     return (
       <View
         style={{
           height: '100%',
           width: '100%',
           backgroundColor: platformBackColor,
+          flexDirection: 'column',
         }}
       >
         <Icon
@@ -151,12 +163,14 @@ class CalendarPage extends Component<Props> {
           }}
         >
           <FlatList
-            data={dates}
+            data={mapDates}
             showsHorizontalScrollIndicator={false}
             horizontal
             style={{}}
             renderItem={({ item }) => {
-              const style = (item.selected) ? styles.dateStyleSelected : styles.dateStyle;
+              const style = item.selected
+                ? styles.dateStyleSelected
+                : styles.dateStyle;
               return Platform.select({
                 ios: (
                   <TouchableOpacity onPress={() => this.selectDate(item.date)}>
@@ -176,39 +190,110 @@ class CalendarPage extends Component<Props> {
                   </TouchableNativeFeedback>
                 ),
               });
-            }
-            }
+            }}
           />
         </View>
-        <Timeline
-          data={data}
-          style={{ top: 20, alignSelf: 'center', width: '100%' }}
-          rowContainerStyle={{ width: '95%' }}
-          renderDetail={(rowData, sectionID, rowID) => {
-            return Platform.select({
-              ios: (
-                <TouchableOpacity
-                  style={styles.timeSelectorButton}
-                  onPress={() => {}}
-                >
-                  <Text> lol </Text>
-                </TouchableOpacity>
-              ),
-              android: (
-                <TouchableNativeFeedback
-                  background={TouchableNativeFeedback.Ripple('#CCC')}
-                  onPress={() => {}}
+        <View style={{ height: '80%' }}>
+          <Divider />
+          <Timeline
+            data={mapTimes}
+            style={{ marginHorizontal: 20, marginBottom: 100 }}
+            renderItem={(element) => {
+              const {
+                props, item, isLast, index, key,
+              } = element;
+              let frameStyle = styles.timeFrame;
+
+              if (item.occupied) {
+                frameStyle = {
+                  ...styles.timeFrame,
+                  ...styles.timeFrameOccupied,
+                };
+              }
+
+              if (item.selected) {
+                frameStyle = {
+                  ...styles.timeFrame,
+                  ...styles.timeFrameSelected,
+                };
+              }
+
+              const firstPadding = index === 0 ? 5 : 0;
+              return (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    paddingTop: firstPadding,
+                    width: '100%',
+                  }}
                 >
                   <View
-                    style={{ backgroundColor: 'rgba(0,0,0, .05)', height: 100 }}
+                    style={{
+                      backgroundColor: 'rgba(50, 50, 200, 0.3)',
+                      borderRadius: 20,
+                      height: 25,
+                      paddingVertical: 5,
+                      paddingHorizontal: 5,
+                      alignItems: 'center',
+                      marginRight: 5,
+                      top: -2,
+                    }}
                   >
-                    <Text style={{}}> lol </Text>
+                    <Text>{item.time}</Text>
                   </View>
-                </TouchableNativeFeedback>
-              ),
-            });
-          }}
-        />
+                  <View style={{ flexDirection: 'column' }}>
+                    <View
+                      style={{
+                        backgroundColor: props.circleColor,
+                        width: 20,
+                        height: 20,
+                        borderRadius: 50,
+                      }}
+                    />
+                    {!isLast ? (
+                      <View
+                        style={{
+                          backgroundColor: props.lineColor,
+                          width: props.lineWidth,
+                          height: 50,
+                          marginLeft: 9,
+                        }}
+                      />
+                    ) : null}
+                  </View>
+                  {Platform.select({
+                    ios: (
+                      <TouchableOpacity
+                        style={styles.timeSelectorButton}
+                        onPress={() => {
+                          this.selectTime(item);
+                        }}
+                        key={key}
+                      >
+                        <View style={frameStyle} />
+                      </TouchableOpacity>
+                    ),
+                    android: (
+                      <TouchableNativeFeedback
+                        background={TouchableNativeFeedback.Ripple('#CCC')}
+                        onPress={() => {
+                          this.selectTime(item);
+                        }}
+                        style={{}}
+                        key={key}
+                      >
+                        <View style={frameStyle}>
+                          <Divider />
+                        </View>
+                      </TouchableNativeFeedback>
+                    ),
+                  })}
+                </View>
+              );
+            }}
+          />
+          <Divider style={{ bottom: 100 }} />
+        </View>
       </View>
     );
   }
@@ -222,6 +307,25 @@ function mapStateToProps(state) {
     service: state.service,
   };
 }
+
+/*
+<Timeline
+          data={data}
+          preset={Preset.SingleColumnRight}
+          style={{
+            top: 20,
+            marginBottom: 20,
+            width: '100%',
+          }}
+          rowStyle={{ width: 100 }}
+          renderDetail={(rowData) => {
+
+            const { key } = rowData;
+
+          }}
+
+        />
+*/
 
 function mapDispatchToProps(dispatch) {
   return {

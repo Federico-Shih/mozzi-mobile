@@ -1,3 +1,5 @@
+import newUuid from 'uuid';
+
 const res = [
   {
     name: 'BuenDia',
@@ -50,14 +52,18 @@ const business = {
 };
 
 const newTime = (hours, minutes) => {
-  const nah = new Date(0).setTime(1000 * 60 * minutes + 1000 * 60 * 60 * hours);
-  return new Date(nah).toLocaleTimeString('en-US', {
-    dateStyle: 'short',
-    hour12: false,
-    timeZone: 'Etc/GMT',
-    hour: 'numeric',
-    minute: 'numeric',
-  });
+  const nah = new Date(0).setTime(
+    1000 * 60 * minutes + 1000 * 60 * 60 * (hours + 3),
+  );
+  return new Date(nah)
+    .toLocaleTimeString('en-US', {
+      timeStyle: 'medium',
+      hour12: false,
+      timeZone: 'UTC',
+      hour: 'numeric',
+      minute: 'numeric',
+    })
+    .slice(0, -3);
 };
 
 export const getStores = ({ search, token }) => res;
@@ -75,10 +81,20 @@ export const getServiceTimes = ({
   const start = 8;
   const end = 20;
   const uff = (end - start) * 4;
-  const returnVal = [];
+  const returnVal = new Map();
   for (let i = 0; i <= uff; i += 1) {
-    returnVal.push({ time: newTime(start, i * 15), occupied: false });
+    const key = newUuid();
+    returnVal.set(key, {
+      time: newTime(start, i * 15),
+      occupied: false,
+      selected: false,
+      key,
+    });
   }
-
   return returnVal;
 };
+
+/*
+
+
+*/

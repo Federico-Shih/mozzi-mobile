@@ -94,4 +94,15 @@ export default StyleSheet.create({
     top: -40,
     backgroundColor: 'black',
   },
+  timeFrameSelected: {
+    backgroundColor: 'rgba(200,0,0, .2)',
+  },
+  timeFrameOccupied: {
+    backgroundColor: 'rgba(0,0,200, .2)',
+  },
+  timeFrame: {
+    backgroundColor: 'rgba(0,0,0, .05)',
+    width: '100%',
+    marginLeft: 10,
+  },
 });

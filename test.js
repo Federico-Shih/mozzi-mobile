@@ -1,14 +1,28 @@
-// import console = require("console");
+function getNextDay(nDays) {
+  const date = new Date();
+  return new Date(date.setSeconds(date.getSeconds() + 60 * 60 * 24 * nDays));
+}
 
-const newTime = (hours, minutes) => {
-  date = new Date(0).setTime(1000 * 60 * minutes + 1000 * 60 * 60 * hours);
-  return new Date(date).toLocaleTimeString("en-US", {
-    dateStyle: "short",
-    hour12: false,
-    timeZone: "Etc/GMT",
-    hour: "numeric",
-    minute: "numeric"
-  });
-};
+const mm = new Date();
+const dates = new Map();
+const newDate = { date: mm, key: 29, selected: false };
 
-console.log(new Date(new Date().setHours(24)));
+let initialDate;
+for (let i = 0; i < 30; i += 1) {
+  const date = getNextDay(i + 1);
+  const objectDate = { date, key: i, selected: i === 0 };
+  if (i === 0) initialDate = objectDate;
+  dates.set(i, objectDate);
+}
+
+const selectedDate = "";
+
+console.time();
+if (selectedDate.key !== newDate.key) {
+  dates.set(newDate.key, { ...dates.get(newDate.key), selected: true });
+  if (selectedDate !== "") {
+    newDates[oldIndex] = { ...dates[oldIndex], selected: false };
+  }
+}
+const array = Array.from(dates.values);
+console.timeEnd();
