@@ -172,21 +172,22 @@ class CalendarPage extends Component<Props> {
       this.sendPopup('No seleccionaste dia', errorMessages.noDateSelected);
     } else if (selectedTime === '') {
       this.sendPopup('Fecha', errorMessages.noTimeSelected);
-    }
-    try {
-      const confirm = await this.showAlert(this.state);
-      if (confirm) {
-        const saved = await sendAppointment({
-          uuid,
-          service,
-          token,
-          date: selectedDate,
-          time: selectedTime,
-        });
-        if (saved) navigation.pop(3);
+    } else {
+      try {
+        const confirm = await this.showAlert(this.state);
+        if (confirm) {
+          const saved = await sendAppointment({
+            uuid,
+            service,
+            token,
+            date: selectedDate,
+            time: selectedTime,
+          });
+          if (saved) navigation.pop(2);
+        }
+      } catch (e) {
+        this.sendPopup('ALERTERROR', 'Alert error');
       }
-    } catch (e) {
-      this.sendPopup('ALERTERROR', 'Alert error');
     }
     setLoading(false);
   };

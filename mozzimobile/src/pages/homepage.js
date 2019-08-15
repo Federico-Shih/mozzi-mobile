@@ -10,6 +10,7 @@ import {
   Keyboard,
   TouchableOpacity,
   TouchableNativeFeedback,
+  BackHandler,
 } from 'react-native';
 import React, { Component } from 'react';
 import {
@@ -55,6 +56,11 @@ class Homepage extends Component<Props> {
     token: PropTypes.string.isRequired,
     navigateToBusiness: PropTypes.func.isRequired,
   };
+
+  constructor(props) {
+    super(props);
+    this.searchModal = React.createRef();
+  }
 
   componentDidMount() {
     const { navigation, token } = this.props;
@@ -103,7 +109,11 @@ class Homepage extends Component<Props> {
       >
         <NavigationEvents
           onWillFocus={(payload) => {
-            if (payload.action.type === 'Navigation/POP') this.setState({ searchBarIsOpen: false });
+            if (payload.action.type === 'Navigation/POP') {
+              this.setState({ searchBarIsOpen: false });
+              const { current } = this.searchModal;
+              current.resetSearch();
+            }
           }}
         />
         <KeyboardAvoidingView style={styles.avoidContainer}>
@@ -159,6 +169,7 @@ class Homepage extends Component<Props> {
           open={searchBarIsOpen}
           navigation={navigation}
           token={token}
+          ref={this.searchModal}
           toggle={() => {
             this.toggleSearchBar();
           }}
@@ -200,6 +211,7 @@ class SearchBarSlideUp extends Component<Props> {
         anim: new Animated.Value(Dimensions.get('window').height),
       });
     }
+    this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.goBack);
   }
 
   componentDidUpdate(prevProps) {
@@ -219,6 +231,21 @@ class SearchBarSlideUp extends Component<Props> {
         }).start();
       }
     }
+  }
+
+  componentWillUnmount() {
+    this.backHandler.remove();
+  }
+
+  goBack = () => {
+    alert('am')
+    const { toggle, navigation, open } = this.props;
+    if (!open) {
+      navigation.pop();
+    } else {
+      toggle();
+    }
+    return true;
   }
 
   updateSearch = (search) => {
