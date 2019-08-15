@@ -25,6 +25,8 @@ export const errorMessages = {
   certificateError: 'Hubo problema con tu WIFI, prueba con otra conexión.',
   noConnection: 'No tienes conexión de Internet. ',
   wrongPassword: 'La contraseña ingresada es incorrecta.',
+  noDateSelected: 'No haz seleccionado una fecha',
+  noTimeSelected: 'No haz seleccionado un horario',
 };
 
 export const grantingPermissions = Platform.select({

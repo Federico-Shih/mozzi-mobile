@@ -5,6 +5,7 @@ import {
   Platform,
   TouchableNativeFeedback,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
@@ -13,11 +14,15 @@ import { Icon, Button, Divider } from 'react-native-elements';
 import keyUUID from 'uuid';
 import Timeline from 'react-native-timeline-feed';
 
-import { Preset } from 'react-native-timeline-feed/lib/Types';
+import { Popup } from '../libraries/props';
 import { platformBackColor } from '../libraries/styles/constants';
-import { REMOVE_SERVICE } from '../actions';
+import { REMOVE_SERVICE, LOADING } from '../actions';
 import styles from '../libraries/styles/styles';
-import { getServiceTimes } from '../libraries/connect/businessCalls';
+import {
+  getServiceTimes,
+  sendAppointment,
+} from '../libraries/connect/businessCalls';
+import { errorMessages } from '../libraries/helpers';
 
 type Props = {};
 
@@ -56,14 +61,20 @@ class CalendarPage extends Component<Props> {
     selectedTime: '',
   };
 
+  time = '';
+
+  popupMessage = { title: '', message: '', previousMessage: '' };
+
   static propTypes = {
     navigation: PropTypes.shape({
       goBack: PropTypes.func,
       navigate: PropTypes.func,
+      pop: PropTypes.func,
     }).isRequired,
     uuid: PropTypes.string.isRequired,
     token: PropTypes.string.isRequired,
     service: PropTypes.string.isRequired,
+    setLoading: PropTypes.func.isRequired,
   };
   // { title: 'Title Text', key: 'item5', style: styles.dateStyle },
 
@@ -72,7 +83,7 @@ class CalendarPage extends Component<Props> {
     const dates = new Map();
 
     let initialDate;
-    for (let i = 0; i < 30; i += 1) {
+    for (let i = 0; i < 20; i += 1) {
       const date = getNextDay(i + 1);
       const thisUuid = keyUUID();
       const objectDate = { date, key: thisUuid, selected: i === 0 };
@@ -107,15 +118,94 @@ class CalendarPage extends Component<Props> {
     }
   };
 
+  displayPopup = () => {
+    if (this.popupMessage.message) {
+      return <Popup message={this.popupMessage.message} init />;
+    }
+    if (!this.popupMessage.message && this.popupMessage.previousMessage) {
+      return <Popup message={this.popupMessage.previousMessage} init={false} />;
+    }
+    return null;
+  };
+
+  showAlert = ({ selectedTime, selectedDate }) => new Promise((resolve, reject) => {
+    Alert.alert(
+      'Confirmar',
+      `Confirmas el turno reservado el dia ${selectedDate.date} a las ${
+        selectedTime.time
+      }`,
+      [
+        { text: 'Cancelar', onPress: () => resolve(false), style: 'cancel' },
+        { text: 'Confirmar', onPress: () => resolve(true) },
+      ],
+    );
+  });
+
+  resetErrorPopup = () => {
+    if (this.popupMessage.message !== '') {
+      this.popupMessage = { ...this.popupMessage, title: '', message: '' };
+      this.forceUpdate();
+    }
+    if (this.time) {
+      clearTimeout(this.time);
+    }
+  };
+
+  sendPopup = (title, message) => {
+    this.popupMessage = {
+      title,
+      message,
+      previousMessage: message,
+    };
+    this.forceUpdate();
+    this.time = setTimeout(this.resetErrorPopup, 2000);
+  };
+
+  saveAppointment = async () => {
+    const {
+      setLoading, uuid, service, token, navigation,
+    } = this.props;
+    const { selectedDate, selectedTime } = this.state;
+
+    setLoading(true);
+    if (selectedDate === '') {
+      this.sendPopup('No seleccionaste dia', errorMessages.noDateSelected);
+    } else if (selectedTime === '') {
+      this.sendPopup('Fecha', errorMessages.noTimeSelected);
+    }
+    try {
+      const confirm = await this.showAlert(this.state);
+      if (confirm) {
+        const saved = await sendAppointment({
+          uuid,
+          service,
+          token,
+          date: selectedDate,
+          time: selectedTime,
+        });
+        if (saved) navigation.pop(3);
+      }
+    } catch (e) {
+      this.sendPopup('ALERTERROR', 'Alert error');
+    }
+    setLoading(false);
+  };
+
   selectTime = (newTime) => {
     const { data, selectedTime } = this.state;
 
-    if (!newTime.selected && !newTime.occupied && !(newTime.key === selectedTime.key)) {
+    if (
+      !newTime.selected
+      && !newTime.occupied
+      && !(newTime.key === selectedTime.key)
+    ) {
       const newTimes = data;
-      data.set(newTime.key, { ...data.get(newTime.key), selected: true });
-
-      if (selectedTime.time) {
-        data.set(selectedTime.key, { ...data.get(selectedTime.key), selected: false });
+      data.set(newTime.index, { ...data.get(newTime.index), selected: true });
+      if (selectedTime !== '') {
+        data.set(selectedTime.index, {
+          ...data.get(selectedTime.index),
+          selected: false,
+        });
       }
       this.setState({ selectedTime: newTime, data: newTimes });
     }
@@ -126,13 +216,17 @@ class CalendarPage extends Component<Props> {
     const { dates, data } = this.state;
     const mapDates = Array.from(dates.values());
     const mapTimes = Array.from(data.values());
+    console.log(mapTimes);
     return (
       <View
         style={{
-          height: '100%',
-          width: '100%',
+          flex: 1,
           backgroundColor: platformBackColor,
           flexDirection: 'column',
+          justifyContent: 'flex-end',
+        }}
+        onStartShouldSetResponder={() => {
+          this.resetErrorPopup(true);
         }}
       >
         <Icon
@@ -193,11 +287,12 @@ class CalendarPage extends Component<Props> {
             }}
           />
         </View>
-        <View style={{ height: '80%' }}>
+        <View style={{ height: '70%' }}>
           <Divider />
           <Timeline
             data={mapTimes}
-            style={{ marginHorizontal: 20, marginBottom: 100 }}
+            style={{ marginHorizontal: 20 }}
+            keyExtractor={(item, index) => index.toString()}
             renderItem={(element) => {
               const {
                 props, item, isLast, index, key,
@@ -221,6 +316,7 @@ class CalendarPage extends Component<Props> {
               const firstPadding = index === 0 ? 5 : 0;
               return (
                 <View
+                  key={key}
                   style={{
                     flexDirection: 'row',
                     paddingTop: firstPadding,
@@ -250,16 +346,17 @@ class CalendarPage extends Component<Props> {
                         borderRadius: 50,
                       }}
                     />
-                    {!isLast ? (
-                      <View
-                        style={{
-                          backgroundColor: props.lineColor,
-                          width: props.lineWidth,
-                          height: 50,
-                          marginLeft: 9,
-                        }}
-                      />
-                    ) : null}
+
+                    <View
+                      style={{
+                        backgroundColor: isLast
+                          ? 'transparent'
+                          : props.lineColor,
+                        width: props.lineWidth,
+                        height: 50,
+                        marginLeft: 9,
+                      }}
+                    />
                   </View>
                   {Platform.select({
                     ios: (
@@ -268,7 +365,6 @@ class CalendarPage extends Component<Props> {
                         onPress={() => {
                           this.selectTime(item);
                         }}
-                        key={key}
                       >
                         <View style={frameStyle} />
                       </TouchableOpacity>
@@ -280,7 +376,6 @@ class CalendarPage extends Component<Props> {
                           this.selectTime(item);
                         }}
                         style={{}}
-                        key={key}
                       >
                         <View style={frameStyle}>
                           <Divider />
@@ -292,8 +387,21 @@ class CalendarPage extends Component<Props> {
               );
             }}
           />
-          <Divider style={{ bottom: 100 }} />
+          <Divider />
+          <Button
+            containerStyle={{
+              height: 50,
+              width: 100,
+              marginTop: 20,
+              alignSelf: 'center',
+            }}
+            onPress={this.saveAppointment}
+            buttonStyle={{ height: '100%', width: '100%' }}
+            title="Reserva!"
+          />
         </View>
+        <View style={{ flex: 1 }} />
+        <View>{this.displayPopup()}</View>
       </View>
     );
   }
@@ -332,6 +440,12 @@ function mapDispatchToProps(dispatch) {
     removeService: () => {
       dispatch({
         type: REMOVE_SERVICE,
+      });
+    },
+    setLoading: (loading) => {
+      dispatch({
+        type: LOADING,
+        loading,
       });
     },
   };

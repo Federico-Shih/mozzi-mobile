@@ -114,7 +114,9 @@ export class Popup extends Component<Props> {
     const { anim } = this.state;
     const { message } = this.props;
     return (
-      <Animated.View style={{ ...styles.popup, bottom: anim }}>
+      <Animated.View
+        style={{ ...styles.popup, bottom: anim, position: 'absolute' }}
+      >
         <View style={{ height: '100%', backgroundColor: 'red', width: 10 }} />
         <Text style={{ paddingLeft: 20, fontSize: 15 }}>{message}</Text>
       </Animated.View>

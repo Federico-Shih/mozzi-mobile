@@ -75,20 +75,30 @@ export const getBusiness = ({ uuid, token }) => business;
   resolve(business);
 });
 */
+
+export const sendAppointment = ({
+  uuid, token, service, date, time,
+}) => new Promise((resolve, reject) => {
+  resolve(true);
+});
+
 export const getServiceTimes = ({
   service, token, uuid, day,
 }) => {
   const start = 8;
   const end = 20;
-  const uff = (end - start) * 4;
+  const interval = 60;
+  const uff = (end - start) * (60 / interval);
   const returnVal = new Map();
   for (let i = 0; i <= uff; i += 1) {
     const key = newUuid();
-    returnVal.set(key, {
-      time: newTime(start, i * 15),
+    returnVal.set(i, {
+      time: newTime(start, i * interval),
       occupied: false,
       selected: false,
       key,
+      index: i,
+      isLast: i === uff,
     });
   }
   return returnVal;
