@@ -1,10 +1,12 @@
 import { PermissionsAndroid, Platform } from 'react-native';
 
+// Validate that email is of the correct format
 export const validateEmail = function validateEmail(email) {
   const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(email);
 };
 
+// Concentrates all messages so you can modify this to change language
 export const errorMessages = {
   name: {
     empty: 'No haz ingresado un nombre.',
@@ -29,6 +31,7 @@ export const errorMessages = {
   noTimeSelected: 'No haz seleccionado un horario',
 };
 
+// Grants permissions on android and iOS
 export const grantingPermissions = Platform.select({
   ios: () => {},
   android: () => new Promise((resolve) => {

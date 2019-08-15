@@ -11,6 +11,7 @@ import PropTypes from 'prop-types';
 import {
   Image, Divider, Button, Icon,
 } from 'react-native-elements';
+import newUUID from 'uuid';
 
 import { ScrollView } from 'react-native-gesture-handler';
 import styles from '../libraries/styles/styles';
@@ -19,6 +20,7 @@ import { getBusiness } from '../libraries/connect/businessCalls';
 
 type Props = {};
 
+// Services template which shows brief info of each service
 function Services({ el }) {
   return (
     <View
@@ -39,6 +41,7 @@ Services.propTypes = {
   }).isRequired,
 };
 
+// Main business page
 class Business extends Component<Props> {
   state = {
     business: {
@@ -52,6 +55,7 @@ class Business extends Component<Props> {
     },
   };
 
+  // Validates props
   static propTypes = {
     token: PropTypes.string.isRequired,
     uuid: PropTypes.string.isRequired,
@@ -63,24 +67,28 @@ class Business extends Component<Props> {
     addService: PropTypes.func.isRequired,
   };
 
+  // Gets the business when it mounts
   componentDidMount = () => {
     /*
-    basic catch and then
+    basic catch and then when get Business receives the API call
     */
     const { token, uuid } = this.props;
     const business = getBusiness({ token, uuid });
+    // changes the business
     this.setState({ business });
   };
 
+  // Depending on the service id, navigates to the calendar and uses redux to save the service selected
   navToCalendar = (id) => {
     const { addService, navigation } = this.props;
     addService(id);
     navigation.navigate('Calendar');
   }
 
+  // Main render process
   render() {
     const { business } = this.state;
-    const { token, uuid, navigation, navigateToSearcher } = this.props;
+    const { navigation, navigateToSearcher } = this.props;
     const { street, zone, number } = business;
     return (
       <View style={styles.container}>
@@ -134,7 +142,7 @@ class Business extends Component<Props> {
                 Platform.select({
                   ios: (
                     <TouchableOpacity
-                      key={i}
+                      key={newUUID()}
                       onPress={() => {
                         this.navToCalendar(el.id);
                       }}
@@ -155,7 +163,7 @@ class Business extends Component<Props> {
                   ),
                   android: (
                     <TouchableNativeFeedback
-                      key={i}
+                      key={newUUID()}
                       background={TouchableNativeFeedback.Ripple('#DDD')}
                       conta
                       onPress={() => {

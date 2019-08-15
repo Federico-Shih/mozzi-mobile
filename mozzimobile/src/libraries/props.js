@@ -5,6 +5,7 @@ import styles from './styles/styles';
 
 type Props = {};
 
+// Not used
 const TitleProp = (props) => {
   const { text } = props;
   return <Text style={styles.title}>{text}</Text>;
@@ -14,6 +15,7 @@ TitleProp.propTypes = {
   text: PropTypes.string.isRequired,
 };
 
+// Not used
 const LogRegTitleProp = (props) => {
   const { style, text } = props;
   return (
@@ -27,6 +29,7 @@ LogRegTitleProp.propTypes = {
   text: PropTypes.string.isRequired,
 };
 
+// Modify the time to display the animation POPUP in ms
 const popupDuration = 200;
 
 /* To implement Popup */
@@ -61,13 +64,16 @@ const popupDuration = 200;
         this.time = setTimeout(this.resetErrorPopup, 2000);
     };
 
-    ADD A <View>
+    REMEMBER TO USE IT IN A VIEW WITH ALIGNCONTENT FLEXEND
+    ADD A
+    <View>
         {this.displayPopup()}
     </View>
 
     in render
 */
 
+// Popup component
 export class Popup extends Component<Props> {
   static propTypes = {
     init: PropTypes.bool.isRequired,

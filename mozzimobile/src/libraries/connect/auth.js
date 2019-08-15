@@ -4,16 +4,19 @@ const serverSettings = require('./server');
 
 // Assuming parameters and returned successfully
 
+/* Register function using GRAPHQL */
 export const register = (name, surname, email, password) => new Promise((resolve, reject) => {
   axios
     .post(
+      // Uses string formatting to insert each variable in the call
       `${serverSettings.serverURL}/graphql`,
       {
+        // It sends the query in the data object, with query with the GRAPHQL query variables with its variables
         query: `
-                mutation Register($creds: registerInput) {
-                    register(input: $creds)
-                }
-            `,
+            mutation Register($creds: registerInput) {
+                register(input: $creds)
+            }
+          `,
         variables: {
           creds: {
             email,
@@ -66,6 +69,7 @@ const register = (name, surname, email, password) => {
 
 */
 
+// Login GRAPHQL query, instead of mutation its a query since we aren't changing data
 export const login = (email, password) => new Promise((resolve, reject) => {
   axios
     .post(
@@ -123,6 +127,7 @@ const login = (email, password) => {
 };
 */
 
+// Legacy REST API recover password function, when GRAPHQL endpoint is implemented will change
 export const recoverPassword = email => new Promise((resolve, reject) => {
   axios({
     baseURL: serverSettings.serverURL,
@@ -144,11 +149,11 @@ export const recoverPassword = email => new Promise((resolve, reject) => {
     });
 });
 
+// Temporal API result
 const User = {
   image: 'https://pickaface.net/gallery/avatar/Opi51c74d0125fd4.png',
   name: 'Federico Shih',
 };
 
-export const getProfile = ({ token }) => {
-  return User;
-};
+// Gets user profile depending on token that will be used to get user information
+export const getProfile = ({ token }) => User;

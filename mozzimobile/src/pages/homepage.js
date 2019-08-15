@@ -13,12 +13,19 @@ import {
 } from 'react-native';
 import React, { Component } from 'react';
 import {
-  SearchBar, Button, Header, Icon, Card, ListItem, Divider,
+  SearchBar,
+  Button,
+  Header,
+  Icon,
+  Card,
+  ListItem,
+  Divider,
 } from 'react-native-elements';
 import PropTypes from 'prop-types';
 import { ScrollView } from 'react-native-gesture-handler';
 import SideMenu from 'react-native-side-menu-over';
 import { connect } from 'react-redux';
+import { NavigationEvents } from 'react-navigation';
 
 import { platformBackColor } from '../libraries/styles/constants';
 import { LOADING, REMOVE_TOKEN, ADD_BUSINESS_UUID } from '../actions';
@@ -31,311 +38,325 @@ type Props = {};
 
 // Main homepage class
 class Homepage extends Component<Props> {
-    state = {
-      isOpen: false,
-      searchBarIsOpen: false,
-      profile: {
-        name: '',
-        image: null,
-      }
-    };
+  state = {
+    isOpen: false,
+    searchBarIsOpen: false,
+    profile: {
+      name: '',
+      image: null,
+    },
+  };
 
-    static propTypes = {
-      navigation: PropTypes.shape({
-        navigate: PropTypes.func.isRequired,
-        replace: PropTypes.func.isRequired,
-      }).isRequired,
-      token: PropTypes.string.isRequired,
-      navigateToBusiness: PropTypes.func.isRequired,
-    }
+  static propTypes = {
+    navigation: PropTypes.shape({
+      navigate: PropTypes.func.isRequired,
+      replace: PropTypes.func.isRequired,
+    }).isRequired,
+    token: PropTypes.string.isRequired,
+    navigateToBusiness: PropTypes.func.isRequired,
+  };
 
-    componentDidMount() {
-      const { navigation, token } = this.props;
+  componentDidMount() {
+    const { navigation, token } = this.props;
 
-      if (token === '' && !devMode) {
-        navigation.replace('Login');
-      } else {
-        /*
+    if (token === '' && !devMode) {
+      navigation.replace('Login');
+    } else {
+      /*
         GET PROFILE LOGIC
         */
-        const user = getProfile(token);
-        this.setState({ profile: user });
-      }
+      const user = getProfile(token);
+      this.setState({ profile: user });
     }
+  }
 
-    toggle() {
-      const { isOpen } = this.state;
-      this.setState({
-        isOpen: !isOpen,
-      });
-    }
+  toggle() {
+    const { isOpen } = this.state;
+    this.setState({
+      isOpen: !isOpen,
+    });
+  }
 
-    updateMenuState(isOpen) {
-      this.setState({
-        isOpen,
-      });
-    }
+  updateMenuState(isOpen) {
+    this.setState({
+      isOpen,
+    });
+  }
 
-    toggleSearchBar() {
-      const { searchBarIsOpen } = this.state;
-      this.setState({
-        searchBarIsOpen: !searchBarIsOpen,
-      });
-    }
+  toggleSearchBar() {
+    const { searchBarIsOpen } = this.state;
+    this.setState({
+      searchBarIsOpen: !searchBarIsOpen,
+    });
+  }
 
-    render() {
-      const { navigation, token, navigateToBusiness } = this.props;
-      const { isOpen, searchBarIsOpen } = this.state;
-      return (
-        <SideMenu
-          menu={<Menu navigation={navigation} props={this.props} state={this.state} />}
-          isOpen={isOpen}
-          onChange={open => this.updateMenuState(open)}
-        >
-          <KeyboardAvoidingView style={styles.avoidContainer}>
-            <Header
-              leftComponent={(
-                <Button
-                  containerStyle={{ bottom: '50%' }}
-                  icon={
-                    (
-                      <Icon
-                        name="menu"
-                        size={30}
-                      />
-                    )
-                      }
-                  type="clear"
-                  onPress={() => { this.toggle(); }}
-                />
-                )}
-              containerStyle={{ height: 60, backgroundColor: '#F5FCFF', borderWidth: 0 }}
-              centerComponent={{ text: 'Mozzi', style: { bottom: '50%', fontSize: 25 } }}
-              placement="left"
-            />
-
-            <ScrollView
-              style={{ width: '100%' }}
-              scrollEnabled
-            >
+  render() {
+    const { navigation, token, navigateToBusiness } = this.props;
+    const { isOpen, searchBarIsOpen } = this.state;
+    return (
+      <SideMenu
+        menu={
+          <Menu navigation={navigation} props={this.props} state={this.state} />
+        }
+        isOpen={isOpen}
+        onChange={open => this.updateMenuState(open)}
+      >
+        <NavigationEvents
+          onWillFocus={(payload) => {
+            if (payload.action.type === 'Navigation/POP') this.setState({ searchBarIsOpen: false });
+          }}
+        />
+        <KeyboardAvoidingView style={styles.avoidContainer}>
+          <Header
+            leftComponent={(
               <Button
-                icon={(
-                  <Icon
-                    name="search"
-                    size={22}
-                    color="gray"
-                  />
-                )}
-                iconContainerStyle={{}}
-                title="¿A dónde querés comprar?"
+                containerStyle={{ bottom: '50%' }}
+                icon={<Icon name="menu" size={30} />}
+                type="clear"
                 onPress={() => {
-                  this.toggleSearchBar();
-                }}
-                titleStyle={{ fontSize: 13, left: 10, color: 'grey' }}
-                containerStyle={{ justifyContent: 'flex-start', width: '100%', alignItems: 'center' }}
-                buttonStyle={{
-                  borderRadius: 50, justifyContent: 'flex-start', paddingVertical: 10, backgroundColor: '#E0E0E0', width: '90%',
+                  this.toggle();
                 }}
               />
-              <MainSection />
-
-            </ScrollView>
-          </KeyboardAvoidingView>
-          <SearchBarSlideUp
-            open={searchBarIsOpen}
-            navigation={navigation}
-            token={token}
-            toggle={() => { this.toggleSearchBar(); }}
-            navigateToBusiness={navigateToBusiness}
+)}
+            containerStyle={{
+              height: 60,
+              backgroundColor: '#F5FCFF',
+              borderWidth: 0,
+            }}
+            centerComponent={{
+              text: 'Mozzi',
+              style: { bottom: '50%', fontSize: 25 },
+            }}
+            placement="left"
           />
-        </SideMenu>
 
-      );
-    }
+          <ScrollView style={{ width: '100%' }} scrollEnabled>
+            <Button
+              icon={<Icon name="search" size={22} color="gray" />}
+              iconContainerStyle={{}}
+              title="¿A dónde querés comprar?"
+              onPress={() => {
+                this.toggleSearchBar();
+              }}
+              titleStyle={{ fontSize: 13, left: 10, color: 'grey' }}
+              containerStyle={{
+                justifyContent: 'flex-start',
+                width: '100%',
+                alignItems: 'center',
+              }}
+              buttonStyle={{
+                borderRadius: 50,
+                justifyContent: 'flex-start',
+                paddingVertical: 10,
+                backgroundColor: '#E0E0E0',
+                width: '90%',
+              }}
+            />
+            <MainSection />
+          </ScrollView>
+        </KeyboardAvoidingView>
+        <SearchBarSlideUp
+          open={searchBarIsOpen}
+          navigation={navigation}
+          token={token}
+          toggle={() => {
+            this.toggleSearchBar();
+          }}
+          navigateToBusiness={navigateToBusiness}
+        />
+      </SideMenu>
+    );
+  }
 }
 
 const slideUpDuration = 300;
 
 class SearchBarSlideUp extends Component<Props> {
-    state = {
-      anim: new Animated.Value(20),
-      search: '',
-      loading: false,
-      searchResults: [],
-    }
+  state = {
+    anim: new Animated.Value(20),
+    search: '',
+    loading: false,
+    searchResults: [],
+  };
 
-    static propTypes = {
-      open: PropTypes.bool.isRequired,
-      toggle: PropTypes.func.isRequired,
-      token: PropTypes.string.isRequired,
-      navigateToBusiness: PropTypes.func.isRequired,
-      navigation: PropTypes.object.isRequired,
-    }
+  static propTypes = {
+    open: PropTypes.bool.isRequired,
+    toggle: PropTypes.func.isRequired,
+    token: PropTypes.string.isRequired,
+    navigateToBusiness: PropTypes.func.isRequired,
+    navigation: PropTypes.object.isRequired,
+  };
 
-    componentDidMount() {
-      const { open } = this.props;
-      const { anim } = this.state;
+  componentDidMount() {
+    const { open } = this.props;
+    const { anim } = this.state;
+    if (open) {
+      Animated.timing(anim, {
+        toValue: 0,
+        duration: slideUpDuration,
+      }).start();
+    } else {
+      this.setState({
+        anim: new Animated.Value(Dimensions.get('window').height),
+      });
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    const { open } = this.props;
+    const { anim } = this.state;
+    if (open !== prevProps.open) {
       if (open) {
-        Animated.timing(
-          anim,
-          {
-            toValue: 0,
-            duration: slideUpDuration,
-          },
-        ).start();
+        Animated.timing(anim, {
+          toValue: 0,
+          duration: slideUpDuration,
+        }).start();
+        this.textInput.focus();
       } else {
-        this.setState({ anim: new Animated.Value(Dimensions.get('window').height) });
+        Animated.timing(anim, {
+          toValue: Dimensions.get('window').height,
+          duration: slideUpDuration,
+        }).start();
       }
     }
+  }
 
-    componentDidUpdate(prevProps) {
-      const { open } = this.props;
-      const { anim } = this.state;
-      if (open !== prevProps.open) {
-        if (open) {
-          Animated.timing(
-            anim,
-            {
-              toValue: 0,
-              duration: slideUpDuration,
-            },
-          ).start();
-          this.textInput.focus();
-        } else {
-          Animated.timing(
-            anim,
-            {
-              toValue: Dimensions.get('window').height,
-              duration: slideUpDuration,
-            },
-          ).start();
-        }
-      }
-    }
+  updateSearch = (search) => {
+    this.setState({ search });
+  };
 
-    updateSearch = (search) => {
-      this.setState({ search });
-    }
+  resetSearch = () => {
+    this.setState({ searchResults: [], search: '' });
+  };
 
-    resetSearch = () => {
-      this.setState({ searchResults: [], search: '' });
-    }
+  sendToPage = (uuid) => {
+    const { navigateToBusiness, navigation } = this.props;
+    navigateToBusiness(uuid);
+    navigation.navigate('Business');
+  };
 
-    sendToPage = (uuid) => {
-      const { navigateToBusiness, navigation } = this.props;
-      navigateToBusiness(uuid);
-      navigation.navigate('Business');
-    }
-
-    render() {
-      const {
-        anim, search, loading, searchResults,
-      } = this.state;
-      const { toggle, token } = this.props;
-      return (
-        <Animated.View
-          style={{
-            ...styles.container,
+  render() {
+    const {
+      anim, search, loading, searchResults,
+    } = this.state;
+    const { toggle, token } = this.props;
+    return (
+      <Animated.View
+        style={{
+          ...styles.container,
+          backgroundColor: platformBackColor,
+          flex: 1,
+          width: Dimensions.get('window').width,
+          height: Dimensions.get('window').height,
+          position: 'absolute',
+          top: anim,
+        }}
+      >
+        <Button
+          icon={(
+            <Icon
+              name={Platform.select({
+                ios: 'arrow-back-ios',
+                android: 'arrow-back',
+              })}
+              size={30}
+              color="gray"
+            />
+)}
+          onPress={() => {
+            Keyboard.dismiss();
+            toggle();
+            this.resetSearch();
+          }}
+          containerStyle={{
+            borderRadius: 50,
+            flexDirection: 'row',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            width: '100%',
+            height: 50,
+          }}
+          buttonStyle={{
+            borderRadius: 50,
             backgroundColor: platformBackColor,
-            flex: 1,
-            width: Dimensions.get('window').width,
-            height: Dimensions.get('window').height,
-            position: 'absolute',
-            top: anim,
+            marginLeft: 5,
+            marginTop: 5,
+          }}
+        />
+        <SearchBar
+          ref={(ref) => {
+            this.textInput = ref;
+          }}
+          placeholder="Buscar..."
+          onChangeText={text => this.updateSearch(text)}
+          value={search}
+          lightTheme
+          showLoading={loading}
+          onSubmitEditing={() => {
+            this.setState({ loading: true });
+
+            // CHANGE WHEN API IS HERE
+            this.setState({ searchResults: getStores(search, token) });
+            this.setState({ loading: false });
+          }}
+          round
+          containerStyle={{
+            width: '90%',
+            height: 60,
+            backgroundColor: platformBackColor,
+            borderWidth: 0,
+            borderBottomWidth: 0,
+            borderTopWidth: 0,
+          }}
+        />
+        <Divider
+          style={{ backgroundColor: '#DDDDDD', width: '100%', height: 2 }}
+        />
+        <ScrollView
+          style={{
+            width: '100%',
+            marginTop: 10,
           }}
         >
-
-          <Button
-            icon={(
-              <Icon
-                name={Platform.select({ ios: 'arrow-back-ios', android: 'arrow-back' })}
-                size={30}
-                color="gray"
+          {searchResults.map((el, o) => (
+            <View key={o}>
+              {Platform.select({
+                ios: (
+                  <TouchableOpacity
+                    onPress={() => {
+                      this.sendToPage(el.uuid);
+                    }}
+                  >
+                    <SearchElement el={el} />
+                  </TouchableOpacity>
+                ),
+                android: (
+                  <TouchableNativeFeedback
+                    background={TouchableNativeFeedback.Ripple('#DDD')}
+                    onPress={() => {
+                      this.sendToPage(el.uuid);
+                    }}
+                  >
+                    <View>
+                      <SearchElement el={el} />
+                    </View>
+                  </TouchableNativeFeedback>
+                ),
+              })}
+              <Divider
+                style={{
+                  backgroundColor: '#DDDDDD',
+                  width: 300,
+                  height: 0.9,
+                  alignSelf: 'flex-end',
+                }}
               />
-            )}
-            onPress={() => {
-              Keyboard.dismiss();
-              toggle();
-              this.resetSearch();
-            }}
-            containerStyle={{
-              borderRadius: 50, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', width: '100%', height: 50,
-            }}
-            buttonStyle={{
-              borderRadius: 50, backgroundColor: platformBackColor, marginLeft: 5, marginTop: 5,
-            }}
-          />
-          <SearchBar
-            ref={(ref) => { this.textInput = ref; }}
-            placeholder="Buscar..."
-            onChangeText={text => this.updateSearch(text)}
-            value={search}
-            lightTheme
-            showLoading={loading}
-            onSubmitEditing={() => {
-              this.setState({ loading: true });
-
-              // CHANGE WHEN API IS HERE
-              this.setState({ searchResults: getStores(search, token) });
-              this.setState({ loading: false });
-            }}
-            round
-            containerStyle={{
-              width: '90%', height: 60, backgroundColor: platformBackColor, borderWidth: 0, borderBottomWidth: 0, borderTopWidth: 0,
-            }}
-          />
-          <Divider style={{ backgroundColor: '#DDDDDD', width: '100%', height: 2 }} />
-          <ScrollView
-            style={
-              {
-                width: '100%',
-                marginTop: 10,
-              }
-            }
-          >
-
-            {
-              searchResults.map((el, o) => (
-                <View key={o}>
-                  {
-                    Platform.select({
-                      ios: (
-                        <TouchableOpacity
-                          onPress={() => {
-                            this.sendToPage(el.uuid);
-                          }}
-                        >
-                          <SearchElement el={el} />
-                        </TouchableOpacity>
-                      ),
-                      android: (
-                        <TouchableNativeFeedback
-                          background={TouchableNativeFeedback.Ripple('#DDD')}
-                          onPress={() => {
-                            this.sendToPage(el.uuid);
-                          }}
-                        >
-                          <View>
-                            <SearchElement el={el} />
-                          </View>
-                        </TouchableNativeFeedback>
-                      ),
-                    })
-                  }
-                  <Divider style={{
-                    backgroundColor: '#DDDDDD',
-                    width: 300,
-                    height: 0.9,
-                    alignSelf: 'flex-end',
-                  }}
-                  />
-                </View>
-              ))
-            }
-          </ScrollView>
-        </Animated.View>
-      );
-    }
+            </View>
+          ))}
+        </ScrollView>
+      </Animated.View>
+    );
+  }
 }
 
 function SearchElement({ el }) {
@@ -353,12 +374,8 @@ function SearchElement({ el }) {
         style={{ width: 60, height: 60, borderRadius: 10 }}
       />
       <View style={{ flexDirection: 'column', left: 20 }}>
-        <Text style={{ fontSize: 20 }}>
-          {el.name}
-        </Text>
-        <Text style={{ fontSize: 15 }}>
-          {el.description}
-        </Text>
+        <Text style={{ fontSize: 20 }}>{el.name}</Text>
+        <Text style={{ fontSize: 15 }}>{el.description}</Text>
       </View>
     </View>
   );
@@ -373,7 +390,7 @@ SearchElement.propTypes = {
 };
 
 // STRUCTURE OF THE MAIN SECTION OF THE MAINPAGE. THINGS LIKE RECENT STORES, CHANGE structure ONLOAD TO LOAD THE API DATA
-let structure = [
+const structure = [
   {
     title: 'Recientes',
     items: [
@@ -394,9 +411,7 @@ let structure = [
 
   {
     title: 'Favoritos',
-    items: [
-
-    ],
+    items: [],
   },
   {
     title: 'Recientes',
@@ -438,17 +453,12 @@ let structure = [
 function MainSection(props) {
   const listCards = structure.map((el, i) => (
     <Card title={el.title} key={i}>
-      {
-        el.items.map((stores, k) => (
-          <ListItem
-            key={k}
-            title={stores.title}
-          />
-        ))
-      }
+      {el.items.map((stores, k) => (
+        <ListItem key={k} title={stores.title} />
+      ))}
     </Card>
   ));
-  return (listCards);
+  return listCards;
 }
 
 /*
@@ -490,7 +500,6 @@ const buttons = [
     id: 'config',
     icon: 'settings',
   },
-
 ];
 
 // Pretty self explanatory
@@ -547,7 +556,11 @@ const menuStyles = StyleSheet.create({
 // MENU DISPLAYED ON SIDEBAR MENU
 function Menu({ navigation, props, state }) {
   return (
-    <ScrollView scrollsToTop={false} style={menuStyles.menu} contentContainerStyle={{ height: '100%', justifyContent: 'flex-end' }}>
+    <ScrollView
+      scrollsToTop={false}
+      style={menuStyles.menu}
+      contentContainerStyle={{ height: '100%', justifyContent: 'flex-end' }}
+    >
       <View style={menuStyles.avatarContainer}>
         <Image
           style={menuStyles.avatar}
@@ -560,12 +573,7 @@ function Menu({ navigation, props, state }) {
       <View style={{ flex: 1 }} />
       <Button
         containerStyle={{ alignItems: 'flex-start', width: '100%' }}
-        icon={(
-          <Icon
-            name="exit-to-app"
-            size={25}
-          />
-        )}
+        icon={<Icon name="exit-to-app" size={25} />}
         buttonStyle={{ width: '100%', paddingRight: '50%' }}
         type="clear"
         onPress={() => {
@@ -574,7 +582,6 @@ function Menu({ navigation, props, state }) {
         }}
         title="Cerrar Sesión"
       />
-
     </ScrollView>
   );
 }
@@ -602,17 +609,10 @@ function SideMenuButtons(props) {
       titleStyle={menuStyles.item}
       onPress={() => props.navigation.navigate(btn.nav)}
       buttonStyle={menuStyles.itemButton}
-      icon={
-        (
-          <Icon
-            name={btn.icon}
-            size={25}
-          />
-        )
-      }
+      icon={<Icon name={btn.icon} size={25} />}
     />
   ));
-  return (listButtons);
+  return listButtons;
 }
 
 function mapStateToProps(state) {
@@ -621,7 +621,6 @@ function mapStateToProps(state) {
     token: state.token,
   };
 }
-
 
 function mapDispatchToProps(dispatch) {
   return {
@@ -645,4 +644,7 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Homepage);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(Homepage);

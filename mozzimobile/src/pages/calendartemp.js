@@ -216,7 +216,6 @@ class CalendarPage extends Component<Props> {
     const { dates, data } = this.state;
     const mapDates = Array.from(dates.values());
     const mapTimes = Array.from(data.values());
-    console.log(mapTimes);
     return (
       <View
         style={{
