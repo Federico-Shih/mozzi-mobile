@@ -28,7 +28,9 @@ import SideMenu from 'react-native-side-menu-over';
 import { connect } from 'react-redux';
 import { NavigationEvents } from 'react-navigation';
 
+import { errorMessages } from '../libraries/helpers';
 import { platformBackColor } from '../libraries/styles/constants';
+import { Popup } from '../libraries/props';
 import { LOADING, REMOVE_TOKEN, ADD_BUSINESS_UUID } from '../actions';
 import styles from '../libraries/styles/styles';
 import { getStores } from '../libraries/connect/businessCalls';
@@ -57,6 +59,10 @@ class Homepage extends Component<Props> {
     navigateToBusiness: PropTypes.func.isRequired,
   };
 
+  popupMessage = { title: '', message: '', previousMessage: '' };
+
+  time = '';
+
   constructor(props) {
     super(props);
     this.searchModal = React.createRef();
@@ -75,6 +81,32 @@ class Homepage extends Component<Props> {
       this.setState({ profile: user });
     }
   }
+
+  sendPopup = (title, message) => {
+    this.popupMessage = { title, message, previousMessage: message };
+    this.forceUpdate();
+    this.time = setTimeout(this.resetErrorPopup, 2000);
+  };
+
+  displayPopup = () => {
+    if (this.popupMessage.message) {
+      return <Popup message={this.popupMessage.message} init />;
+    }
+    if (!this.popupMessage.message && this.popupMessage.previousMessage) {
+      return <Popup message={this.popupMessage.previousMessage} init={false} />;
+    }
+    return null;
+  };
+
+  resetErrorPopup = () => {
+    if (this.popupMessage.message != '') {
+      this.popupMessage = { ...this.popupMessage, title: '', message: '' };
+      this.forceUpdate();
+    }
+    if (this.time) {
+      clearTimeout(this.time);
+    }
+  };
 
   toggle() {
     const { isOpen } = this.state;
@@ -170,11 +202,13 @@ class Homepage extends Component<Props> {
           navigation={navigation}
           token={token}
           ref={this.searchModal}
+          sendPopup={this.sendPopup}
           toggle={() => {
             this.toggleSearchBar();
           }}
           navigateToBusiness={navigateToBusiness}
         />
+        <View>{this.displayPopup()}</View>
       </SideMenu>
     );
   }
@@ -196,6 +230,7 @@ class SearchBarSlideUp extends Component<Props> {
     token: PropTypes.string.isRequired,
     navigateToBusiness: PropTypes.func.isRequired,
     navigation: PropTypes.object.isRequired,
+    sendPopup: PropTypes.func.isRequired,
   };
 
   componentDidMount() {
@@ -211,7 +246,10 @@ class SearchBarSlideUp extends Component<Props> {
         anim: new Animated.Value(Dimensions.get('window').height),
       });
     }
-    this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.goBack);
+    this.backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      this.goBack,
+    );
   }
 
   componentDidUpdate(prevProps) {
@@ -238,7 +276,6 @@ class SearchBarSlideUp extends Component<Props> {
   }
 
   goBack = () => {
-    alert('am')
     const { toggle, navigation, open } = this.props;
     if (!open) {
       navigation.pop();
@@ -246,7 +283,7 @@ class SearchBarSlideUp extends Component<Props> {
       toggle();
     }
     return true;
-  }
+  };
 
   updateSearch = (search) => {
     this.setState({ search });
@@ -266,7 +303,7 @@ class SearchBarSlideUp extends Component<Props> {
     const {
       anim, search, loading, searchResults,
     } = this.state;
-    const { toggle, token } = this.props;
+    const { toggle, token, sendPopup } = this.props;
     return (
       <Animated.View
         style={{
@@ -319,11 +356,26 @@ class SearchBarSlideUp extends Component<Props> {
           value={search}
           lightTheme
           showLoading={loading}
-          onSubmitEditing={() => {
+          onSubmitEditing={async () => {
             this.setState({ loading: true });
-
+            if (!(search.length <= 1 || search.length > 25)) {
+              const storeResults = await getStores({ search, token });
+              const { data } = storeResults;
+              if (data.errors) {
+                data.errors.forEach((el) => {
+                  sendPopup('Ni idea', el.message);
+                });
+              } else if (data.data.businessSearch === null) {
+                this.setState({ searchResults: [] });
+              } else {
+                this.setState({ searchResults: data.data.businessSearch });
+              }
+            } else if (search.length === 1) {
+              sendPopup('Menor que 1', errorMessages.notEnoughLength);
+            } else if (search.length > 25) {
+              sendPopup('Mayor a 25', errorMessages.tooMuchLength);
+            }
             // CHANGE WHEN API IS HERE
-            this.setState({ searchResults: getStores(search, token) });
             this.setState({ loading: false });
           }}
           round
@@ -397,7 +449,7 @@ function SearchElement({ el }) {
       }}
     >
       <Image
-        source={{ uri: el.image }}
+        source={{ uri: 'https://semantic-ui.com/images/wireframe/image.png' }}
         style={{ width: 60, height: 60, borderRadius: 10 }}
       />
       <View style={{ flexDirection: 'column', left: 20 }}>

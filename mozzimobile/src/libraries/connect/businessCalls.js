@@ -1,5 +1,8 @@
 import newUuid from 'uuid';
 
+const axios = require('axios');
+const serverSettings = require('./server');
+
 // Search data that will be received.
 const res = [
   {
@@ -74,7 +77,29 @@ const newTime = (hours, minutes) => {
 };
 
 // To replace when Store search API is present
-export const getStores = ({ search, token }) => res;
+export const getStores = ({ search, token }) => axios.post(
+  `${serverSettings.serverURL}/graphql`,
+  {
+    query: `
+        query Business($search: String!) {
+          businessSearch(name: $search) {
+            uuid
+            name
+            description
+          }
+        }
+      `,
+    variables: {
+      search,
+    },
+  },
+  {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: token,
+    },
+  },
+);
 
 // To replace when business information is present, receives data that will be used to fill the business template
 export const getBusiness = ({ uuid, token }) => business;

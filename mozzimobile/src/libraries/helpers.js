@@ -29,6 +29,8 @@ export const errorMessages = {
   wrongPassword: 'La contraseña ingresada es incorrecta.',
   noDateSelected: 'No haz seleccionado una fecha',
   noTimeSelected: 'No haz seleccionado un horario',
+  notEnoughLength: 'Tiene que ingresar más de 1 letra',
+  tooMuchLength: 'Tiene que ingresar menos de 25 letras',
 };
 
 // Grants permissions on android and iOS
