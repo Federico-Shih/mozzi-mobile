@@ -1,4 +1,5 @@
 import { PermissionsAndroid, Platform } from 'react-native';
+import { EventRegister } from 'react-native-event-listeners';
 
 // Validate that email is of the correct format
 export const validateEmail = function validateEmail(email) {
@@ -33,6 +34,9 @@ export const errorMessages = {
   tooMuchLength: 'Tiene que ingresar menos de 25 letras',
 };
 
+export const sendPopup = (message) => {
+  EventRegister.emit('ReceiveMessage', message);
+};
 // Grants permissions on android and iOS
 export const grantingPermissions = Platform.select({
   ios: () => {},

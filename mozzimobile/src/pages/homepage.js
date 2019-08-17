@@ -28,7 +28,7 @@ import SideMenu from 'react-native-side-menu-over';
 import { connect } from 'react-redux';
 import { NavigationEvents } from 'react-navigation';
 
-import { errorMessages } from '../libraries/helpers';
+import { errorMessages, sendPopup } from '../libraries/helpers';
 import { platformBackColor } from '../libraries/styles/constants';
 import { Popup } from '../libraries/props';
 import { LOADING, REMOVE_TOKEN, ADD_BUSINESS_UUID } from '../actions';
@@ -81,32 +81,6 @@ class Homepage extends Component<Props> {
       this.setState({ profile: user });
     }
   }
-
-  sendPopup = (title, message) => {
-    this.popupMessage = { title, message, previousMessage: message };
-    this.forceUpdate();
-    this.time = setTimeout(this.resetErrorPopup, 2000);
-  };
-
-  displayPopup = () => {
-    if (this.popupMessage.message) {
-      return <Popup message={this.popupMessage.message} init />;
-    }
-    if (!this.popupMessage.message && this.popupMessage.previousMessage) {
-      return <Popup message={this.popupMessage.previousMessage} init={false} />;
-    }
-    return null;
-  };
-
-  resetErrorPopup = () => {
-    if (this.popupMessage.message != '') {
-      this.popupMessage = { ...this.popupMessage, title: '', message: '' };
-      this.forceUpdate();
-    }
-    if (this.time) {
-      clearTimeout(this.time);
-    }
-  };
 
   toggle() {
     const { isOpen } = this.state;
@@ -202,13 +176,11 @@ class Homepage extends Component<Props> {
           navigation={navigation}
           token={token}
           ref={this.searchModal}
-          sendPopup={this.sendPopup}
           toggle={() => {
             this.toggleSearchBar();
           }}
           navigateToBusiness={navigateToBusiness}
         />
-        <View>{this.displayPopup()}</View>
       </SideMenu>
     );
   }
@@ -230,7 +202,6 @@ class SearchBarSlideUp extends Component<Props> {
     token: PropTypes.string.isRequired,
     navigateToBusiness: PropTypes.func.isRequired,
     navigation: PropTypes.object.isRequired,
-    sendPopup: PropTypes.func.isRequired,
   };
 
   componentDidMount() {
@@ -303,7 +274,7 @@ class SearchBarSlideUp extends Component<Props> {
     const {
       anim, search, loading, searchResults,
     } = this.state;
-    const { toggle, token, sendPopup } = this.props;
+    const { toggle, token } = this.props;
     return (
       <Animated.View
         style={{
@@ -363,7 +334,7 @@ class SearchBarSlideUp extends Component<Props> {
               const { data } = storeResults;
               if (data.errors) {
                 data.errors.forEach((el) => {
-                  sendPopup('Ni idea', el.message);
+                  sendPopup(el.message);
                 });
               } else if (data.data.businessSearch === null) {
                 this.setState({ searchResults: [] });
@@ -371,9 +342,9 @@ class SearchBarSlideUp extends Component<Props> {
                 this.setState({ searchResults: data.data.businessSearch });
               }
             } else if (search.length === 1) {
-              sendPopup('Menor que 1', errorMessages.notEnoughLength);
+              sendPopup(errorMessages.notEnoughLength);
             } else if (search.length > 25) {
-              sendPopup('Mayor a 25', errorMessages.tooMuchLength);
+              sendPopup(errorMessages.tooMuchLength);
             }
             // CHANGE WHEN API IS HERE
             this.setState({ loading: false });

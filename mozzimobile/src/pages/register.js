@@ -8,7 +8,7 @@ import { Input, Button } from 'react-native-elements';
 import NetInfo from '@react-native-community/netinfo';
 import PropTypes from 'prop-types';
 // codes
-import { validateEmail, errorMessages } from '../libraries/helpers';
+import { validateEmail, errorMessages, sendPopup } from '../libraries/helpers';
 import { register } from '../libraries/connect/auth';
 import styles from '../libraries/styles/styles';
 import buttonStyle from '../libraries/styles/buttonsStyles';
@@ -42,11 +42,6 @@ class Register extends Component<Props> {
       password: styles.inputText,
       confirmpassword: styles.inputText,
     }
-
-    // Popup Section
-    popupMessage = { title: '', message: '', previousMessage: '' };
-
-    time = '';
 
     static propTypes = {
       setLoading: PropTypes.func.isRequired,
@@ -150,7 +145,7 @@ class Register extends Component<Props> {
         } = this.state;
 
         if (!connection) {
-          this.sendPopup('Intenet connection failure', errorMessages.noConnection);
+          sendPopup(errorMessages.noConnection);
           return;
         }
 
@@ -163,7 +158,7 @@ class Register extends Component<Props> {
           console.log(res);
           if (!res.data.register) {
             for (let i = 0; i < res.errors.length; i += 1) {
-              this.sendPopup(res.errors[i].extensions.code, res.errors[i].message);
+              sendPopup(res.errors[i].message);
             }
           } else {
             setToken(res.data.register);
@@ -172,7 +167,7 @@ class Register extends Component<Props> {
           setLoading(false);
         } catch (error) {
           console.log(error);
-          this.sendPopup('CatchAllErrors', error.message);
+          sendPopup(error.message);
           setLoading(false);
         }
       }
@@ -187,7 +182,7 @@ class Register extends Component<Props> {
               this.setState({ connection: true });
               resolve();
             } else {
-              this.sendPopup('Not connected', errorMessages.noConnection);
+              sendPopup(errorMessages.noConnection);
               this.setState({ connection: false });
               resolve();
             }
@@ -210,32 +205,6 @@ class Register extends Component<Props> {
       } else {
         this.setState({ connection: true });
       }
-    };
-
-    displayPopup = () => {
-      if (this.popupMessage.message) {
-        return <Popup message={this.popupMessage.message} init />;
-      }
-      if (!this.popupMessage.message && this.popupMessage.previousMessage) {
-        return <Popup message={this.popupMessage.previousMessage} init={false} />;
-      }
-      return null;
-    };
-
-    resetErrorPopup = () => {
-      if (this.popupMessage.message !== '') {
-        this.popupMessage = { ...this.popupMessage, title: '', message: '' };
-        this.forceUpdate();
-      }
-      if (this.time) {
-        clearTimeout(this.time);
-      }
-    };
-
-    sendPopup = (title, message) => {
-      this.popupMessage = { title, message, previousMessage: message };
-      this.forceUpdate();
-      this.time = setTimeout(this.resetErrorPopup, 2000);
     };
 
     // Input Error section
@@ -267,12 +236,6 @@ class Register extends Component<Props> {
       );
     }
 
-    componentWillUnmount = () => {
-      if (this.time) {
-        clearTimeout(this.time);
-      }
-    }
-
     // Main render
     render() {
       const { name, surname } = this.state;
@@ -282,9 +245,6 @@ class Register extends Component<Props> {
           style={styles.avoidContainer}
           behavior={Platform.OS === 'ios' ? 'padding' : ''}
           enabled
-          onStartShouldSetResponder={() => {
-            this.resetErrorPopup(true);
-          }}
         >
           <StyledTitle text="Registrate" style={styles.logregTitle} />
           <Input
@@ -364,10 +324,6 @@ class Register extends Component<Props> {
             />
           </View>
           <View style={{ flex: 1 }} />
-
-          <View>
-            {this.displayPopup()}
-          </View>
         </KeyboardAvoidingView>
       );
     }

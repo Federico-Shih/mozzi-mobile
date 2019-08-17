@@ -13,7 +13,7 @@ import NetInfo from '@react-native-community/netinfo';
 import PropTypes from 'prop-types';
 
 // codes
-import { validateEmail, errorMessages } from '../libraries/helpers';
+import { validateEmail, errorMessages, sendPopup } from '../libraries/helpers';
 import { login } from '../libraries/connect/auth';
 import styles from '../libraries/styles/styles';
 import buttonStyle from '../libraries/styles/buttonsStyles';
@@ -44,11 +44,6 @@ class Login extends Component<Props> {
     setToken: PropTypes.func.isRequired,
     loading: PropTypes.bool.isRequired,
   };
-
-  // Popup Section
-  popupMessage = { title: '', message: '', previousMessage: '' };
-
-  time = '';
 
   // Error and Style handlers
   setErrorState = (incomingJson) => {
@@ -123,10 +118,7 @@ class Login extends Component<Props> {
       await this.checkConnectivity();
       const { connection } = this.state;
       if (!connection) {
-        this.sendPopup(
-          'Intenet connection failure',
-          errorMessages.noConnection,
-        );
+        sendPopup(errorMessages.noConnection);
         return;
       }
 
@@ -138,10 +130,7 @@ class Login extends Component<Props> {
         const res = await login(email, password);
         if (!res.data.login) {
           for (let i = 0; i < res.errors.length; i += 1) {
-            this.sendPopup(
-              res.errors[i].extensions.code,
-              res.errors[i].message,
-            );
+            sendPopup(res.errors[i].message);
           }
         } else {
           setToken(res.data.login);
@@ -149,7 +138,7 @@ class Login extends Component<Props> {
         }
         setLoading(false);
       } catch (error) {
-        this.sendPopup('CatchAllErrors', error.message);
+        sendPopup(error.message);
         setLoading(false);
       }
 
@@ -188,7 +177,7 @@ class Login extends Component<Props> {
           this.setState({ connection: true });
           resolve();
         } else {
-          this.sendPopup('Not connected', errorMessages.noConnection);
+          sendPopup(errorMessages.noConnection);
           this.setState({ connection: false });
           resolve();
         }
@@ -213,32 +202,6 @@ class Login extends Component<Props> {
     } else {
       this.setState({ connection: true });
     }
-  };
-
-  displayPopup = () => {
-    if (this.popupMessage.message) {
-      return <Popup message={this.popupMessage.message} init />;
-    }
-    if (!this.popupMessage.message && this.popupMessage.previousMessage) {
-      return <Popup message={this.popupMessage.previousMessage} init={false} />;
-    }
-    return null;
-  };
-
-  resetErrorPopup = () => {
-    if (this.popupMessage.message !== '') {
-      this.popupMessage = { ...this.popupMessage, title: '', message: '' };
-      this.forceUpdate();
-    }
-    if (this.time) {
-      clearTimeout(this.time);
-    }
-  };
-
-  sendPopup = (title, message) => {
-    this.popupMessage = { title, message, previousMessage: message };
-    this.forceUpdate();
-    this.time = setTimeout(this.resetErrorPopup, 2000);
   };
 
   // Input Error section
@@ -291,9 +254,6 @@ class Login extends Component<Props> {
         style={styles.avoidContainer}
         behavior={Platform.OS === 'ios' ? 'padding' : ''}
         enabled
-        onStartShouldSetResponder={() => {
-          this.resetErrorPopup(true);
-        }}
       >
         <StyledTitle text="Iniciar Sesión" style={styles.logregTitle} />
 
@@ -369,9 +329,6 @@ class Login extends Component<Props> {
         </View>
 
         <View style={{ flex: 1 }} />
-
-        {/* Popup component */}
-        <View>{this.displayPopup()}</View>
       </KeyboardAvoidingView>
     );
   }
