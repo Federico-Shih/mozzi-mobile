@@ -32,47 +32,6 @@ LogRegTitleProp.propTypes = {
 // Modify the time to display the animation POPUP in ms
 const popupDuration = 200;
 
-/* To implement Popup */
-/*
-    popupMessage = {title: '', message: '', previousMessage: ''};
-
-    displayPopup = () => {
-        if (this.popupMessage.message) {
-            return <Popup message={this.popupMessage.message} init/>
-        } else if(!this.popupMessage.message && this.popupMessage.previousMessage) {
-            return <Popup message={this.popupMessage.previousMessage} init = {false}/>
-        } else {
-            return null;
-        }
-    };
-
-    resetErrorPopup = () => {
-        if (this.popupMessage.message != ''){
-            this.popupMessage = {...this.popupMessage, title: '', message: ''};
-            this.forceUpdate();
-        }
-        if (this.time) {
-            clearTimeout(this.time);
-        }
-    };
-
-    time = '';
-
-    sendPopup = (title, message) => {
-        this.popupMessage = {title: title, message: message, previousMessage: message};
-        this.forceUpdate();
-        this.time = setTimeout(this.resetErrorPopup, 2000);
-    };
-
-    REMEMBER TO USE IT IN A VIEW WITH ALIGNCONTENT FLEXEND
-    ADD A
-    <View>
-        {this.displayPopup()}
-    </View>
-
-    in render
-*/
-
 // Popup component
 export class Popup extends Component<Props> {
   static propTypes = {

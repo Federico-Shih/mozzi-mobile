@@ -96,13 +96,46 @@ export const getStores = ({ search, token }) => axios.post(
   {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: token,
+      Authorization:
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiODQ1YTBhOWUtN2FjMy00ZjcxLThhMDItMTFhNTFmNTI3NWE3IiwiaWF0IjoxNTY2MTUzNzM5LCJleHAiOjE4MTU2NjE1MzczOX0.V4cdrRnktKcKztwl2WPvumc7s4b7MaSmsxTBFrrN6lM', // token,
     },
   },
 );
 
 // To replace when business information is present, receives data that will be used to fill the business template
-export const getBusiness = ({ uuid, token }) => business;
+export const getBusiness = ({ uuid, token }) => axios.post(
+  `${serverSettings.serverURL}/graphql`,
+  {
+    query: `
+        query Store($store: ID!) {
+          business(uuid: $store) {
+            name
+            street
+            number
+            zone
+            description
+            services {
+              uuid
+              name
+              price
+              duration
+            }
+            postal
+          }
+        }
+      `,
+    variables: {
+      store: uuid,
+    },
+  },
+  {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization:
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiODQ1YTBhOWUtN2FjMy00ZjcxLThhMDItMTFhNTFmNTI3NWE3IiwiaWF0IjoxNTY2MTUzNzM5LCJleHAiOjE4MTU2NjE1MzczOX0.V4cdrRnktKcKztwl2WPvumc7s4b7MaSmsxTBFrrN6lM', // token,
+    },
+  },
+);
 
 // export const getTimetable = ({ uuid, token, serviceId, day}) =>
 /*

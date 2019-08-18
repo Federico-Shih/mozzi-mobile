@@ -268,6 +268,7 @@ class SearchBarSlideUp extends Component<Props> {
     const { navigateToBusiness, navigation } = this.props;
     navigateToBusiness(uuid);
     navigation.navigate('Business');
+    this.backHandler.remove();
   };
 
   render() {

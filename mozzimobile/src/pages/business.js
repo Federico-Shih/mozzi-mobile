@@ -15,6 +15,7 @@ import newUUID from 'uuid';
 
 import { ScrollView } from 'react-native-gesture-handler';
 import styles from '../libraries/styles/styles';
+import { sendPopup } from '../libraries/helpers';
 import { LOADING, REMOVE_BUSINESS_UUID, SELECT_SERVICE, REMOVE_SERVICE } from '../actions';
 import { getBusiness } from '../libraries/connect/businessCalls';
 
@@ -22,15 +23,41 @@ type Props = {};
 
 // Services template which shows brief info of each service
 function Services({ el }) {
+  let formatted = 'Duracion: ';
+  const { duration } = el;
+  if (duration !== null) {
+    if (duration / 60 !== 0) {
+      const unidad = (duration / 60 === 1) ? 'Hora' : 'Horas';
+      formatted = formatted.concat(`${Math.floor(duration / 60)} ${unidad} `);
+    }
+    if (duration % 60 !== 0) {
+      formatted = formatted.concat(`${duration % 60} Minutos`);
+    }
+  } else {
+    formatted = '';
+  }
   return (
     <View
       style={{ color: 'black' }}
     >
-      <Text
-        style={{ fontSize: 16 }}
-      >
-        {el.name}
-      </Text>
+      <View style={{ flex: 1, flexDirection: 'row' }}>
+        <View>
+          <Text
+            style={{ fontSize: 16 }}
+          >
+            {el.name}
+          </Text>
+          <Text>
+            {`${formatted}`}
+          </Text>
+        </View>
+        <View style={{ flex: 1 }} />
+        <Text>
+          {`$ ${el.price}`}
+        </Text>
+      </View>
+
+
     </View>
   );
 }
@@ -38,6 +65,8 @@ function Services({ el }) {
 Services.propTypes = {
   el: PropTypes.shape({
     name: PropTypes.string,
+    price: PropTypes.number,
+    duration: PropTypes.number,
   }).isRequired,
 };
 
@@ -68,14 +97,20 @@ class Business extends Component<Props> {
   };
 
   // Gets the business when it mounts
-  componentDidMount = () => {
+  componentDidMount = async () => {
     /*
     basic catch and then when get Business receives the API call
     */
     const { token, uuid } = this.props;
-    const business = getBusiness({ token, uuid });
-    // changes the business
-    this.setState({ business });
+    const business = await getBusiness({ token, uuid });
+    const { data } = business;
+    if (data.errors) {
+      data.errors.forEach((el) => {
+        sendPopup(el.message);
+      });
+    } else {
+      this.setState({ business: data.data.business });
+    }
   };
 
   // Depending on the service id, navigates to the calendar and uses redux to save the service selected
@@ -88,8 +123,9 @@ class Business extends Component<Props> {
   // Main render process
   render() {
     const { business } = this.state;
+    console.log(business);
     const { navigation, navigateToSearcher } = this.props;
-    const { street, zone, number } = business;
+    const { street, zone, number, postal } = business;
     return (
       <View style={styles.container}>
         <View
@@ -99,7 +135,7 @@ class Business extends Component<Props> {
           }}
         >
           <Image
-            source={{ uri: business.image }}
+            source={{ uri: 'https://semantic-ui.com/images/wireframe/image.png' }}
             style={{
               width: 1000,
               height: 160,
@@ -138,13 +174,13 @@ class Business extends Component<Props> {
                 width: '100%',
               }}
             >
-              {business.services.map((el, i) => (
+              {business.services.map(el => (
                 Platform.select({
                   ios: (
                     <TouchableOpacity
                       key={newUUID()}
                       onPress={() => {
-                        this.navToCalendar(el.id);
+                        this.navToCalendar(el.uuid);
                       }}
                     >
                       <View style={{ }}>
@@ -167,7 +203,7 @@ class Business extends Component<Props> {
                       background={TouchableNativeFeedback.Ripple('#DDD')}
                       conta
                       onPress={() => {
-                        this.navToCalendar(el.id);
+                        this.navToCalendar(el.uuid);
                       }}
                     >
                       <View style={{ }}>
@@ -241,7 +277,7 @@ class Business extends Component<Props> {
             containerStyle={{}}
             onPress={() => {
               /* TEMPORARY, REPLACE WITH INFORMATION PAGE */
-              alert(`${street} ${number}, ${zone}.`);
+              alert(`${street} ${number}, ${zone}. Codigo Postal ${postal}.`);
             }}
             buttonStyle={{ backgroundColor: 'transparent' }}
           />
