@@ -96,8 +96,7 @@ export const getStores = ({ search, token }) => axios.post(
   {
     headers: {
       'Content-Type': 'application/json',
-      Authorization:
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiODQ1YTBhOWUtN2FjMy00ZjcxLThhMDItMTFhNTFmNTI3NWE3IiwiaWF0IjoxNTY2MTUzNzM5LCJleHAiOjE4MTU2NjE1MzczOX0.V4cdrRnktKcKztwl2WPvumc7s4b7MaSmsxTBFrrN6lM', // token,
+      Authorization: token,
     },
   },
 );
@@ -131,8 +130,7 @@ export const getBusiness = ({ uuid, token }) => axios.post(
   {
     headers: {
       'Content-Type': 'application/json',
-      Authorization:
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiODQ1YTBhOWUtN2FjMy00ZjcxLThhMDItMTFhNTFmNTI3NWE3IiwiaWF0IjoxNTY2MTUzNzM5LCJleHAiOjE4MTU2NjE1MzczOX0.V4cdrRnktKcKztwl2WPvumc7s4b7MaSmsxTBFrrN6lM', // token,
+      Authorization: token,
     },
   },
 );

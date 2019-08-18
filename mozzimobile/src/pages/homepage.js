@@ -30,7 +30,6 @@ import { NavigationEvents } from 'react-navigation';
 
 import { errorMessages, sendPopup } from '../libraries/helpers';
 import { platformBackColor } from '../libraries/styles/constants';
-import { Popup } from '../libraries/props';
 import { LOADING, REMOVE_TOKEN, ADD_BUSINESS_UUID } from '../actions';
 import styles from '../libraries/styles/styles';
 import { getStores } from '../libraries/connect/businessCalls';
@@ -68,17 +67,26 @@ class Homepage extends Component<Props> {
     this.searchModal = React.createRef();
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const { navigation, token } = this.props;
 
     if (token === '' && !devMode) {
       navigation.replace('Login');
+      sendPopup('El cliente no tiene una sesión valida');
     } else {
-      /*
-        GET PROFILE LOGIC
-        */
-      const user = getProfile(token);
-      this.setState({ profile: user });
+      const { data } = await getProfile({ token });
+      if (data.errors) {
+        data.errors.forEach((el) => {
+          sendPopup(el.message);
+        });
+      } else {
+        this.setState({
+          profile: {
+            ...data.data.me,
+            image: 'https://pickaface.net/gallery/avatar/Opi51c74d0125fd4.png',
+          },
+        });
+      }
     }
   }
 
@@ -97,6 +105,8 @@ class Homepage extends Component<Props> {
 
   toggleSearchBar() {
     const { searchBarIsOpen } = this.state;
+    const { current } = this.searchModal;
+    current.addGoBackEvent();
     this.setState({
       searchBarIsOpen: !searchBarIsOpen,
     });
@@ -115,10 +125,13 @@ class Homepage extends Component<Props> {
       >
         <NavigationEvents
           onWillFocus={(payload) => {
+            const { current } = this.searchModal;
+            current.resetSearch();
             if (payload.action.type === 'Navigation/POP') {
               this.setState({ searchBarIsOpen: false });
-              const { current } = this.searchModal;
               current.resetSearch();
+            } else if (payload.action.type === 'Navigation/BACK') {
+              current.addGoBackEvent();
             }
           }}
         />
@@ -217,10 +230,6 @@ class SearchBarSlideUp extends Component<Props> {
         anim: new Animated.Value(Dimensions.get('window').height),
       });
     }
-    this.backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      this.goBack,
-    );
   }
 
   componentDidUpdate(prevProps) {
@@ -243,16 +252,15 @@ class SearchBarSlideUp extends Component<Props> {
   }
 
   componentWillUnmount() {
-    this.backHandler.remove();
+    if (this.backHandler) this.backHandler.remove();
   }
 
   goBack = () => {
     const { toggle, navigation, open } = this.props;
-    if (!open) {
-      navigation.pop();
-    } else {
-      toggle();
-    }
+    Keyboard.dismiss();
+    toggle();
+    this.resetSearch();
+    this.backHandler.remove();
     return true;
   };
 
@@ -270,6 +278,13 @@ class SearchBarSlideUp extends Component<Props> {
     navigation.navigate('Business');
     this.backHandler.remove();
   };
+
+  addGoBackEvent() {
+    this.backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      this.goBack,
+    );
+  }
 
   render() {
     const {
@@ -617,7 +632,9 @@ function Menu({ navigation, props, state }) {
           style={menuStyles.avatar}
           source={{ uri: state.profile.image }}
         />
-        <Text style={menuStyles.name}>{state.profile.name}</Text>
+        <Text style={menuStyles.name}>
+          {`${state.profile.name} ${state.profile.lastname}`}
+        </Text>
       </View>
 
       <SideMenuButtons buttons={buttons} navigation={navigation} />

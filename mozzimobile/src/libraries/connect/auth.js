@@ -156,4 +156,22 @@ const User = {
 };
 
 // Gets user profile depending on token that will be used to get user information
-export const getProfile = ({ token }) => User;
+export const getProfile = ({ token }) => axios.post(
+  `${serverSettings.serverURL}/graphql`,
+  {
+    query: `
+        query Profile {
+          me {
+            name
+            lastname
+          }
+        }
+      `,
+  },
+  {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: token,
+    },
+  },
+);
