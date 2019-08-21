@@ -58,10 +58,6 @@ class Homepage extends Component<Props> {
     navigateToBusiness: PropTypes.func.isRequired,
   };
 
-  popupMessage = { title: '', message: '', previousMessage: '' };
-
-  time = '';
-
   constructor(props) {
     super(props);
     this.searchModal = React.createRef();
@@ -118,7 +114,7 @@ class Homepage extends Component<Props> {
     return (
       <SideMenu
         menu={
-          <Menu navigation={navigation} props={this.props} state={this.state} />
+          <Menu navigation={navigation} props={this.props} state={this.state} searchModal={this.searchModal} />
         }
         isOpen={isOpen}
         onChange={open => this.updateMenuState(open)}
@@ -263,6 +259,10 @@ class SearchBarSlideUp extends Component<Props> {
     this.backHandler.remove();
     return true;
   };
+
+  removeHandler = () => {
+    if (this.backHandler) this.backHandler.remove();
+  }
 
   updateSearch = (search) => {
     this.setState({ search });
@@ -620,7 +620,7 @@ const menuStyles = StyleSheet.create({
 });
 
 // MENU DISPLAYED ON SIDEBAR MENU
-function Menu({ navigation, props, state }) {
+function Menu({ navigation, props, state, searchModal }) {
   return (
     <ScrollView
       scrollsToTop={false}
@@ -637,7 +637,7 @@ function Menu({ navigation, props, state }) {
         </Text>
       </View>
 
-      <SideMenuButtons buttons={buttons} navigation={navigation} />
+      <SideMenuButtons buttons={buttons} navigation={navigation} searchModal={searchModal} />
       <View style={{ flex: 1 }} />
       <Button
         containerStyle={{ alignItems: 'flex-start', width: '100%' }}
@@ -675,7 +675,10 @@ function SideMenuButtons(props) {
       type="clear"
       containerStyle={menuStyles.itemContainer}
       titleStyle={menuStyles.item}
-      onPress={() => props.navigation.navigate(btn.nav)}
+      onPress={() => {
+        props.navigation.navigate(btn.nav);
+        props.searchModal.current.removeHandler();
+      }}
       buttonStyle={menuStyles.itemButton}
       icon={<Icon name={btn.icon} size={25} />}
     />

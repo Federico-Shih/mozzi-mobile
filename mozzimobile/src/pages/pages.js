@@ -6,7 +6,7 @@ import calendar from './calendartemp';
 import homepage from './homepage';
 import forgotPassword from './forgotPassword';
 import recentBusinesses from './recentBusinesses';
-import turns from './myOptions';
+import turns from './myAppointments';
 import profile from './myProfile';
 import configuration from './configuration';
 import favorites from './favorites';

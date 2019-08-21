@@ -33,7 +33,7 @@ const AppNavigator = createStackNavigator(
     Calendar: scr.CalendarTemp,
   },
   {
-    initialRouteName: 'Home',
+    initialRouteName: 'Turns',
     defaultNavigationOptions: {
       header: null,
     },

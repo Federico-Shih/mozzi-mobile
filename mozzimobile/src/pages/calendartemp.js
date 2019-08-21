@@ -141,26 +141,6 @@ class CalendarPage extends Component<Props> {
     );
   });
 
-  resetErrorPopup = () => {
-    if (this.popupMessage.message !== '') {
-      this.popupMessage = { ...this.popupMessage, title: '', message: '' };
-      this.forceUpdate();
-    }
-    if (this.time) {
-      clearTimeout(this.time);
-    }
-  };
-
-  sendPopup = (title, message) => {
-    this.popupMessage = {
-      title,
-      message,
-      previousMessage: message,
-    };
-    this.forceUpdate();
-    this.time = setTimeout(this.resetErrorPopup, 2000);
-  };
-
   saveAppointment = async () => {
     const {
       setLoading, uuid, service, token, navigation,

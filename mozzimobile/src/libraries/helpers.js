@@ -7,6 +7,16 @@ export const validateEmail = function validateEmail(email) {
   return re.test(email);
 };
 
+export const getUsableTimeFormat = val => new Date(val)
+  .toLocaleTimeString('en-US', {
+    timeStyle: 'medium',
+    hour12: false,
+    timeZone: 'UTC',
+    hour: 'numeric',
+    minute: 'numeric',
+  })
+  .slice(0, -3);
+
 // Concentrates all messages so you can modify this to change language
 export const errorMessages = {
   name: {
