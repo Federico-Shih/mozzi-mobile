@@ -439,9 +439,9 @@ function SearchElement({ el }) {
         source={{ uri: 'https://semantic-ui.com/images/wireframe/image.png' }}
         style={{ width: 60, height: 60, borderRadius: 10 }}
       />
-      <View style={{ flexDirection: 'column', left: 20 }}>
+      <View style={{ flexDirection: 'column', paddingLeft: 20 }}>
         <Text style={{ fontSize: 20 }}>{el.name}</Text>
-        <Text style={{ fontSize: 15 }}>{el.description}</Text>
+        <Text style={{ fontSize: 15, maxWidth: 290 }}>{el.description}</Text>
       </View>
     </View>
   );
