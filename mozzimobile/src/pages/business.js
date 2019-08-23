@@ -26,7 +26,7 @@ function Services({ el }) {
   let formatted = 'Duracion: ';
   const { duration } = el;
   if (duration !== null) {
-    if (duration / 60 !== 0) {
+    if (Math.floor(duration / 60) !== 0) {
       const unidad = (duration / 60 === 1) ? 'Hora' : 'Horas';
       formatted = formatted.concat(`${Math.floor(duration / 60)} ${unidad} `);
     }
@@ -56,8 +56,6 @@ function Services({ el }) {
           {`$ ${el.price}`}
         </Text>
       </View>
-
-
     </View>
   );
 }

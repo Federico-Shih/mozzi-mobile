@@ -10,6 +10,7 @@ import turns from './myAppointments';
 import profile from './myProfile';
 import configuration from './configuration';
 import favorites from './favorites';
+import authenticate from './authenticatePage';
 
 export const HomePage = homepage;
 export const Business = business;
@@ -23,3 +24,4 @@ export const Turns = turns;
 export const Profile = profile;
 export const Config = configuration;
 export const Favs = favorites;
+export const Auth = authenticate;

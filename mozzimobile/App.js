@@ -31,9 +31,10 @@ const AppNavigator = createStackNavigator(
     Favs: scr.Favs,
     Business: scr.Business,
     Calendar: scr.CalendarTemp,
+    Auth: scr.Auth,
   },
   {
-    initialRouteName: 'Home',
+    initialRouteName: 'Auth',
     defaultNavigationOptions: {
       header: null,
     },

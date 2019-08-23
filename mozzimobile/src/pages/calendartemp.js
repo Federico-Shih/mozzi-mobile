@@ -22,7 +22,7 @@ import {
   getServiceTimes,
   sendAppointment,
 } from '../libraries/connect/businessCalls';
-import { errorMessages } from '../libraries/helpers';
+import { errorMessages, sendPopup } from '../libraries/helpers';
 
 type Props = {};
 
@@ -60,10 +60,6 @@ class CalendarPage extends Component<Props> {
     data: [],
     selectedTime: '',
   };
-
-  time = '';
-
-  popupMessage = { title: '', message: '', previousMessage: '' };
 
   static propTypes = {
     navigation: PropTypes.shape({
@@ -118,16 +114,6 @@ class CalendarPage extends Component<Props> {
     }
   };
 
-  displayPopup = () => {
-    if (this.popupMessage.message) {
-      return <Popup message={this.popupMessage.message} init />;
-    }
-    if (!this.popupMessage.message && this.popupMessage.previousMessage) {
-      return <Popup message={this.popupMessage.previousMessage} init={false} />;
-    }
-    return null;
-  };
-
   showAlert = ({ selectedTime, selectedDate }) => new Promise((resolve, reject) => {
     Alert.alert(
       'Confirmar',
@@ -149,9 +135,9 @@ class CalendarPage extends Component<Props> {
 
     setLoading(true);
     if (selectedDate === '') {
-      this.sendPopup('No seleccionaste dia', errorMessages.noDateSelected);
+      sendPopup(errorMessages.noDateSelected);
     } else if (selectedTime === '') {
-      this.sendPopup('Fecha', errorMessages.noTimeSelected);
+      sendPopup(errorMessages.noTimeSelected);
     } else {
       try {
         const confirm = await this.showAlert(this.state);
@@ -166,7 +152,7 @@ class CalendarPage extends Component<Props> {
           if (saved) navigation.pop(2);
         }
       } catch (e) {
-        this.sendPopup('ALERTERROR', 'Alert error');
+        sendPopup('Alert error');
       }
     }
     setLoading(false);
@@ -204,9 +190,6 @@ class CalendarPage extends Component<Props> {
           backgroundColor: platformBackColor,
           flexDirection: 'column',
           justifyContent: 'flex-end',
-        }}
-        onStartShouldSetResponder={() => {
-          this.resetErrorPopup(true);
         }}
       >
         <Icon
@@ -381,7 +364,6 @@ class CalendarPage extends Component<Props> {
           />
         </View>
         <View style={{ flex: 1 }} />
-        <View>{this.displayPopup()}</View>
       </View>
     );
   }
