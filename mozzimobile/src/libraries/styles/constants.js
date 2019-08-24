@@ -3,13 +3,13 @@ import { Platform } from 'react-native';
 let platformFont;
 switch (Platform.OS) {
   case 'ios':
-    platformFont = 'San Francisco';
+    platformFont = 'Nunito-SemiBold';
     break;
   case 'android':
-    platformFont = 'Montserrat';
+    platformFont = 'Nunito-SemiBold';
     break;
   default:
-    platformFont = 'Montserrat';
+    platformFont = 'Nunito-Semibold';
     break;
 }
 

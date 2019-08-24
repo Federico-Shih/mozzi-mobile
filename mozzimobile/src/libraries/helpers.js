@@ -31,7 +31,7 @@ export const errorMessages = {
   password: 'La contraseña es menor a 8 carácteres.',
   confirmpassword: {
     nomatch: 'Las contraseñas no coinciden.',
-    empty: 'No haz ingresado la confirmación de tu contraseña.',
+    empty: 'No haz confirmado tu contraseña.',
   },
   duplicateAccount: 'Esta cuenta ya fue creada',
   internalServerError: 'Hubo un problema del servidor',

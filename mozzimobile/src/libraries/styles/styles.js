@@ -38,6 +38,7 @@ export default StyleSheet.create({
     fontSize: 15,
     fontFamily: fontType,
     letterSpacing: 0,
+    color: 'rgba(70, 0, 218, 0.7)',
   },
   logregTitle: {
     textAlign: 'left',
@@ -49,14 +50,10 @@ export default StyleSheet.create({
     top: '5%',
     fontFamily: fontType,
   },
-
   inputText: {
-    borderBottomWidth: 2,
-    borderWidth: 2,
-    borderRadius: 30,
-    borderColor: 'black',
-    marginTop: 7,
-    width: InputTextWidth,
+    borderWidth: 0,
+    borderColor: '#AAAAAA',
+    width: '100%',
     alignSelf: 'center',
   },
   popup: {

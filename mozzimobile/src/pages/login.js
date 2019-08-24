@@ -17,7 +17,7 @@ import { validateEmail, errorMessages, sendPopup } from '../libraries/helpers';
 import { login } from '../libraries/connect/auth';
 import styles from '../libraries/styles/styles';
 import buttonStyle from '../libraries/styles/buttonsStyles';
-import { StyledTitle, Popup } from '../libraries/props';
+import { StyledTitle } from '../libraries/props';
 import { LOADING, GET_TOKEN } from '../actions';
 
 type Props = {};
@@ -110,7 +110,7 @@ class Login extends Component<Props> {
   });
 
   // Create account function
-  checkAndRegister = async () => {
+  checkAndLogin = async () => {
     const checkPass = await this.checkIfValidPasswordAndSet();
     const checkEmail = await this.checkIfValidEmailAndSet();
 
@@ -141,32 +141,6 @@ class Login extends Component<Props> {
         sendPopup(error.message);
         setLoading(false);
       }
-
-      /*
-            switch (response.data.code) {
-                case 'wrongPassword':
-                    this.sendPopup('Wrong Password', errorMessages.wrongPassword);
-                    return;
-                case 500:
-                    this.sendPopup('Server errors', errorMessages.internalServerError);
-                    return;
-            }
-
-            /*
-            if(response.headers.connection == 'Close') {
-                this.sendPopup('Certificate failure', errorMessages.certificateError);
-                return;
-            }
-
-            if (response.data.code === 0) {
-                this.props.setToken(response.data.token);//storeData('@jwt', response.data.token);
-                this.props.navigation.navigate('Home');
-            }
-
-            if (response.data.code == 'hasSession') {
-                this.props.navigation.navigate('Home');
-            }
-            */
     }
   };
 
@@ -231,19 +205,13 @@ class Login extends Component<Props> {
         type="outline"
         loading={loading}
         onPress={() => {
-          this.checkAndRegister();
+          this.checkAndLogin();
         }}
         titleStyle={buttonStyle.reglogButtonText}
         buttonStyle={{ ...buttonStyle.reglogButton }}
         containerStyle={{ marginTop: '20%', width: '60%', alignSelf: 'center' }}
       />
     );
-  };
-
-  componentWillUnmount = () => {
-    if (this.time) {
-      clearTimeout(this.time);
-    }
   };
 
   // Main render
