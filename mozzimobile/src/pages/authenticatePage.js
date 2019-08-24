@@ -44,6 +44,7 @@ class Authenticate extends Component<Props> {
     registerSize: new Animated.Value(20),
     registerHeight: new Animated.Value(27),
     slideValue: new Animated.Value(0),
+    underLinePosition: new Animated.Value(ScreenSizeWidth / 10 + 4),
     isLoginShow: true,
     connection: null,
     loginState: {
@@ -342,7 +343,12 @@ class Authenticate extends Component<Props> {
   };
 
   changeToRegister = () => {
-    const { loginSize, registerSize, slideValue } = this.state;
+    const {
+      loginSize,
+      registerSize,
+      slideValue,
+      underLinePosition,
+    } = this.state;
     this.setState({ isLoginShow: false });
     Animated.parallel([
       Animated.timing(loginSize, {
@@ -357,11 +363,20 @@ class Authenticate extends Component<Props> {
         toValue: -ScreenSizeWidth,
         slideDuration,
       }),
+      Animated.timing(underLinePosition, {
+        toValue: 10 + (ScreenSizeWidth * 5) / 10,
+        slideDuration,
+      }),
     ]).start();
   };
 
   changeToLogin = () => {
-    const { loginSize, registerSize, slideValue } = this.state;
+    const {
+      loginSize,
+      registerSize,
+      slideValue,
+      underLinePosition,
+    } = this.state;
     this.setState({ isLoginShow: true });
     Animated.parallel([
       Animated.timing(loginSize, {
@@ -376,6 +391,10 @@ class Authenticate extends Component<Props> {
         toValue: 0,
         slideDuration,
       }),
+      Animated.timing(underLinePosition, {
+        toValue: 4 + (ScreenSizeWidth * 1) / 10,
+        slideDuration,
+      }),
     ]).start();
   };
 
@@ -388,6 +407,7 @@ class Authenticate extends Component<Props> {
       loginState,
       slideValue,
       registerState,
+      underLinePosition,
     } = this.state;
     const { name, surname } = registerState;
     const { navigation, loading } = this.props;
@@ -466,6 +486,15 @@ class Authenticate extends Component<Props> {
               </SpecialButton>
             </View>
           </View>
+          <Animated.View
+            style={{
+              width: '14%',
+              height: 4,
+              top: 8,
+              left: underLinePosition,
+              backgroundColor: '#4600DA',
+            }}
+          />
           <View
             style={{
               marginTop: 40,
@@ -616,7 +645,11 @@ class Authenticate extends Component<Props> {
                 onSubmitEditing={() => {
                   this.checkIfInputIsEmpty('name');
                 }}
-                leftIcon={{ type: 'material', name: 'account-circle', color: '#AAAAAA' }}
+                leftIcon={{
+                  type: 'material',
+                  name: 'account-circle',
+                  color: '#AAAAAA',
+                }}
               />
               <View style={{ height: 20 }}>
                 {this.displayErrorMessage('name')}
@@ -640,7 +673,11 @@ class Authenticate extends Component<Props> {
                 onSubmitEditing={() => {
                   this.checkIfInputIsEmpty('surname');
                 }}
-                leftIcon={{ type: 'material', name: 'perm-identity', color: '#AAAAAA' }}
+                leftIcon={{
+                  type: 'material',
+                  name: 'perm-identity',
+                  color: '#AAAAAA',
+                }}
               />
               <View style={{ height: 20 }}>
                 {this.displayErrorMessage('surname')}

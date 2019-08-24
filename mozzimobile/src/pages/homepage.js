@@ -646,7 +646,7 @@ function Menu({ navigation, props, state, searchModal }) {
         type="clear"
         onPress={() => {
           props.removeToken();
-          navigation.replace('Login');
+          navigation.replace('Auth');
         }}
         title="Cerrar Sesión"
       />
