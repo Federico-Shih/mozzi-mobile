@@ -74,8 +74,8 @@ class CalendarPage extends Component<Props> {
   };
   // { title: 'Title Text', key: 'item5', style: styles.dateStyle },
 
-  componentDidMount = () => {
-    const { uuid, service, token } = this.props;
+  componentDidMount = async () => {
+    const { service, token } = this.props;
     const dates = new Map();
 
     let initialDate;
@@ -86,17 +86,35 @@ class CalendarPage extends Component<Props> {
       if (i === 0) initialDate = objectDate;
       dates.set(thisUuid, objectDate);
     }
-
-    const data = getServiceTimes({
+    const data = await getServiceTimes({
       service,
-      uuid,
       token,
-      selectedDate: initialDate,
+      day: initialDate,
     });
+    this.checkForErrors(data);
     this.setState({ dates, selectedDate: initialDate, data });
   };
 
-  selectDate = (newDate) => {
+  checkForErrors = (data) => {
+    if (!(data instanceof Map)) {
+      data.data.errors.forEach((element) => {
+        sendPopup(element.message);
+      });
+    }
+  }
+
+  updateSlots = async (selectedDate) => {
+    const { service, token } = this.props;
+    const data = await getServiceTimes({
+      service,
+      token,
+      day: selectedDate,
+    });
+    this.checkForErrors(data);
+    this.setState({ data });
+  }
+
+  selectDate = async (newDate) => {
     const { dates, selectedDate } = this.state;
 
     if (selectedDate.key !== newDate.key) {
@@ -111,6 +129,7 @@ class CalendarPage extends Component<Props> {
         selected: false,
       });
       this.setState({ selectedDate: newDate, dates: newDates });
+      this.updateSlots(newDate);
     }
   };
 
@@ -181,8 +200,8 @@ class CalendarPage extends Component<Props> {
   render() {
     const { navigation } = this.props;
     const { dates, data } = this.state;
-    const mapDates = Array.from(dates.values());
-    const mapTimes = Array.from(data.values());
+    const mapDates = (dates instanceof Map) ? Array.from(dates.values()) : [];
+    const mapTimes = (data instanceof Map) ? Array.from(data.values()) : [];
     return (
       <View
         style={{
@@ -276,6 +295,12 @@ class CalendarPage extends Component<Props> {
                 };
               }
 
+              if (item.end) {
+                return (
+                  <View style={{ width: '100%', height: 30 }} />
+                );
+              }
+
               const firstPadding = index === 0 ? 5 : 0;
               return (
                 <View
@@ -312,7 +337,7 @@ class CalendarPage extends Component<Props> {
 
                     <View
                       style={{
-                        backgroundColor: isLast
+                        backgroundColor: (isLast || item.isLast)
                           ? 'transparent'
                           : props.lineColor,
                         width: props.lineWidth,

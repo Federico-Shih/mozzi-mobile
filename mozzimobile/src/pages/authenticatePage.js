@@ -33,7 +33,7 @@ const SpecialButton = Platform.select({
 
 const ScreenSizeWidth = Dimensions.get('window').width;
 
-const duration = 50;
+const duration = 500;
 
 const slideDuration = 500;
 

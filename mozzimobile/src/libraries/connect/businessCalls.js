@@ -60,6 +60,7 @@ const business = {
 // Function that returns a time object without dates and objective.
 const newTime = (hours, minutes) => {
   // Defaults as 0 time and adds the hours and minutes so we can manipulate time from 0
+
   const nah = new Date(0).setTime(
     1000 * 60 * minutes + 1000 * 60 * 60 * (hours + 3),
   );
@@ -69,7 +70,7 @@ const newTime = (hours, minutes) => {
     .toLocaleTimeString('en-US', {
       timeStyle: 'medium',
       hour12: false,
-      timeZone: 'UTC',
+      timeZone: 'America/Argentina/Buenos_Aires',
       hour: 'numeric',
       minute: 'numeric',
     })
@@ -151,8 +152,101 @@ export const sendAppointment = ({
 
 // To replace when service times and availability is present
 export const getServiceTimes = ({
-  service, token, uuid, day,
-}) => {
+  service, token, day,
+}) => new Promise(async (resolve, reject) => {
+  const asd = await axios.post(
+    `${serverSettings.serverURL}/graphql`,
+    {
+      query: `
+            query Slots($inputSlots: viewSlotsInput) {
+              viewSlots(input: $inputSlots) {
+                start
+                finish
+                uuid
+                day
+                available
+                schedule {
+                  uuid
+                  day
+                  start
+                  finish
+                }
+              }
+            }
+        `,
+      variables: {
+        inputSlots: {
+          day: Math.floor(day.date.getTime() / 8.64e+7),
+          service,
+        },
+      },
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token,
+      },
+    },
+  );
+
+  if ('errors' in asd) {
+    resolve(asd);
+  }
+
+  const { data } = asd.data;
+
+  if (data.viewSlots === null) {
+    resolve(new Map());
+  } else {
+    const newMap = new Map();
+    let prevSchedule = '';
+    const { viewSlots } = data;
+    for (let i = 0; i < viewSlots.length; i += 1) {
+      const key = newUuid();
+      const { start, schedule, available } = viewSlots[i];
+      if (prevSchedule === '') {
+        prevSchedule = schedule.uuid;
+      } else if (schedule.uuid !== prevSchedule) {
+        newMap.set(newMap.size, { end: viewSlots[i - 1].schedule.finish });
+        prevSchedule = schedule.uuid;
+      }
+
+      let isLast = false;
+      if (i === viewSlots.length - 1) isLast = true;
+      try {
+        if (schedule.uuid !== viewSlots[i + 1].schedule.uuid) {
+          console.log('lol');
+          isLast = true;
+        }
+      } catch (error) {}
+
+      newMap.set(newMap.size, {
+        time: newTime(0, start),
+        occupied: !available,
+        selected: false,
+        key,
+        index: newMap.size,
+        isLast,
+      });
+    }
+    resolve(newMap);
+  }
+
+  /*
+available: true
+day: 18136
+finish: 1060
+schedule:
+day: 3
+finish: 1090
+start: 1000
+uuid: "8b896b1d-cd8f-4b87-a123-f2b9c13ec99e"
+__proto__: Object
+start: 1030
+uuid: "cbe3f562-d189-44ed-aad5-20984109dbd9"
+  */
+
+  /*
   const start = 8; // What time starts the service
   const end = 20; // What hour it ends
   const interval = 60; // Interval between each service
@@ -171,8 +265,9 @@ export const getServiceTimes = ({
       isLast: i === intervals,
     });
   }
-  return returnVal;
-};
+  resolve(returnVal);
+  */
+});
 
 /*
 

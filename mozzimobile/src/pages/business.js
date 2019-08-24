@@ -16,7 +16,9 @@ import newUUID from 'uuid';
 import { ScrollView } from 'react-native-gesture-handler';
 import styles from '../libraries/styles/styles';
 import { sendPopup } from '../libraries/helpers';
-import { LOADING, REMOVE_BUSINESS_UUID, SELECT_SERVICE, REMOVE_SERVICE } from '../actions';
+import {
+  LOADING, REMOVE_BUSINESS_UUID, SELECT_SERVICE, REMOVE_SERVICE,
+} from '../actions';
 import { getBusiness } from '../libraries/connect/businessCalls';
 
 type Props = {};
@@ -123,7 +125,9 @@ class Business extends Component<Props> {
     const { business } = this.state;
     console.log(business);
     const { navigation, navigateToSearcher } = this.props;
-    const { street, zone, number, postal } = business;
+    const {
+      street, zone, number, postal,
+    } = business;
     return (
       <View style={styles.container}>
         <View
