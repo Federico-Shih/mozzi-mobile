@@ -59,6 +59,7 @@ export const getAppointments = ({ token }) => axios.post(
                   price
                   business {
                     name
+                    uuid
                   }
                 }
                 slot {

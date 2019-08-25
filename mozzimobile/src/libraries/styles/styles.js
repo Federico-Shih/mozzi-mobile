@@ -72,20 +72,19 @@ export default StyleSheet.create({
     backgroundColor: platformBackColor,
   },
   dateStyle: {
-    backgroundColor: '#E4EBEE',
+    backgroundColor: '#9868FF',
     marginHorizontal: 7,
     marginVertical: 15,
     width: 80,
     borderRadius: 20,
   },
   dateStyleSelected: {
-    backgroundColor: '#E4EBEE',
+    backgroundColor: '#6A32E3',
     marginHorizontal: 7,
     marginVertical: 15,
     width: 80,
     borderRadius: 20,
-    borderWidth: 4,
-    borderColor: 'purple',
+    elevation: 10,
   },
   timeSelectorButton: {
     top: -40,

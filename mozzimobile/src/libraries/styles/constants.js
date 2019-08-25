@@ -14,4 +14,4 @@ switch (Platform.OS) {
 }
 
 export const fontType = platformFont;
-export const platformBackColor = '#F5FCFF';
+export const platformBackColor = '#FFFFFF';

@@ -1,5 +1,5 @@
 import {
-  Text, View, Platform, Alert,
+  Text, View, Platform, Alert, TouchableHighlight, TouchableNativeFeedback,
 } from 'react-native';
 import React, { Component } from 'react';
 import { Divider, Button, Icon } from 'react-native-elements';
@@ -14,10 +14,13 @@ import {
 import styles from '../libraries/styles/styles';
 import { getUsableTimeFormat as hour, sendPopup, newTime } from '../libraries/helpers';
 import { platformBackColor } from '../libraries/styles/constants';
+import { ADD_BUSINESS_UUID } from '../actions';
 
 type Props = {};
 
-class Buscador extends Component<Props> {
+const TouchButton = Platform.select({ ios: TouchableHighlight, android: TouchableNativeFeedback });
+
+class MyAppointments extends Component<Props> {
   state = {
     appointments: new Map(),
   };
@@ -59,12 +62,18 @@ class Buscador extends Component<Props> {
       } else if (resultsAPI.data.errors) {
         resultsAPI.data.errors.forEach((el) => {
           sendPopup(el.message);
-        })
+        });
       } else {
         sendPopup('El servidor no ha respondido');
       }
     }
   };
+
+  navToStore = (uuid) => {
+    const { navigateToBusiness, navigation } = this.props;
+    navigateToBusiness(uuid);
+    navigation.navigate('Business');
+  }
 
   showAlert = appointment => new Promise((resolve) => {
     const {
@@ -137,59 +146,65 @@ class Buscador extends Component<Props> {
           <Divider style={{ height: 2, width: '100%' }} />
           {arrayAppointments.map(val => (
             <View key={val.uuid} style={{ flexDirection: 'column' }}>
-              <View style={{ flexDirection: 'row' }}>
-                <View
-                  style={{
-                    flexDirection: 'column',
-                    paddingLeft: 5,
-                  }}
-                >
-                  <Text style={{ paddingTop: 5, fontSize: 20 }}>
-                    {val.service.business.name}
-                  </Text>
-                  <View style={{ flexDirection: 'row' }}>
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        width: 100,
-                        alignSelf: 'center',
-                      }}
-                    >
-                      {val.service.name}
+              <TouchButton
+                onPress={() => {
+                  this.navToStore(val.service.business.uuid);
+                }}
+              >
+                <View style={{ flexDirection: 'row' }}>
+                  <View
+                    style={{
+                      flexDirection: 'column',
+                      paddingLeft: 5,
+                    }}
+                  >
+                    <Text style={{ paddingTop: 5, fontSize: 20 }}>
+                      {val.service.business.name}
                     </Text>
-                    <Text style={{ alignSelf: 'center', fontSize: 20 }}>
-                      {`$${val.service.price}`}
-                    </Text>
+                    <View style={{ flexDirection: 'row' }}>
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          width: 100,
+                          alignSelf: 'center',
+                        }}
+                      >
+                        {val.service.name}
+                      </Text>
+                      <Text style={{ alignSelf: 'center', fontSize: 20 }}>
+                        {`$${val.service.price}`}
+                      </Text>
+                    </View>
                   </View>
+                  <View style={{ flex: 1 }} />
+                  <View
+                    style={{
+                      flexDirection: 'column',
+                      marginRight: 10,
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Text>{new Date((val.slot.day) * 24 * 60 * 60 * 1000 + val.slot.start * 60 * 1000).toDateString()}</Text>
+                    <Text>{`${newTime(0, val.slot.start)}~${newTime(0, val.slot.finish)}`}</Text>
+                  </View>
+                  <Icon
+                    name="clear"
+                    type="material"
+                    containerStyle={{
+                      justifyContent: 'center',
+                      marginRight: 10,
+                    }}
+                    iconStyle={{
+                      paddingHorizontal: 15,
+                      paddingVertical: 15,
+                      borderRadius: 50,
+                    }}
+                    onPress={() => {
+                      this.appointmentDelete(val);
+                    }}
+                  />
                 </View>
-                <View style={{ flex: 1 }} />
-                <View
-                  style={{
-                    flexDirection: 'column',
-                    marginRight: 10,
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Text>{new Date((val.slot.day) * 24 * 60 * 60 * 1000 + val.slot.start * 60 * 1000).toDateString()}</Text>
-                  <Text>{`${newTime(0, val.slot.start)}~${newTime(0, val.slot.finish)}`}</Text>
-                </View>
-                <Icon
-                  name="clear"
-                  type="material"
-                  containerStyle={{
-                    justifyContent: 'center',
-                    marginRight: 10,
-                  }}
-                  iconStyle={{
-                    paddingHorizontal: 10,
-                    paddingVertical: 10,
-                    borderRadius: 50,
-                  }}
-                  onPress={() => {
-                    this.appointmentDelete(val);
-                  }}
-                />
-              </View>
+              </TouchButton>
               <Divider style={{ width: '100%' }} />
             </View>
           ))}
@@ -207,13 +222,20 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return {};
+  return {
+    navigateToBusiness: (uuid) => {
+      dispatch({
+        type: ADD_BUSINESS_UUID,
+        uuid,
+      });
+    },
+  };
 }
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(Buscador);
+)(MyAppointments);
 
 /*
 {

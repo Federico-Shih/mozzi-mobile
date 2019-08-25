@@ -5,6 +5,7 @@ import {
   Dimensions,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
   SafeAreaView,
   Animated,
   TouchableNativeFeedback,
@@ -348,27 +349,32 @@ class Authenticate extends Component<Props> {
       registerSize,
       slideValue,
       underLinePosition,
+      isLoginShow,
     } = this.state;
-    this.setState({ isLoginShow: false });
-    Animated.parallel([
-      Animated.timing(loginSize, {
-        toValue: 20,
-        duration,
-      }),
-      Animated.timing(registerSize, {
-        toValue: 25,
-        duration,
-      }),
-      Animated.timing(slideValue, {
-        toValue: -ScreenSizeWidth,
-        slideDuration,
-      }),
-      Animated.timing(underLinePosition, {
-        toValue: 10 + (ScreenSizeWidth * 5) / 10,
-        slideDuration,
-      }),
-    ]).start();
-  };
+    if (isLoginShow) {
+      Keyboard.dismiss();
+      this.setState({ isLoginShow: false });
+      Animated.parallel([
+        Animated.timing(loginSize, {
+          toValue: 20,
+          duration,
+        }),
+        Animated.timing(registerSize, {
+          toValue: 25,
+          duration,
+        }),
+        Animated.timing(slideValue, {
+          toValue: -ScreenSizeWidth,
+          slideDuration,
+        }),
+        Animated.timing(underLinePosition, {
+          toValue: 10 + (ScreenSizeWidth * 5) / 10,
+          slideDuration,
+        }),
+      ]).start();
+    }
+  }
+
 
   changeToLogin = () => {
     const {
@@ -376,26 +382,30 @@ class Authenticate extends Component<Props> {
       registerSize,
       slideValue,
       underLinePosition,
+      isLoginShow,
     } = this.state;
-    this.setState({ isLoginShow: true });
-    Animated.parallel([
-      Animated.timing(loginSize, {
-        toValue: 25,
-        duration,
-      }),
-      Animated.timing(registerSize, {
-        toValue: 20,
-        duration,
-      }),
-      Animated.timing(slideValue, {
-        toValue: 0,
-        slideDuration,
-      }),
-      Animated.timing(underLinePosition, {
-        toValue: 4 + (ScreenSizeWidth * 1) / 10,
-        slideDuration,
-      }),
-    ]).start();
+    if (!isLoginShow) {
+      Keyboard.dismiss();
+      this.setState({ isLoginShow: true });
+      Animated.parallel([
+        Animated.timing(loginSize, {
+          toValue: 25,
+          duration,
+        }),
+        Animated.timing(registerSize, {
+          toValue: 20,
+          duration,
+        }),
+        Animated.timing(slideValue, {
+          toValue: 0,
+          slideDuration,
+        }),
+        Animated.timing(underLinePosition, {
+          toValue: 4 + (ScreenSizeWidth * 1) / 10,
+          slideDuration,
+        }),
+      ]).start();
+    }
   };
 
   render() {

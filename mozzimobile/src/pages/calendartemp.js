@@ -42,8 +42,8 @@ function Box(props) {
   const { element } = props;
   return (
     <View style={{ width: '100%', height: '100%', alignItems: 'center' }}>
-      <Text style={{ paddingTop: 20 }}>{toDateString(element.date)}</Text>
-      <Text style={{ marginTop: 5, fontSize: 20, color: 'black' }}>
+      <Text style={{ paddingTop: 20, color: 'white' }}>{toDateString(element.date)}</Text>
+      <Text style={{ marginTop: 5, fontSize: 20, color: 'white' }}>
         {element.date.getDate()}
       </Text>
     </View>

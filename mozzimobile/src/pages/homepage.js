@@ -145,38 +145,51 @@ class Homepage extends Component<Props> {
 )}
             containerStyle={{
               height: 60,
-              backgroundColor: '#F5FCFF',
+              backgroundColor: platformBackColor,
               borderWidth: 0,
             }}
+            /*
             centerComponent={{
               text: 'Mozzi',
               style: { bottom: '50%', fontSize: 25 },
             }}
+            */
             placement="left"
           />
 
-          <ScrollView style={{ width: '100%' }} scrollEnabled>
-            <Button
-              icon={<Icon name="search" size={22} color="gray" />}
-              iconContainerStyle={{}}
-              title="¿A dónde querés comprar?"
-              onPress={() => {
-                this.toggleSearchBar();
-              }}
-              titleStyle={{ fontSize: 13, left: 10, color: 'grey' }}
-              containerStyle={{
-                justifyContent: 'flex-start',
-                width: '100%',
-                alignItems: 'center',
-              }}
-              buttonStyle={{
-                borderRadius: 50,
-                justifyContent: 'flex-start',
-                paddingVertical: 10,
-                backgroundColor: '#E0E0E0',
-                width: '90%',
-              }}
-            />
+          <ScrollView style={{ width: '100%', top: 5 }} scrollEnabled>
+            <View style={{
+              justifyContent: 'center',
+              width: '100%',
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}
+            >
+              <Button
+                icon={<Icon name="search" size={22} color="gray" />}
+                // title="¿A dónde querés comprar?"
+                onPress={() => {
+                  this.toggleSearchBar();
+                }}
+                containerStyle={{ width: '80%' }}
+                titleStyle={{ fontSize: 13, left: 10, color: 'grey' }}
+                buttonStyle={{
+                  borderRadius: 15,
+                  justifyContent: 'flex-start',
+                  paddingVertical: 10,
+                  backgroundColor: '#E0E0E0',
+                  width: '100%',
+                }}
+              />
+              <Icon
+                name="settings-input-component"
+                size={30}
+                containerStyle={{ left: 10 }}
+                onPress={() => { alert('In progresss'); }}
+                underlayColor="rgba(1,1,1, 0.2)"
+              />
+            </View>
+
             <MainSection />
           </ScrollView>
         </KeyboardAvoidingView>
@@ -593,16 +606,17 @@ const menuStyles = StyleSheet.create({
     paddingTop: 20,
     fontSize: 25,
     color: 'black',
+    fontFamily: 'Nunito-SemiBold',
   },
   item: {
     fontSize: 18,
     fontWeight: 'normal',
-    fontFamily: 'monospace',
+    fontFamily: 'Nunito-SemiBold',
     paddingTop: 0,
     margin: 0,
     color: 'black',
     textAlign: 'left',
-    paddingLeft: 30,
+    paddingLeft: 10,
   },
   itemContainer: {
     width: '100%',
@@ -620,7 +634,9 @@ const menuStyles = StyleSheet.create({
 });
 
 // MENU DISPLAYED ON SIDEBAR MENU
-function Menu({ navigation, props, state, searchModal }) {
+function Menu({
+  navigation, props, state, searchModal,
+}) {
   return (
     <ScrollView
       scrollsToTop={false}
@@ -640,9 +656,12 @@ function Menu({ navigation, props, state, searchModal }) {
       <SideMenuButtons buttons={buttons} navigation={navigation} searchModal={searchModal} />
       <View style={{ flex: 1 }} />
       <Button
-        containerStyle={{ alignItems: 'flex-start', width: '100%' }}
-        icon={<Icon name="exit-to-app" size={25} />}
-        buttonStyle={{ width: '100%', paddingRight: '50%' }}
+        containerStyle={{ width: '100%' }}
+        icon={<Icon name="exit-to-app" color="#5819E0" size={25} />}
+        titleStyle={{
+          color: 'black', fontFamily: 'Nunito-SemiBold', left: 10, fontSize: 20,
+        }}
+        buttonStyle={{ justifyContent: 'center', paddingRight: 20, paddingVertical: 10 }}
         type="clear"
         onPress={() => {
           props.removeToken();
@@ -680,7 +699,7 @@ function SideMenuButtons(props) {
         props.searchModal.current.removeHandler();
       }}
       buttonStyle={menuStyles.itemButton}
-      icon={<Icon name={btn.icon} size={25} />}
+      icon={<Icon name={btn.icon} color="#5819E0" size={25} />}
     />
   ));
   return listButtons;
