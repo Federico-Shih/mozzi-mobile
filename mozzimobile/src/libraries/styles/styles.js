@@ -95,7 +95,7 @@ export default StyleSheet.create({
     backgroundColor: 'rgba(200,0,0, .2)',
   },
   timeFrameOccupied: {
-    backgroundColor: 'rgba(0,0,200, .2)',
+    backgroundColor: 'rgba(88, 25, 224, 0.3)',
   },
   timeFrame: {
     backgroundColor: 'rgba(0,0,0, .05)',

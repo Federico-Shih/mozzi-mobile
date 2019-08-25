@@ -1,4 +1,4 @@
-import newUuid from 'uuid';
+import { newTime } from '../helpers';
 
 const axios = require('axios');
 const serverSettings = require('./server');
@@ -55,26 +55,6 @@ const business = {
     },
   ],
   image: 'https://pickaface.net/gallery/avatar/Opi51c74d0125fd4.png',
-};
-
-// Function that returns a time object without dates and objective.
-const newTime = (hours, minutes) => {
-  // Defaults as 0 time and adds the hours and minutes so we can manipulate time from 0
-
-  const nah = new Date(0).setTime(
-    1000 * 60 * minutes + 1000 * 60 * 60 * (hours + 3),
-  );
-
-  // Returns formats the date object so it returns the hour and minute only
-  return new Date(nah)
-    .toLocaleTimeString('en-US', {
-      timeStyle: 'medium',
-      hour12: false,
-      timeZone: 'America/Argentina/Buenos_Aires',
-      hour: 'numeric',
-      minute: 'numeric',
-    })
-    .slice(0, -3);
 };
 
 // To replace when Store search API is present
@@ -229,7 +209,7 @@ export const getServiceTimes = ({
       if (prevSchedule === '') {
         prevSchedule = schedule.uuid;
       } else if (schedule.uuid !== prevSchedule) {
-        newMap.set(newMap.size, { end: viewSlots[i - 1].schedule.finish });
+        newMap.set(newMap.size, { start: schedule.start, end: viewSlots[i - 1].schedule.finish });
         prevSchedule = schedule.uuid;
       }
 

@@ -46,5 +46,54 @@ const appointments = [
     },
   },
 ];
-export const getAppointments = ({ token }) => appointments;
-export const removeAppointments = ({ token, uuid }) => false;
+export const getAppointments = ({ token }) => axios.post(
+  `${serverSettings.serverURL}/graphql`,
+  {
+    query: `
+          query Me {
+            me {
+              appointments {
+                uuid
+                service {
+                  name
+                  price
+                  business {
+                    name
+                  }
+                }
+                slot {
+                  day
+                  start
+                  finish
+                }
+              }
+            }
+          }
+      `,
+  },
+  {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: token,
+    },
+  },
+);
+export const removeAppointments = ({ token, uuid }) => axios.post(
+  `${serverSettings.serverURL}/graphql`,
+  {
+    query: `
+        mutation deleteAppointment($uuid: ID!) {
+          appointmentDelete(uuid: $uuid)
+        }
+      `,
+    variables: {
+      uuid,
+    },
+  },
+  {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: token,
+    },
+  },
+);;

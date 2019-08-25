@@ -10,11 +10,12 @@ import {
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Icon, Button, Divider } from 'react-native-elements';
+import {
+  Icon, Button, Divider, Image,
+} from 'react-native-elements';
 import keyUUID from 'uuid';
 import Timeline from 'react-native-timeline-feed';
 
-import { Popup } from '../libraries/props';
 import { platformBackColor } from '../libraries/styles/constants';
 import { REMOVE_SERVICE, LOADING } from '../actions';
 import styles from '../libraries/styles/styles';
@@ -22,7 +23,7 @@ import {
   getServiceTimes,
   sendAppointment,
 } from '../libraries/connect/businessCalls';
-import { errorMessages, sendPopup } from '../libraries/helpers';
+import { errorMessages, sendPopup, newTime } from '../libraries/helpers';
 
 type Props = {};
 
@@ -46,6 +47,19 @@ function Box(props) {
         {element.date.getDate()}
       </Text>
     </View>
+  );
+}
+
+function ShowImage({ length }) {
+  const imageSource = require('../assets/shisus.jpg');
+  if (length > 0) {
+    return null;
+  }
+  return (
+    <Image
+      source={imageSource}
+      style={{ alignSelf: 'center', marginTop: '30%' }}
+    />
   );
 }
 
@@ -111,7 +125,7 @@ class CalendarPage extends Component<Props> {
       day: selectedDate,
     });
     this.checkForErrors(data);
-    this.setState({ data });
+    this.setState({ data, selectedTime: '' });
   }
 
   selectDate = async (newDate) => {
@@ -136,7 +150,7 @@ class CalendarPage extends Component<Props> {
   showAlert = ({ selectedTime, selectedDate }) => new Promise((resolve, reject) => {
     Alert.alert(
       'Confirmar',
-      `Confirmas el turno reservado el dia ${selectedDate.date} a las ${
+      `Confirmas el turno reservado el dia ${selectedDate.date.toLocaleDateString('es-ES', { dateStyle: 'full' })} a las ${
         selectedTime.time
       }`,
       [
@@ -270,8 +284,9 @@ class CalendarPage extends Component<Props> {
             }}
           />
         </View>
-        <View style={{ height: '70%' }}>
+        <View style={{ flex: 1 }}>
           <Divider />
+          <ShowImage length={mapTimes.length} />
           <Timeline
             data={mapTimes}
             style={{ marginHorizontal: 20 }}
@@ -298,7 +313,9 @@ class CalendarPage extends Component<Props> {
 
               if (item.end) {
                 return (
-                  <View style={{ width: '100%', height: 30 }} />
+                  <View style={{ width: '100%', paddingVertical: 20, alignItems: 'center' }}>
+                    <Text style={{ fontSize: 25, fontFamily: 'Nunito-SemiBold' }}>{`${newTime(0, item.end)} - ${newTime(0, item.start)}`}</Text>
+                  </View>
                 );
               }
 
@@ -355,7 +372,9 @@ class CalendarPage extends Component<Props> {
                           this.selectTime(item);
                         }}
                       >
-                        <View style={frameStyle} />
+                        <View style={frameStyle}>
+                          <Divider style={{ height: 1, backgroundColor: '#AAAAAA' }} />
+                        </View>
                       </TouchableOpacity>
                     ),
                     android: (
@@ -367,7 +386,7 @@ class CalendarPage extends Component<Props> {
                         style={{}}
                       >
                         <View style={frameStyle}>
-                          <Divider />
+                          <Divider style={{ height: 1, backgroundColor: '#AAAAAA' }} />
                         </View>
                       </TouchableNativeFeedback>
                     ),
@@ -377,19 +396,40 @@ class CalendarPage extends Component<Props> {
             }}
           />
           <Divider />
+
           <Button
             containerStyle={{
-              height: 50,
-              width: 100,
+              width: 80,
+              height: 80,
               marginTop: 20,
+              borderWidth: 1,
+              borderColor: 'transparent',
+              borderRadius: 50,
+              backgroundColor: 'white',
               alignSelf: 'center',
+              shadowColor: '#000',
+              shadowOffset: {
+                width: 0,
+                height: 5,
+              },
+              shadowOpacity: 0.34,
+              shadowRadius: 6.27,
+              elevation: 10,
+              position: 'absolute',
+              bottom: 35,
+              right: 35,
             }}
+            icon={(
+              <Icon
+                name="done"
+                size={60}
+                color="#5819E0"
+              />
+            )}
             onPress={this.saveAppointment}
-            buttonStyle={{ height: '100%', width: '100%' }}
-            title="Reserva!"
+            buttonStyle={{ height: '100%', width: '100%', backgroundColor: 'transparent' }}
           />
         </View>
-        <View style={{ flex: 1 }} />
       </View>
     );
   }

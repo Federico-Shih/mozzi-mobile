@@ -44,6 +44,26 @@ export const errorMessages = {
   tooMuchLength: 'Tiene que ingresar menos de 25 letras',
 };
 
+export const newTime = (hours, minutes) => {
+  // Defaults as 0 time and adds the hours and minutes so we can manipulate time from 0
+
+  const nah = new Date(0).setTime(
+    1000 * 60 * minutes + 1000 * 60 * 60 * (hours + 3),
+  );
+
+  // Returns formats the date object so it returns the hour and minute only
+  return new Date(nah)
+    .toLocaleTimeString('en-US', {
+      timeStyle: 'medium',
+      hour12: false,
+      timeZone: 'America/Argentina/Buenos_Aires',
+      hour: 'numeric',
+      minute: 'numeric',
+    })
+    .slice(0, -3);
+};
+
+
 export const sendPopup = (message) => {
   EventRegister.emit('ReceiveMessage', message);
 };
