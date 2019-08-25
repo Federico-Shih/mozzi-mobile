@@ -1,5 +1,4 @@
+const lol = new Date();
+const tz = lol.getTimezoneOffset();
 
-const lol = {
-  pene: '',
-}
-console.log('lol' in lol);
+console.log(tz);

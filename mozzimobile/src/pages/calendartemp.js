@@ -148,7 +148,7 @@ class CalendarPage extends Component<Props> {
 
   saveAppointment = async () => {
     const {
-      setLoading, uuid, service, token, navigation,
+      setLoading, token, navigation,
     } = this.props;
     const { selectedDate, selectedTime } = this.state;
 
@@ -162,13 +162,15 @@ class CalendarPage extends Component<Props> {
         const confirm = await this.showAlert(this.state);
         if (confirm) {
           const saved = await sendAppointment({
-            uuid,
-            service,
             token,
-            date: selectedDate,
-            time: selectedTime,
+            slot: selectedTime.key,
           });
-          if (saved) navigation.pop(2);
+          if (!('errors' in saved.data)) navigation.pop(2);
+          else {
+            saved.data.errors.forEach((el) => {
+              sendPopup(el.message);
+            });
+          }
         }
       } catch (e) {
         sendPopup('Alert error');
@@ -179,7 +181,6 @@ class CalendarPage extends Component<Props> {
 
   selectTime = (newTime) => {
     const { data, selectedTime } = this.state;
-
     if (
       !newTime.selected
       && !newTime.occupied
@@ -402,25 +403,6 @@ function mapStateToProps(state) {
     service: state.service,
   };
 }
-
-/*
-<Timeline
-          data={data}
-          preset={Preset.SingleColumnRight}
-          style={{
-            top: 20,
-            marginBottom: 20,
-            width: '100%',
-          }}
-          rowStyle={{ width: 100 }}
-          renderDetail={(rowData) => {
-
-            const { key } = rowData;
-
-          }}
-
-        />
-*/
 
 function mapDispatchToProps(dispatch) {
   return {

@@ -123,7 +123,6 @@ class Business extends Component<Props> {
   // Main render process
   render() {
     const { business } = this.state;
-    console.log(business);
     const { navigation, navigateToSearcher } = this.props;
     const {
       street, zone, number, postal,

@@ -145,15 +145,37 @@ export const getBusiness = ({ uuid, token }) => axios.post(
 
 // To replace when booking appointment info is present
 export const sendAppointment = ({
-  uuid, token, service, date, time,
-}) => new Promise((resolve, reject) => {
-  resolve(true);
+  slot, token,
+}) => new Promise(async (resolve, reject) => {
+  const lol = await axios.post(
+    `${serverSettings.serverURL}/graphql`,
+    {
+      query: `
+            mutation CreateAppointment($slot: ID!) {
+              appointmentCreate(slot: $slot) {
+                uuid
+              }
+            }
+        `,
+      variables: {
+        slot,
+      },
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token,
+      },
+    },
+  );
+  resolve(lol);
 });
 
 // To replace when service times and availability is present
 export const getServiceTimes = ({
   service, token, day,
 }) => new Promise(async (resolve, reject) => {
+  const selectedDay = Math.floor((day.date.getTime() - new Date().getTimezoneOffset() * 60 * 1000) / 8.64e+7);
   const asd = await axios.post(
     `${serverSettings.serverURL}/graphql`,
     {
@@ -176,7 +198,7 @@ export const getServiceTimes = ({
         `,
       variables: {
         inputSlots: {
-          day: Math.floor(day.date.getTime() / 8.64e+7),
+          day: selectedDay,
           service,
         },
       },
@@ -194,7 +216,6 @@ export const getServiceTimes = ({
   }
 
   const { data } = asd.data;
-
   if (data.viewSlots === null) {
     resolve(new Map());
   } else {
@@ -202,8 +223,9 @@ export const getServiceTimes = ({
     let prevSchedule = '';
     const { viewSlots } = data;
     for (let i = 0; i < viewSlots.length; i += 1) {
-      const key = newUuid();
-      const { start, schedule, available } = viewSlots[i];
+      const {
+        start, schedule, available, uuid,
+      } = viewSlots[i];
       if (prevSchedule === '') {
         prevSchedule = schedule.uuid;
       } else if (schedule.uuid !== prevSchedule) {
@@ -215,16 +237,14 @@ export const getServiceTimes = ({
       if (i === viewSlots.length - 1) isLast = true;
       try {
         if (schedule.uuid !== viewSlots[i + 1].schedule.uuid) {
-          console.log('lol');
           isLast = true;
         }
       } catch (error) {}
-
       newMap.set(newMap.size, {
         time: newTime(0, start),
         occupied: !available,
         selected: false,
-        key,
+        key: uuid,
         index: newMap.size,
         isLast,
       });
