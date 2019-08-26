@@ -40,7 +40,7 @@ const slideDuration = 500;
 
 class Authenticate extends Component<Props> {
   state = {
-    loginSize: new Animated.Value(25),
+    loginSize: new Animated.Value(23),
     loginHeight: new Animated.Value(34),
     registerSize: new Animated.Value(20),
     registerHeight: new Animated.Value(27),
@@ -271,17 +271,16 @@ class Authenticate extends Component<Props> {
     const checkEmail = await this.checkIfValidEmailAndSet();
 
     if (checkPass && checkEmail) {
+      const { setLoading, setToken, navigation } = this.props;
+      const { loginState } = this.state;
+      const { email, password } = loginState;
+      setLoading(true);
       await this.checkConnectivity();
       const { connection } = this.state;
       if (!connection) {
         sendPopup(errorMessages.noConnection);
         return;
       }
-
-      const { setLoading, setToken, navigation } = this.props;
-      const { loginState } = this.state;
-      const { email, password } = loginState;
-      setLoading(true);
 
       try {
         const res = await login(email, password);
@@ -295,6 +294,7 @@ class Authenticate extends Component<Props> {
         }
         setLoading(false);
       } catch (error) {
+        alert('lol');
         sendPopup(error.message);
         setLoading(false);
       }
@@ -360,7 +360,7 @@ class Authenticate extends Component<Props> {
           duration,
         }),
         Animated.timing(registerSize, {
-          toValue: 25,
+          toValue: 23,
           duration,
         }),
         Animated.timing(slideValue, {
@@ -389,7 +389,7 @@ class Authenticate extends Component<Props> {
       this.setState({ isLoginShow: true });
       Animated.parallel([
         Animated.timing(loginSize, {
-          toValue: 25,
+          toValue: 23,
           duration,
         }),
         Animated.timing(registerSize, {

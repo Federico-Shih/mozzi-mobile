@@ -2,13 +2,13 @@ import React, { Component } from 'react';
 import { createStackNavigator, createAppContainer } from 'react-navigation';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
-import { View } from 'react-native';
+import { View, PermissionsAndroid, Platform } from 'react-native';
 import Toast from 'react-native-easy-toast';
 import { EventRegister } from 'react-native-event-listeners';
 
 import * as scr from './src/pages/pages';
 import reducer from './src/reducer';
-import { grantingPermissions } from './src/libraries/helpers';
+// import { grantingPermissions } from './src/libraries/helpers';
 import { Popup } from './src/libraries/props';
 
 type Props = {};
@@ -42,6 +42,37 @@ const AppNavigator = createStackNavigator(
 );
 
 const AppContainer = createAppContainer(AppNavigator);
+
+const grantingPermissions = Platform.select({
+  ios: () => {},
+  android: () => new Promise((resolve) => {
+    try {
+      PermissionsAndroid.requestMultiple(
+        // modificar permisos aca
+        [
+          PermissionsAndroid.PERMISSIONS.READ_CALENDAR,
+          PermissionsAndroid.PERMISSIONS.WRITE_CALENDAR,
+        ],
+      ).then((result) => {
+        if (
+          result['android.permission.READ_CALENDAR']
+            && result['android.permission.WRITE_CALENDAR'] === 'granted'
+        ) {
+          resolve('Thank you very much!');
+        } else if (
+          result['android.permission.READ_CALENDAR']
+            || result['android.permission.WRITE_CALENDAR'] === 'never_ask_again'
+        ) {
+          resolve(
+            'Please Go into Settings -> Applications -> Mozzi -> Permissions and Allow permissions to continue',
+          );
+        }
+      });
+    } catch (err) {
+      resolve(err);
+    }
+  }),
+});
 
 // Application creation
 export default class App extends Component<Props> {

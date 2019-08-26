@@ -41,9 +41,12 @@ function getNextDay(nDays) {
 function Box(props) {
   const { element } = props;
   return (
-    <View style={{ width: '100%', height: '100%', alignItems: 'center' }}>
-      <Text style={{ paddingTop: 20, color: 'white' }}>{toDateString(element.date)}</Text>
-      <Text style={{ marginTop: 5, fontSize: 20, color: 'white' }}>
+    <View style={{
+      width: '100%', height: '100%', alignItems: 'center', flexDirection: 'column', justifyContent: 'center',
+    }}
+    >
+      <Text style={{ color: 'white' }}>{toDateString(element.date)}</Text>
+      <Text style={{ marginTop: 0, fontSize: 20, color: 'white' }}>
         {element.date.getDate()}
       </Text>
     </View>

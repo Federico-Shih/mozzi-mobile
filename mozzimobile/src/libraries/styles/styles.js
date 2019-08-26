@@ -76,6 +76,7 @@ export default StyleSheet.create({
     marginHorizontal: 7,
     marginVertical: 15,
     width: 80,
+    height: '80%',
     borderRadius: 20,
   },
   dateStyleSelected: {
@@ -83,6 +84,7 @@ export default StyleSheet.create({
     marginHorizontal: 7,
     marginVertical: 15,
     width: 80,
+    height: '80%',
     borderRadius: 20,
     elevation: 10,
   },
