@@ -1,4 +1,4 @@
-import { PermissionsAndroid, Platform } from 'react-native';
+import { PermissionsAndroid, Platform, Dimensions } from 'react-native';
 import { EventRegister } from 'react-native-event-listeners';
 
 // Validate that email is of the correct format
@@ -6,6 +6,17 @@ export const validateEmail = function validateEmail(email) {
   const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(email);
 };
+
+const { width, height } = Dimensions.get('window');
+const temp = {
+  vw: width / 100,
+  vh: height / 100,
+};
+
+temp.vmin = Math.min(temp.vw, temp.vh);
+temp.vmax = Math.max(temp.vw, temp.vh);
+
+export const units = temp;
 
 export const getUsableTimeFormat = val => new Date(val)
   .toLocaleTimeString('en-US', {
@@ -62,7 +73,6 @@ export const newTime = (hours, minutes) => {
     })
     .slice(0, -3);
 };
-
 
 export const sendPopup = (message) => {
   EventRegister.emit('ReceiveMessage', message);

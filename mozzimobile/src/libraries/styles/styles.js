@@ -1,5 +1,10 @@
 import { StyleSheet, Dimensions } from 'react-native';
 import { fontType, platformBackColor } from './constants';
+import { units } from '../helpers';
+
+const {
+  vh, vw, vmax, vmin,
+} = units;
 
 const InputTextWidth = `${Math.round(
   (1 - 40 / Dimensions.get('window').width) * 100,
@@ -55,6 +60,7 @@ export default StyleSheet.create({
     borderColor: '#AAAAAA',
     width: '100%',
     alignSelf: 'center',
+    height: 5 * vh,
   },
   popup: {
     flexDirection: 'row',

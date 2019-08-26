@@ -19,7 +19,12 @@ import PropTypes from 'prop-types';
 import update from 'immutability-helper';
 
 // codes
-import { validateEmail, errorMessages, sendPopup } from '../libraries/helpers';
+import {
+  validateEmail,
+  errorMessages,
+  sendPopup,
+  units,
+} from '../libraries/helpers';
 import { register, login } from '../libraries/connect/auth';
 
 import styles from '../libraries/styles/styles';
@@ -32,6 +37,10 @@ const SpecialButton = Platform.select({
   android: TouchableNativeFeedback,
 });
 
+const {
+  vh, vw, vmax, vmin,
+} = units;
+
 const ScreenSizeWidth = Dimensions.get('window').width;
 
 const duration = 500;
@@ -40,9 +49,9 @@ const slideDuration = 500;
 
 class Authenticate extends Component<Props> {
   state = {
-    loginSize: new Animated.Value(23),
+    loginSize: new Animated.Value(6 * vw),
     loginHeight: new Animated.Value(34),
-    registerSize: new Animated.Value(20),
+    registerSize: new Animated.Value(5 * vw),
     registerHeight: new Animated.Value(27),
     slideValue: new Animated.Value(0),
     underLinePosition: new Animated.Value(ScreenSizeWidth / 10 + 4),
@@ -356,11 +365,11 @@ class Authenticate extends Component<Props> {
       this.setState({ isLoginShow: false });
       Animated.parallel([
         Animated.timing(loginSize, {
-          toValue: 20,
+          toValue: 5 * vw,
           duration,
         }),
         Animated.timing(registerSize, {
-          toValue: 23,
+          toValue: 6 * vw,
           duration,
         }),
         Animated.timing(slideValue, {
@@ -373,8 +382,7 @@ class Authenticate extends Component<Props> {
         }),
       ]).start();
     }
-  }
-
+  };
 
   changeToLogin = () => {
     const {
@@ -389,11 +397,11 @@ class Authenticate extends Component<Props> {
       this.setState({ isLoginShow: true });
       Animated.parallel([
         Animated.timing(loginSize, {
-          toValue: 23,
+          toValue: 6 * vw,
           duration,
         }),
         Animated.timing(registerSize, {
-          toValue: 20,
+          toValue: 5 * vw,
           duration,
         }),
         Animated.timing(slideValue, {
@@ -603,7 +611,7 @@ class Authenticate extends Component<Props> {
                 titleStyle={buttonStyle.reglogButtonText}
                 buttonStyle={{ ...buttonStyle.reglogButton }}
                 containerStyle={{
-                  marginTop: 50,
+                  marginTop: 4 * vh,
                 }}
               />
               <View
@@ -774,7 +782,7 @@ class Authenticate extends Component<Props> {
                 titleStyle={buttonStyle.reglogButtonText}
                 buttonStyle={{ ...buttonStyle.reglogButton }}
                 containerStyle={{
-                  marginTop: 50,
+                  marginTop: 4 * vh,
                 }}
               />
 
