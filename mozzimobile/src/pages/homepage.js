@@ -28,15 +28,24 @@ import SideMenu from 'react-native-side-menu-over';
 import { connect } from 'react-redux';
 import { NavigationEvents } from 'react-navigation';
 
-import { errorMessages, sendPopup } from '../libraries/helpers';
+import { errorMessages, sendPopup, units } from '../libraries/helpers';
 import { platformBackColor } from '../libraries/styles/constants';
 import { LOADING, REMOVE_TOKEN, ADD_BUSINESS_UUID } from '../actions';
 import styles from '../libraries/styles/styles';
-import { getStores } from '../libraries/connect/businessCalls';
+import { getStores, getCollections } from '../libraries/connect/businessCalls';
 import { getProfile } from '../libraries/connect/auth';
 
 const devMode = true;
 type Props = {};
+
+const {
+  vh, vw, vmax, vmin,
+} = units;
+
+const MyButton = Platform.select({
+  ios: TouchableOpacity,
+  android: TouchableNativeFeedback,
+});
 
 // Main homepage class
 class Homepage extends Component<Props> {
@@ -47,6 +56,7 @@ class Homepage extends Component<Props> {
       name: '',
       image: null,
     },
+    collections: [],
   };
 
   static propTypes = {
@@ -84,6 +94,9 @@ class Homepage extends Component<Props> {
         });
       }
     }
+
+    const collections = await getCollections({ token });
+    this.setState({ collections });
   }
 
   toggle() {
@@ -99,10 +112,15 @@ class Homepage extends Component<Props> {
     });
   }
 
+  closeSearchBar() {
+    this.setState({
+      searchBarIsOpen: false,
+    });
+  }
+
   toggleSearchBar() {
     const { searchBarIsOpen } = this.state;
     const { current } = this.searchModal;
-    current.addGoBackEvent();
     this.setState({
       searchBarIsOpen: !searchBarIsOpen,
     });
@@ -110,12 +128,17 @@ class Homepage extends Component<Props> {
 
   render() {
     const { navigation, token, navigateToBusiness } = this.props;
-    const { isOpen, searchBarIsOpen } = this.state;
+    const { isOpen, searchBarIsOpen, collections } = this.state;
     return (
       <SideMenu
-        menu={
-          <Menu navigation={navigation} props={this.props} state={this.state} searchModal={this.searchModal} />
-        }
+        menu={(
+          <Menu
+            navigation={navigation}
+            props={this.props}
+            state={this.state}
+            searchModal={this.searchModal}
+          />
+)}
         isOpen={isOpen}
         onChange={open => this.updateMenuState(open)}
       >
@@ -148,22 +171,17 @@ class Homepage extends Component<Props> {
               backgroundColor: platformBackColor,
               borderWidth: 0,
             }}
-            /*
-            centerComponent={{
-              text: 'Mozzi',
-              style: { bottom: '50%', fontSize: 25 },
-            }}
-            */
             placement="left"
           />
 
           <ScrollView style={{ width: '100%', top: 5 }} scrollEnabled>
-            <View style={{
-              justifyContent: 'center',
-              width: '100%',
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}
+            <View
+              style={{
+                justifyContent: 'center',
+                width: '100%',
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}
             >
               <Button
                 icon={<Icon name="search" size={22} color="gray" />}
@@ -181,15 +199,76 @@ class Homepage extends Component<Props> {
                   width: '100%',
                 }}
               />
-              <Icon
-                name="settings-input-component"
-                size={30}
-                containerStyle={{ left: 10 }}
-                onPress={() => { alert('In progresss'); }}
-                underlayColor="rgba(1,1,1, 0.2)"
+              <Button
+                onPress={() => {
+                  alert('In progresss');
+                }}
+                icon={(
+                  <Icon
+                    name="settings-input-component"
+                    size={30}
+                    underlayColor="rgba(1,1,1, 0.2)"
+                  />
+                )}
+                containerStyle={{ overflow: 'hidden', left: 5 }}
+                buttonStyle={{ backgroundColor: 'transparent', borderRadius: 50 }}
               />
             </View>
-
+            <View
+              style={{
+                height: vh * 23,
+                width: 100 * vw,
+                marginTop: 2 * vh,
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              {collections.map(el => (
+                <View
+                  key={el.uuid}
+                  style={{
+                    marginVertical: 10,
+                    marginHorizontal: 8,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <View
+                    style={{
+                      borderRadius: 50,
+                      overflow: 'hidden',
+                      height: 14 * vmin,
+                      width: 14 * vmin,
+                      backgroundColor: '#6A32E3',
+                    }}
+                  >
+                    <MyButton
+                      background={TouchableNativeFeedback.Ripple('#AAF', false)}
+                    >
+                      <View
+                        style={{
+                          height: '100%',
+                          width: '100%',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <Icon
+                          name="accessibility"
+                          size={10 * vmin}
+                          color="white"
+                        />
+                      </View>
+                    </MyButton>
+                  </View>
+                  <Text style={{ fontFamily: 'Nunito-SemiBold', fontSize: 14 }}>
+                    {el.name}
+                  </Text>
+                </View>
+              ))}
+            </View>
             <MainSection />
           </ScrollView>
         </KeyboardAvoidingView>
@@ -200,6 +279,9 @@ class Homepage extends Component<Props> {
           ref={this.searchModal}
           toggle={() => {
             this.toggleSearchBar();
+          }}
+          close={() => {
+            this.closeSearchBar();
           }}
           navigateToBusiness={navigateToBusiness}
         />
@@ -258,6 +340,7 @@ class SearchBarSlideUp extends Component<Props> {
         }).start();
       }
     }
+    this.addGoBackEvent();
   }
 
   componentWillUnmount() {
@@ -265,17 +348,18 @@ class SearchBarSlideUp extends Component<Props> {
   }
 
   goBack = () => {
-    const { toggle, navigation, open } = this.props;
-    Keyboard.dismiss();
-    toggle();
-    this.resetSearch();
-    this.backHandler.remove();
-    return true;
+    const { close, navigation, open } = this.props;
+    if (open) {
+      close();
+      this.resetSearch();
+      return true;
+    }
+    return false;
   };
 
   removeHandler = () => {
     if (this.backHandler) this.backHandler.remove();
-  }
+  };
 
   updateSearch = (search) => {
     this.setState({ search });
@@ -399,29 +483,16 @@ class SearchBarSlideUp extends Component<Props> {
         >
           {searchResults.map((el, o) => (
             <View key={o}>
-              {Platform.select({
-                ios: (
-                  <TouchableOpacity
-                    onPress={() => {
-                      this.sendToPage(el.uuid);
-                    }}
-                  >
-                    <SearchElement el={el} />
-                  </TouchableOpacity>
-                ),
-                android: (
-                  <TouchableNativeFeedback
-                    background={TouchableNativeFeedback.Ripple('#DDD')}
-                    onPress={() => {
-                      this.sendToPage(el.uuid);
-                    }}
-                  >
-                    <View>
-                      <SearchElement el={el} />
-                    </View>
-                  </TouchableNativeFeedback>
-                ),
-              })}
+              <MyButton
+                background={TouchableNativeFeedback.Ripple('#DDD')}
+                onPress={() => {
+                  this.sendToPage(el.uuid);
+                }}
+              >
+                <View>
+                  <SearchElement el={el} />
+                </View>
+              </MyButton>
               <Divider
                 style={{
                   backgroundColor: '#DDDDDD',
@@ -653,15 +724,26 @@ function Menu({
         </Text>
       </View>
 
-      <SideMenuButtons buttons={buttons} navigation={navigation} searchModal={searchModal} />
+      <SideMenuButtons
+        buttons={buttons}
+        navigation={navigation}
+        searchModal={searchModal}
+      />
       <View style={{ flex: 1 }} />
       <Button
         containerStyle={{ width: '100%' }}
         icon={<Icon name="exit-to-app" color="#5819E0" size={25} />}
         titleStyle={{
-          color: 'black', fontFamily: 'Nunito-SemiBold', left: 10, fontSize: 20,
+          color: 'black',
+          fontFamily: 'Nunito-SemiBold',
+          left: 10,
+          fontSize: 20,
         }}
-        buttonStyle={{ justifyContent: 'center', paddingRight: 20, paddingVertical: 10 }}
+        buttonStyle={{
+          justifyContent: 'center',
+          paddingRight: 20,
+          paddingVertical: 10,
+        }}
         type="clear"
         onPress={() => {
           props.removeToken();

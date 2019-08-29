@@ -1,6 +1,8 @@
 import { newTime } from '../helpers';
 
 const axios = require('axios');
+const newUUID = require('uuid');
+
 const serverSettings = require('./server');
 
 // Search data that will be received.
@@ -57,7 +59,20 @@ const business = {
   image: 'https://pickaface.net/gallery/avatar/Opi51c74d0125fd4.png',
 };
 
-// To replace when Store search API is present
+const collections = {
+  name: 'Odontologos',
+  businesses: [],
+  id: 'huh',
+};
+
+export const getCollections = ({ token }) => {
+  const arr = [];
+  for (let i = 0; i < 8; i += 1) {
+    arr.push({ ...collections, uuid: newUUID() });
+  }
+  return arr;
+};
+
 export const getStores = ({ search, token }) => axios.post(
   `${serverSettings.serverURL}/graphql`,
   {
@@ -124,9 +139,7 @@ export const getBusiness = ({ uuid, token }) => axios.post(
 */
 
 // To replace when booking appointment info is present
-export const sendAppointment = ({
-  slot, token,
-}) => new Promise(async (resolve, reject) => {
+export const sendAppointment = ({ slot, token }) => new Promise(async (resolve, reject) => {
   const lol = await axios.post(
     `${serverSettings.serverURL}/graphql`,
     {
@@ -151,11 +164,11 @@ export const sendAppointment = ({
   resolve(lol);
 });
 
-// To replace when service times and availability is present
-export const getServiceTimes = ({
-  service, token, day,
-}) => new Promise(async (resolve, reject) => {
-  const selectedDay = Math.floor((day.date.getTime() - new Date().getTimezoneOffset() * 60 * 1000) / 8.64e+7);
+export const getServiceTimes = ({ service, token, day }) => new Promise(async (resolve, reject) => {
+  const selectedDay = Math.floor(
+    (day.date.getTime() - new Date().getTimezoneOffset() * 60 * 1000)
+        / 8.64e7,
+  );
   const asd = await axios.post(
     `${serverSettings.serverURL}/graphql`,
     {
@@ -209,7 +222,10 @@ export const getServiceTimes = ({
       if (prevSchedule === '') {
         prevSchedule = schedule.uuid;
       } else if (schedule.uuid !== prevSchedule) {
-        newMap.set(newMap.size, { start: schedule.start, end: viewSlots[i - 1].schedule.finish });
+        newMap.set(newMap.size, {
+          start: schedule.start,
+          end: viewSlots[i - 1].schedule.finish,
+        });
         prevSchedule = schedule.uuid;
       }
 

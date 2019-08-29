@@ -7,14 +7,21 @@ export const validateEmail = function validateEmail(email) {
   return re.test(email);
 };
 
-const { width, height } = Dimensions.get('window');
 const temp = {
-  vw: width / 100,
-  vh: height / 100,
+  vw: Dimensions.get('window').width / 100,
+  vh: Dimensions.get('window').height / 100,
 };
 
 temp.vmin = Math.min(temp.vw, temp.vh);
 temp.vmax = Math.max(temp.vw, temp.vh);
+
+temp.update = () => {
+  const { width, height } = Dimensions.get('window');
+  temp.vw = width / 100;
+  temp.vh = height / 100;
+  temp.vmax = Math.max(width, height);
+  temp.vmin = Math.min(width, height);
+};
 
 export const units = temp;
 

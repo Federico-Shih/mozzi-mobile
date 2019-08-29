@@ -8,7 +8,7 @@ import { EventRegister } from 'react-native-event-listeners';
 
 import * as scr from './src/pages/pages';
 import reducer from './src/reducer';
-// import { grantingPermissions } from './src/libraries/helpers';
+import { units } from './src/libraries/helpers';
 import { Popup } from './src/libraries/props';
 
 type Props = {};
@@ -34,7 +34,7 @@ const AppNavigator = createStackNavigator(
     Auth: scr.Auth,
   },
   {
-    initialRouteName: 'Auth',
+    initialRouteName: 'Home',
     defaultNavigationOptions: {
       header: null,
     },
@@ -130,6 +130,9 @@ export default class App extends Component<Props> {
     return (
       <Provider store={store}>
         <View
+          onLayout={() => {
+            units.update();
+          }}
           style={{ flex: 1 }}
           onStartShouldSetResponder={this.resetErrorPopup}
         >

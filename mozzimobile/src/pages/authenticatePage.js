@@ -288,6 +288,7 @@ class Authenticate extends Component<Props> {
       const { connection } = this.state;
       if (!connection) {
         sendPopup(errorMessages.noConnection);
+        setLoading(false);
         return;
       }
 
@@ -303,7 +304,6 @@ class Authenticate extends Component<Props> {
         }
         setLoading(false);
       } catch (error) {
-        alert('lol');
         sendPopup(error.message);
         setLoading(false);
       }
@@ -325,12 +325,12 @@ class Authenticate extends Component<Props> {
         name, surname, email, password,
       } = registerState;
 
+      const { setLoading, navigation, setToken } = this.props;
       if (!connection) {
         sendPopup(errorMessages.noConnection);
+        setLoading(false);
         return;
       }
-
-      const { setLoading, navigation, setToken } = this.props;
 
       // calling function
       setLoading(true);
@@ -377,7 +377,7 @@ class Authenticate extends Component<Props> {
           slideDuration,
         }),
         Animated.timing(underLinePosition, {
-          toValue: 10 + (ScreenSizeWidth * 5) / 10,
+          toValue: 3 * vw + (100 * vw * 5) / 10,
           slideDuration,
         }),
       ]).start();
@@ -409,7 +409,7 @@ class Authenticate extends Component<Props> {
           slideDuration,
         }),
         Animated.timing(underLinePosition, {
-          toValue: 4 + (ScreenSizeWidth * 1) / 10,
+          toValue: 1 * vw + (100 * vw) / 10,
           slideDuration,
         }),
       ]).start();
@@ -429,6 +429,8 @@ class Authenticate extends Component<Props> {
     } = this.state;
     const { name, surname } = registerState;
     const { navigation, loading } = this.props;
+    units.update();
+
     return (
       <SafeAreaView style={{ backgroundColor: '#5819E0', flex: 1 }}>
         <View
@@ -528,6 +530,7 @@ class Authenticate extends Component<Props> {
                 width: '100%',
                 left: slideValue,
               }}
+              overflow="scroll"
             >
               <Input
                 keyboardType="email-address"
@@ -642,6 +645,7 @@ class Authenticate extends Component<Props> {
                 left: slideValue,
                 marginLeft: 80,
               }}
+              overflow="scroll"
             >
               <Input
                 placeholder="Name"

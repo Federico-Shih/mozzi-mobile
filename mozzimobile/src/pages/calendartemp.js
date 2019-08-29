@@ -23,7 +23,9 @@ import {
   getServiceTimes,
   sendAppointment,
 } from '../libraries/connect/businessCalls';
-import { errorMessages, sendPopup, newTime } from '../libraries/helpers';
+import { errorMessages, sendPopup, newTime, units } from '../libraries/helpers';
+
+const { vh, vw } = units;
 
 type Props = {};
 
@@ -45,8 +47,8 @@ function Box(props) {
       width: '100%', height: '100%', alignItems: 'center', flexDirection: 'column', justifyContent: 'center',
     }}
     >
-      <Text style={{ color: 'white' }}>{toDateString(element.date)}</Text>
-      <Text style={{ marginTop: 0, fontSize: 20, color: 'white' }}>
+      <Text style={{ color: 'white', fontSize: 5 * vw }}>{toDateString(element.date)}</Text>
+      <Text style={{ fontSize: 5 * vw, color: 'white' }}>
         {element.date.getDate()}
       </Text>
     </View>
@@ -61,7 +63,7 @@ function ShowImage({ length }) {
   return (
     <Image
       source={imageSource}
-      style={{ alignSelf: 'center', marginTop: '30%' }}
+      style={{ alignSelf: 'center', marginTop: vh * 15 }}
     />
   );
 }
@@ -252,7 +254,7 @@ class CalendarPage extends Component<Props> {
 
         <View
           style={{
-            height: '15%',
+            height: vh * 15,
             marginLeft: 20,
           }}
         >

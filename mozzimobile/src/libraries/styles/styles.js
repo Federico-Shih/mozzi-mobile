@@ -82,7 +82,7 @@ export default StyleSheet.create({
     marginHorizontal: 7,
     marginVertical: 15,
     width: 80,
-    height: '80%',
+    height: 12 * vh,
     borderRadius: 20,
   },
   dateStyleSelected: {
@@ -90,7 +90,7 @@ export default StyleSheet.create({
     marginHorizontal: 7,
     marginVertical: 15,
     width: 80,
-    height: '80%',
+    height: 12 * vh,
     borderRadius: 20,
     elevation: 10,
   },
