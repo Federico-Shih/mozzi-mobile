@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Input, Button } from 'react-native-elements';
+import { Input, Button, Icon } from 'react-native-elements';
 import NetInfo from '@react-native-community/netinfo';
 import PropTypes from 'prop-types';
 import update from 'immutability-helper';
@@ -68,6 +68,9 @@ class Authenticate extends Component<Props> {
       password: '',
       tempConfirmedPassword: '',
     },
+    showPassLogin: false,
+    showPassRegister: false,
+    showConfirmRegister: false,
   };
 
   registerError = {
@@ -416,6 +419,25 @@ class Authenticate extends Component<Props> {
     }
   };
 
+  togglePassword = (name) => {
+    const passState = this.state[name];
+    let passwordEmpty;
+    switch (name) { 
+      case 'showPassLogin':
+        passwordEmpty = (this.state.loginState.password === '');
+        break;
+      case 'showPassRegister':
+        passwordEmpty = (this.state.registerState.password === '');
+        break;
+      case 'showConfirmRegister':
+        passwordEmpty = (this.state.registerState.confirmpassword === '');
+        break;
+      default:
+        throw new Error('WHY');
+    }
+    if (!passwordEmpty) this.setState({ [name]: !passState });
+  };
+
   render() {
     const {
       loginSize,
@@ -426,6 +448,9 @@ class Authenticate extends Component<Props> {
       slideValue,
       registerState,
       underLinePosition,
+      showPassLogin,
+      showPassRegister,
+      showConfirmRegister,
     } = this.state;
     const { name, surname } = registerState;
     const { navigation, loading } = this.props;
@@ -561,7 +586,7 @@ class Authenticate extends Component<Props> {
                 {this.displayErrorMessage('email')}
               </View>
               <Input
-                secureTextEntry
+                secureTextEntry={!showPassLogin}
                 placeholder="Password"
                 inputStyle={{
                   fontFamily: 'Nunito-SemiBold',
@@ -579,6 +604,17 @@ class Authenticate extends Component<Props> {
                 }}
                 inputContainerStyle={{ ...this.loginStyle.password }}
                 leftIcon={{ type: 'material', name: 'lock', color: '#AAAAAA' }}
+                rightIcon={(
+                  <Icon
+                    clear
+                    name="remove-red-eye"
+                    type="material"
+                    color="#AAAAAA"
+                    onPress={() => {
+                      this.togglePassword('showPassLogin');
+                    }}
+                  />
+)}
               />
 
               <View style={{ height: 20 }}>
@@ -729,7 +765,7 @@ class Authenticate extends Component<Props> {
                 {this.displayErrorMessage('email')}
               </View>
               <Input
-                secureTextEntry
+                secureTextEntry={!showPassRegister}
                 placeholder="Password"
                 inputStyle={{
                   fontFamily: 'Nunito-SemiBold',
@@ -742,6 +778,17 @@ class Authenticate extends Component<Props> {
                     }),
                   });
                 }}
+                rightIcon={(
+                  <Icon
+                    clear
+                    name="remove-red-eye"
+                    type="material"
+                    color="#AAAAAA"
+                    onPress={() => {
+                      this.togglePassword('showPassRegister');
+                    }}
+                  />
+)}
                 onSubmitEditing={() => {
                   this.checkIfValidPasswordAndSet();
                 }}
@@ -752,7 +799,7 @@ class Authenticate extends Component<Props> {
                 {this.displayErrorMessage('password')}
               </View>
               <Input
-                secureTextEntry
+                secureTextEntry={!showConfirmRegister}
                 inputStyle={{
                   fontFamily: 'Nunito-SemiBold',
                   fontWeight: '100',
@@ -765,6 +812,17 @@ class Authenticate extends Component<Props> {
                     }),
                   });
                 }}
+                rightIcon={(
+                  <Icon
+                    clear
+                    name="remove-red-eye"
+                    type="material"
+                    color="#AAAAAA"
+                    onPress={() => {
+                      this.togglePassword('showConfirmRegister');
+                    }}
+                  />
+)}
                 onSubmitEditing={() => {
                   this.checkIfPasswordsMatchAndSet();
                 }}
