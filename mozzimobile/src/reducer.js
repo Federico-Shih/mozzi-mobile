@@ -6,6 +6,8 @@ import {
   REMOVE_BUSINESS_UUID,
   SELECT_SERVICE,
   REMOVE_SERVICE,
+  ADD_USER,
+  REMOVE_USER,
 } from './actions';
 
 const initialState = {
@@ -13,6 +15,11 @@ const initialState = {
   token: '',
   businessUuid: '',
   service: '',
+  user: {
+    name: '',
+    lastname: '',
+    uuid: '',
+  },
 };
 
 export default function reducer(state = initialState, action) {
@@ -31,6 +38,10 @@ export default function reducer(state = initialState, action) {
       return { ...state, service: action.id };
     case REMOVE_SERVICE:
       return { ...state, service: '' };
+    case ADD_USER:
+      return { ...state, user: action.user };
+    case REMOVE_USER:
+      return { ...state, user: { name: '', lastname: '', uuid: '' } };
     default:
       return state;
   }

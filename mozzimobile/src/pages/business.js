@@ -15,7 +15,7 @@ import newUUID from 'uuid';
 
 import { ScrollView } from 'react-native-gesture-handler';
 import styles from '../libraries/styles/styles';
-import { sendPopup } from '../libraries/helpers';
+import { sendPopup, UserData } from '../libraries/helpers';
 import {
   LOADING, REMOVE_BUSINESS_UUID, SELECT_SERVICE, REMOVE_SERVICE,
 } from '../actions';
@@ -101,7 +101,8 @@ class Business extends Component<Props> {
     /*
     basic catch and then when get Business receives the API call
     */
-    const { token, uuid } = this.props;
+    const { token, uuid, user } = this.props;
+    
     const business = await getBusiness({ token, uuid });
     const { data } = business;
     if (data.errors) {
@@ -110,6 +111,16 @@ class Business extends Component<Props> {
       });
     } else {
       this.setState({ business: data.data.business });
+      UserData.saveAndUpdate('lol', 'ja').then((res) => {
+        console.log(res);
+        UserData.get('lol').then((as) => {
+          console.log(as);
+        }, (mm) => {
+          console.log(mm);
+        });
+      }, (err) => {
+        console.log(err);
+      });
     }
   };
 
@@ -317,6 +328,7 @@ function mapStateToProps(state) {
     loading: state.loading,
     token: state.token,
     uuid: state.businessUuid,
+    user: state.user,
   };
 }
 

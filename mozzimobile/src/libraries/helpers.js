@@ -1,5 +1,6 @@
 import { PermissionsAndroid, Platform, Dimensions } from 'react-native';
 import { EventRegister } from 'react-native-event-listeners';
+import RNSecureKeyStore, { ACCESSIBLE } from 'react-native-secure-key-store';
 
 // Validate that email is of the correct format
 export const validateEmail = function validateEmail(email) {
@@ -115,3 +116,10 @@ export const grantingPermissions = Platform.select({
     }
   }),
 });
+
+export const UserData = {
+  saveAndUpdate: ({ user, business }) => RNSecureKeyStore.set(user, business, {
+    accessible: ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
+  }),
+  get: user => RNSecureKeyStore.get(user),
+};

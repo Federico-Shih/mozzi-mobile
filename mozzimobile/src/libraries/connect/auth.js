@@ -164,6 +164,7 @@ export const getProfile = ({ token }) => axios.post(
           me {
             name
             lastname
+            uuid
           }
         }
       `,

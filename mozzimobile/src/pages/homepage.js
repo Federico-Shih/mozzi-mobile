@@ -30,7 +30,7 @@ import { NavigationEvents } from 'react-navigation';
 
 import { errorMessages, sendPopup, units } from '../libraries/helpers';
 import { platformBackColor } from '../libraries/styles/constants';
-import { LOADING, REMOVE_TOKEN, ADD_BUSINESS_UUID } from '../actions';
+import { LOADING, REMOVE_TOKEN, ADD_BUSINESS_UUID, ADD_USER, REMOVE_USER } from '../actions';
 import styles from '../libraries/styles/styles';
 import { getStores, getCollections } from '../libraries/connect/businessCalls';
 import { getProfile } from '../libraries/connect/auth';
@@ -74,7 +74,7 @@ class Homepage extends Component<Props> {
   }
 
   async componentDidMount() {
-    const { navigation, token } = this.props;
+    const { navigation, token, addUser } = this.props;
 
     if (token === '' && !devMode) {
       navigation.replace('Login');
@@ -86,6 +86,7 @@ class Homepage extends Component<Props> {
           sendPopup(el.message);
         });
       } else {
+        addUser(data.data.me);
         this.setState({
           profile: {
             ...data.data.me,
@@ -747,6 +748,7 @@ function Menu({
         type="clear"
         onPress={() => {
           props.removeToken();
+          props.removeUser();
           navigation.replace('Auth');
         }}
         title="Cerrar Sesión"
@@ -811,6 +813,17 @@ function mapDispatchToProps(dispatch) {
       dispatch({
         type: ADD_BUSINESS_UUID,
         uuid,
+      });
+    },
+    addUser: (user) => {
+      dispatch({
+        type: ADD_USER,
+        user,
+      });
+    },
+    removeUser: () => {
+      dispatch({
+        type: REMOVE_USER,
       });
     },
   };
