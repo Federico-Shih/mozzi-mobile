@@ -3,7 +3,7 @@ package com.mozzi;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-import com.reactlibrary.securekeystore.RNSecureKeyStorePackage;
+import io.realm.react.RealmReactPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.reactnativecommunity.netinfo.NetInfoPackage;
@@ -27,7 +27,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new RNSecureKeyStorePackage(),
+            new RealmReactPackage(),
             new VectorIconsPackage(),
             new RNGestureHandlerPackage(),
             new NetInfoPackage()

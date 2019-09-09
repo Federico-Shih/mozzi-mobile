@@ -1,6 +1,7 @@
 import { PermissionsAndroid, Platform, Dimensions } from 'react-native';
 import { EventRegister } from 'react-native-event-listeners';
-import RNSecureKeyStore, { ACCESSIBLE } from 'react-native-secure-key-store';
+
+const Realm = require('realm');
 
 // Validate that email is of the correct format
 export const validateEmail = function validateEmail(email) {
@@ -117,9 +118,160 @@ export const grantingPermissions = Platform.select({
   }),
 });
 
+const UserSchema = {
+  name: 'User',
+  primaryKey: 'uuid',
+  properties: {
+    uuid: 'string',
+    favorites: 'string[]',
+    recents: 'string[]',
+  },
+};
+
 export const UserData = {
-  saveAndUpdate: ({ user, business }) => RNSecureKeyStore.set(user, business, {
-    accessible: ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
+  loadRealm: () => new Promise((resolve) => {
+    Realm.open({ schema: [UserSchema] })
+      .then((realm) => {
+        this.realm = realm;
+        resolve();
+      })
+      .catch((err) => {
+        sendPopup(err);
+        resolve();
+      });
   }),
-  get: user => RNSecureKeyStore.get(user),
+  realm: {},
+  createUser: (uuid) => {
+    try {
+      this.realm.write(() => {
+        const hi = this.realm.create('User', {
+          uuid,
+          favorites: [],
+          recents: [],
+        });
+        console.log(hi);
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  },
+  checkUser: (uuid) => {
+    const user = this.realm.objects('User').find((item) => {
+      if (item.uuid === uuid) {
+        return true;
+      }
+      return false;
+    });
+    return user !== undefined;
+  },
+  updateUserFavorites: ({ uuid, business }) => {
+    const user = this.realm.objects('User').find((item) => {
+      if (item.uuid === uuid) {
+        return true;
+      }
+      return false;
+    });
+    this.realm.write(() => {
+      const { favorites } = user;
+
+      // Probable efficiency leak
+      const newFavorites = favorites.filter(val => val !== business);
+      newFavorites.unshift(business);
+      this.realm.create(
+        'User',
+        {
+          uuid,
+          favorites: newFavorites,
+          recents: user.recents,
+        },
+        true,
+      );
+    });
+  },
+  updateUserRecents: ({ uuid, business }) => {
+    const user = this.realm.objects('User').find((item) => {
+      if (item.uuid === uuid) {
+        return true;
+      }
+      return false;
+    });
+    this.realm.write(() => {
+      const { recents } = user;
+      // Probable efficiency leak
+      const newRecents = recents.filter(val => val !== business);
+      newRecents.unshift(business);
+      this.realm.create(
+        'User',
+        {
+          uuid,
+          favorites: user.favorites,
+          recents: newRecents,
+        },
+        true,
+      );
+    });
+  },
+  removeUserRecents: ({ uuid, business }) => {
+    const user = this.realm.objects('User').find((item) => {
+      if (item.uuid === uuid) {
+        return true;
+      }
+      return false;
+    });
+
+    this.realm.write(() => {
+      const { recents } = user;
+      // Probable efficiency leak
+      const newRecents = recents.filter(val => val !== business);
+      this.realm.create(
+        'User',
+        {
+          uuid,
+          favorites: user.favorites,
+          recents: newRecents,
+        },
+        true,
+      );
+    });
+  },
+  removeUserFavorites: ({ uuid, business }) => {
+    const user = this.realm.objects('User').find((item) => {
+      if (item.uuid === uuid) {
+        return true;
+      }
+      return false;
+    });
+    this.realm.write(() => {
+      const { favorites } = user;
+      // Probable efficiency leak
+      const newFavorites = favorites.filter(val => val !== business);
+      this.realm.create(
+        'User',
+        {
+          uuid,
+          favorites: newFavorites,
+          recents: user.recents,
+        },
+        true,
+      );
+    });
+  },
+  getFavorites: (uuid) => {
+    const user = this.realm.objects('User').find((item) => {
+      if (item.uuid === uuid) {
+        return true;
+      }
+      return false;
+    });
+    return user.favorites;
+  },
+  getRecents: (uuid) => {
+    const user = this.realm.objects('User').find((item) => {
+      if (item.uuid === uuid) {
+        return true;
+      }
+      return false;
+    });
+    return user.recents;
+  },
 };

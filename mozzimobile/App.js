@@ -34,7 +34,7 @@ const AppNavigator = createStackNavigator(
     Auth: scr.Auth,
   },
   {
-    initialRouteName: 'Home',
+    initialRouteName: 'Auth',
     defaultNavigationOptions: {
       header: null,
     },

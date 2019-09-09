@@ -96,6 +96,12 @@ class Business extends Component<Props> {
     addService: PropTypes.func.isRequired,
   };
 
+  /*
+lastname: "Shih"
+name: "Federico"
+uuid: "845a0a9e-7ac3-4f71-8a02-11a51f5275a7"
+
+  */
   // Gets the business when it mounts
   componentDidMount = async () => {
     /*
@@ -111,16 +117,7 @@ class Business extends Component<Props> {
       });
     } else {
       this.setState({ business: data.data.business });
-      UserData.saveAndUpdate('lol', 'ja').then((res) => {
-        console.log(res);
-        UserData.get('lol').then((as) => {
-          console.log(as);
-        }, (mm) => {
-          console.log(mm);
-        });
-      }, (err) => {
-        console.log(err);
-      });
+      UserData.checkUser(user.uuid);
     }
   };
 
