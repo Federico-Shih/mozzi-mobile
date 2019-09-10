@@ -105,7 +105,6 @@ class Homepage extends Component<Props> {
             image: 'https://pickaface.net/gallery/avatar/Opi51c74d0125fd4.png',
           },
         });
-        await UserData.loadRealm();
         if (!UserData.checkUser(me.uuid)) {
           UserData.createUser(me.uuid);
         }

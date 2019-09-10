@@ -17,7 +17,10 @@ import { ScrollView } from 'react-native-gesture-handler';
 import styles from '../libraries/styles/styles';
 import { sendPopup, UserData } from '../libraries/helpers';
 import {
-  LOADING, REMOVE_BUSINESS_UUID, SELECT_SERVICE, REMOVE_SERVICE,
+  LOADING,
+  REMOVE_BUSINESS_UUID,
+  SELECT_SERVICE,
+  REMOVE_SERVICE,
 } from '../actions';
 import { getBusiness } from '../libraries/connect/businessCalls';
 
@@ -29,7 +32,7 @@ function Services({ el }) {
   const { duration } = el;
   if (duration !== null) {
     if (Math.floor(duration / 60) !== 0) {
-      const unidad = (duration / 60 === 1) ? 'Hora' : 'Horas';
+      const unidad = duration / 60 === 1 ? 'Hora' : 'Horas';
       formatted = formatted.concat(`${Math.floor(duration / 60)} ${unidad} `);
     }
     if (duration % 60 !== 0) {
@@ -39,24 +42,14 @@ function Services({ el }) {
     formatted = '';
   }
   return (
-    <View
-      style={{ color: 'black' }}
-    >
+    <View style={{ color: 'black' }}>
       <View style={{ flex: 1, flexDirection: 'row' }}>
         <View>
-          <Text
-            style={{ fontSize: 16 }}
-          >
-            {el.name}
-          </Text>
-          <Text>
-            {`${formatted}`}
-          </Text>
+          <Text style={{ fontSize: 16 }}>{el.name}</Text>
+          <Text>{`${formatted}`}</Text>
         </View>
         <View style={{ flex: 1 }} />
-        <Text>
-          {`$ ${el.price}`}
-        </Text>
+        <Text>{`$ ${el.price}`}</Text>
       </View>
     </View>
   );
@@ -108,7 +101,6 @@ uuid: "845a0a9e-7ac3-4f71-8a02-11a51f5275a7"
     basic catch and then when get Business receives the API call
     */
     const { token, uuid, user } = this.props;
-    
     const business = await getBusiness({ token, uuid });
     const { data } = business;
     if (data.errors) {
@@ -116,8 +108,19 @@ uuid: "845a0a9e-7ac3-4f71-8a02-11a51f5275a7"
         sendPopup(el.message);
       });
     } else {
-      this.setState({ business: data.data.business });
-      UserData.checkUser(user.uuid);
+      const { business } = data.data;
+      this.setState({ business });
+      if (UserData.checkUser(user.uuid)) {
+        UserData.updateUserRecents({
+          uuid: user.uuid,
+          business: {
+            name: business.name,
+            description: business.description,
+            uuid,
+          },
+        });
+        console.log(UserData.getRecents(user.uuid)[0]);
+      }
     }
   };
 
@@ -126,7 +129,7 @@ uuid: "845a0a9e-7ac3-4f71-8a02-11a51f5275a7"
     const { addService, navigation } = this.props;
     addService(id);
     navigation.navigate('Calendar');
-  }
+  };
 
   // Main render process
   render() {
@@ -144,7 +147,9 @@ uuid: "845a0a9e-7ac3-4f71-8a02-11a51f5275a7"
           }}
         >
           <Image
-            source={{ uri: 'https://semantic-ui.com/images/wireframe/image.png' }}
+            source={{
+              uri: 'https://semantic-ui.com/images/wireframe/image.png',
+            }}
             style={{
               width: 1000,
               height: 160,
@@ -160,12 +165,13 @@ uuid: "845a0a9e-7ac3-4f71-8a02-11a51f5275a7"
               width: '100%',
             }}
           >
-            <Text style={{
-              fontSize: 20,
-              fontWeight: '800',
-              color: 'black',
-              marginLeft: 10,
-            }}
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: '800',
+                color: 'black',
+                marginLeft: 10,
+              }}
             >
               Servicios
             </Text>
@@ -183,55 +189,53 @@ uuid: "845a0a9e-7ac3-4f71-8a02-11a51f5275a7"
                 width: '100%',
               }}
             >
-              {business.services.map(el => (
-                Platform.select({
-                  ios: (
-                    <TouchableOpacity
-                      key={newUUID()}
-                      onPress={() => {
-                        this.navToCalendar(el.uuid);
-                      }}
-                    >
-                      <View style={{ }}>
-                        <View style={{ paddingVertical: 20, marginLeft: 20 }}>
-                          <Services el={el} />
-                        </View>
-                        <Divider
-                          style={{
-                            height: 1,
-                            width: '100%',
-                            backgroundColor: 'grey',
-                          }}
-                        />
+              {business.services.map(el => Platform.select({
+                ios: (
+                  <TouchableOpacity
+                    key={newUUID()}
+                    onPress={() => {
+                      this.navToCalendar(el.uuid);
+                    }}
+                  >
+                    <View style={{}}>
+                      <View style={{ paddingVertical: 20, marginLeft: 20 }}>
+                        <Services el={el} />
                       </View>
-                    </TouchableOpacity>
-                  ),
-                  android: (
-                    <TouchableNativeFeedback
-                      key={newUUID()}
-                      background={TouchableNativeFeedback.Ripple('#DDD')}
-                      conta
-                      onPress={() => {
-                        this.navToCalendar(el.uuid);
-                      }}
-                    >
-                      <View style={{ }}>
-                        <View style={{ paddingVertical: 20, marginLeft: 20 }}>
-                          <Services el={el} />
-                        </View>
-                        <Divider
-                          style={{
-                            height: 1,
-                            width: '100%',
-                            backgroundColor: 'grey',
-                            marginLeft: 10,
-                          }}
-                        />
+                      <Divider
+                        style={{
+                          height: 1,
+                          width: '100%',
+                          backgroundColor: 'grey',
+                        }}
+                      />
+                    </View>
+                  </TouchableOpacity>
+                ),
+                android: (
+                  <TouchableNativeFeedback
+                    key={newUUID()}
+                    background={TouchableNativeFeedback.Ripple('#DDD')}
+                    conta
+                    onPress={() => {
+                      this.navToCalendar(el.uuid);
+                    }}
+                  >
+                    <View style={{}}>
+                      <View style={{ paddingVertical: 20, marginLeft: 20 }}>
+                        <Services el={el} />
                       </View>
-                    </TouchableNativeFeedback>
-                  ),
-                })
-              ))}
+                      <Divider
+                        style={{
+                          height: 1,
+                          width: '100%',
+                          backgroundColor: 'grey',
+                          marginLeft: 10,
+                        }}
+                      />
+                    </View>
+                  </TouchableNativeFeedback>
+                ),
+              }))}
             </ScrollView>
           </View>
         </View>
@@ -298,9 +302,15 @@ uuid: "845a0a9e-7ac3-4f71-8a02-11a51f5275a7"
           }}
         >
           <Icon
-            name={Platform.select({ ios: 'arrow-back-ios', android: 'arrow-back' })}
+            name={Platform.select({
+              ios: 'arrow-back-ios',
+              android: 'arrow-back',
+            })}
             size={25}
-            onPress={() => { navigateToSearcher(); navigation.goBack(); }}
+            onPress={() => {
+              navigateToSearcher();
+              navigation.goBack();
+            }}
             color="white"
             containerStyle={{
               borderRadius: 50,

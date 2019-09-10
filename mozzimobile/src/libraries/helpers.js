@@ -123,22 +123,28 @@ const UserSchema = {
   primaryKey: 'uuid',
   properties: {
     uuid: 'string',
-    favorites: 'string[]',
-    recents: 'string[]',
+    favorites: 'Business[]',
+    recents: 'Business[]',
+  },
+};
+
+const BusinessSchema = {
+  name: 'Business',
+  primaryKey: 'uuid',
+  properties: {
+    uuid: 'string',
+    name: 'string',
+    description: 'string',
   },
 };
 
 export const UserData = {
   loadRealm: () => new Promise((resolve) => {
-    Realm.open({ schema: [UserSchema] })
-      .then((realm) => {
-        this.realm = realm;
-        resolve();
-      })
-      .catch((err) => {
-        sendPopup(err);
-        resolve();
-      });
+    try {
+      this.realm = new Realm({ schema: [UserSchema, BusinessSchema] });
+    } catch (e) {
+      sendPopup(e.message);
+    }
   }),
   realm: {},
   createUser: (uuid) => {
@@ -175,7 +181,7 @@ export const UserData = {
       const { favorites } = user;
 
       // Probable efficiency leak
-      const newFavorites = favorites.filter(val => val !== business);
+      const newFavorites = favorites.filter(val => val.uuid !== business.uuid);
       newFavorites.unshift(business);
       this.realm.create(
         'User',
@@ -198,7 +204,7 @@ export const UserData = {
     this.realm.write(() => {
       const { recents } = user;
       // Probable efficiency leak
-      const newRecents = recents.filter(val => val !== business);
+      const newRecents = recents.filter(val => val.uuid !== business.uuid);
       newRecents.unshift(business);
       this.realm.create(
         'User',
@@ -222,7 +228,7 @@ export const UserData = {
     this.realm.write(() => {
       const { recents } = user;
       // Probable efficiency leak
-      const newRecents = recents.filter(val => val !== business);
+      const newRecents = recents.filter(val => val.uuid !== business.uuid);
       this.realm.create(
         'User',
         {
@@ -244,7 +250,7 @@ export const UserData = {
     this.realm.write(() => {
       const { favorites } = user;
       // Probable efficiency leak
-      const newFavorites = favorites.filter(val => val !== business);
+      const newFavorites = favorites.filter(val => val.uuid !== business.uuid);
       this.realm.create(
         'User',
         {

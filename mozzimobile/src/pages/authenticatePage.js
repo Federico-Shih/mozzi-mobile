@@ -24,6 +24,7 @@ import {
   errorMessages,
   sendPopup,
   units,
+  UserData,
 } from '../libraries/helpers';
 import { register, login } from '../libraries/connect/auth';
 
@@ -437,6 +438,10 @@ class Authenticate extends Component<Props> {
     }
     if (!passwordEmpty) this.setState({ [name]: !passState });
   };
+
+  async componentDidMount() {
+    await UserData.loadRealm();
+  }
 
   render() {
     const {

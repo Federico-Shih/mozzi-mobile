@@ -1,24 +1,37 @@
 import {
-  Text, View, Platform, Alert, TouchableHighlight, TouchableNativeFeedback,
+  Text,
+  View,
+  Platform,
+  Alert,
+  TouchableHighlight,
+  TouchableNativeFeedback,
+  ScrollView,
+  FlatList,
 } from 'react-native';
 import React, { Component } from 'react';
 import { Divider, Button, Icon } from 'react-native-elements';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import newUUID from 'uuid';
 
 import {
   getAppointments,
   removeAppointments,
 } from '../libraries/connect/appointments';
 import styles from '../libraries/styles/styles';
-import { getUsableTimeFormat as hour, sendPopup, newTime } from '../libraries/helpers';
+import {
+  getUsableTimeFormat as hour,
+  sendPopup,
+  newTime,
+} from '../libraries/helpers';
 import { platformBackColor } from '../libraries/styles/constants';
 import { ADD_BUSINESS_UUID } from '../actions';
 
 type Props = {};
 
-const TouchButton = Platform.select({ ios: TouchableHighlight, android: TouchableNativeFeedback });
+const TouchButton = Platform.select({
+  ios: TouchableHighlight,
+  android: TouchableNativeFeedback,
+});
 
 class MyAppointments extends Component<Props> {
   state = {
@@ -51,7 +64,10 @@ class MyAppointments extends Component<Props> {
     const { token } = this.props;
     const confirmar = await this.showAlert(appointment);
     if (confirmar) {
-      const resultsAPI = await removeAppointments({ token, uuid: appointment.uuid });
+      const resultsAPI = await removeAppointments({
+        token,
+        uuid: appointment.uuid,
+      });
       console.log(resultsAPI);
       if (resultsAPI.data.data.appointmentDelete === '0') {
         this.setState((state) => {
@@ -73,18 +89,20 @@ class MyAppointments extends Component<Props> {
     const { navigateToBusiness, navigation } = this.props;
     navigateToBusiness(uuid);
     navigation.navigate('Business');
-  }
+  };
 
   showAlert = appointment => new Promise((resolve) => {
-    const {
-      service,
-      slot,
-    } = appointment;
+    const { service, slot } = appointment;
     Alert.alert(
       'Confirmar',
       `Confirmas la eliminación del servicio de ${service.name} del negocio ${
         service.business.name
-      } de la fecha ${new Date((slot.day) * 24 * 60 * 60 * 1000 + slot.start * 60 * 1000).toDateString()} desde las ${newTime(0, slot.start)} hasta las ${newTime(0, slot.finish)}?`,
+      } de la fecha ${new Date(
+        slot.day * 24 * 60 * 60 * 1000 + slot.start * 60 * 1000,
+      ).toDateString()} desde las ${newTime(
+        0,
+        slot.start,
+      )} hasta las ${newTime(0, slot.finish)}?`,
       [
         { text: 'Cancelar', onPress: () => resolve(false), style: 'cancel' },
         { text: 'Eliminar', onPress: () => resolve(true) },
@@ -144,70 +162,84 @@ class MyAppointments extends Component<Props> {
             Turnos
           </Text>
           <Divider style={{ height: 2, width: '100%' }} />
-          {arrayAppointments.map(val => (
-            <View key={val.uuid} style={{ flexDirection: 'column' }}>
-              <TouchButton
-                onPress={() => {
-                  this.navToStore(val.service.business.uuid);
-                }}
-              >
-                <View style={{ flexDirection: 'row' }}>
-                  <View
-                    style={{
-                      flexDirection: 'column',
-                      paddingLeft: 5,
-                    }}
-                  >
-                    <Text style={{ paddingTop: 5, fontSize: 20 }}>
-                      {val.service.business.name}
-                    </Text>
-                    <View style={{ flexDirection: 'row' }}>
-                      <Text
-                        style={{
-                          fontSize: 14,
-                          width: 100,
-                          alignSelf: 'center',
-                        }}
-                      >
-                        {val.service.name}
+          <FlatList
+            data={arrayAppointments}
+            keyExtractor={item => item.uuid}
+            renderItem={({ item }) => (
+              <View key={item.uuid} style={{ flexDirection: 'column' }}>
+                <TouchButton
+                  onPress={() => {
+                    this.navToStore(item.service.business.uuid);
+                  }}
+                >
+                  <View style={{ flexDirection: 'row' }}>
+                    <View
+                      style={{
+                        flexDirection: 'column',
+                        paddingLeft: 5,
+                      }}
+                    >
+                      <Text style={{ paddingTop: 5, fontSize: 20 }}>
+                        {item.service.business.name}
                       </Text>
-                      <Text style={{ alignSelf: 'center', fontSize: 20 }}>
-                        {`$${val.service.price}`}
+                      <View style={{ flexDirection: 'row' }}>
+                        <Text
+                          style={{
+                            fontSize: 14,
+                            width: 100,
+                            alignSelf: 'center',
+                          }}
+                        >
+                          {item.service.name}
+                        </Text>
+                        <Text style={{ alignSelf: 'center', fontSize: 20 }}>
+                          {`$${item.service.price}`}
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={{ flex: 1 }} />
+                    <View
+                      style={{
+                        flexDirection: 'column',
+                        marginRight: 10,
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <Text>
+                        {new Date(
+                          item.slot.day * 24 * 60 * 60 * 1000
+                            + item.slot.start * 60 * 1000,
+                        ).toDateString()}
+                      </Text>
+                      <Text>
+                        {`${newTime(0, item.slot.start)}~${newTime(
+                          0,
+                          item.slot.finish,
+                        )}`}
                       </Text>
                     </View>
+                    <Icon
+                      name="clear"
+                      type="material"
+                      containerStyle={{
+                        justifyContent: 'center',
+                        marginRight: 10,
+                      }}
+                      iconStyle={{
+                        paddingHorizontal: 15,
+                        paddingVertical: 15,
+                        borderRadius: 50,
+                      }}
+                      onPress={() => {
+                        this.appointmentDelete(item);
+                      }}
+                    />
                   </View>
-                  <View style={{ flex: 1 }} />
-                  <View
-                    style={{
-                      flexDirection: 'column',
-                      marginRight: 10,
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Text>{new Date((val.slot.day) * 24 * 60 * 60 * 1000 + val.slot.start * 60 * 1000).toDateString()}</Text>
-                    <Text>{`${newTime(0, val.slot.start)}~${newTime(0, val.slot.finish)}`}</Text>
-                  </View>
-                  <Icon
-                    name="clear"
-                    type="material"
-                    containerStyle={{
-                      justifyContent: 'center',
-                      marginRight: 10,
-                    }}
-                    iconStyle={{
-                      paddingHorizontal: 15,
-                      paddingVertical: 15,
-                      borderRadius: 50,
-                    }}
-                    onPress={() => {
-                      this.appointmentDelete(val);
-                    }}
-                  />
-                </View>
-              </TouchButton>
-              <Divider style={{ width: '100%' }} />
-            </View>
-          ))}
+                </TouchButton>
+                <Divider style={{ width: '100%' }} />
+              </View>
+            )}
+          />
         </View>
       </View>
     );
