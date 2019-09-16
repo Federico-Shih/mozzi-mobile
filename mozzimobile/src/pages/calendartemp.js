@@ -23,7 +23,9 @@ import {
   getServiceTimes,
   sendAppointment,
 } from '../libraries/connect/businessCalls';
-import { errorMessages, sendPopup, newTime, units } from '../libraries/helpers';
+import {
+  errorMessages, sendPopup, newTime, units,
+} from '../libraries/helpers';
 
 const { vh, vw } = units;
 
@@ -43,11 +45,18 @@ function getNextDay(nDays) {
 function Box(props) {
   const { element } = props;
   return (
-    <View style={{
-      width: '100%', height: '100%', alignItems: 'center', flexDirection: 'column', justifyContent: 'center',
-    }}
+    <View
+      style={{
+        width: '100%',
+        height: '100%',
+        alignItems: 'center',
+        flexDirection: 'column',
+        justifyContent: 'center',
+      }}
     >
-      <Text style={{ color: 'white', fontSize: 5 * vw }}>{toDateString(element.date)}</Text>
+      <Text style={{ color: 'white', fontSize: 5 * vw }}>
+        {toDateString(element.date)}
+      </Text>
       <Text style={{ fontSize: 5 * vw, color: 'white' }}>
         {element.date.getDate()}
       </Text>
@@ -120,7 +129,7 @@ class CalendarPage extends Component<Props> {
         sendPopup(element.message);
       });
     }
-  }
+  };
 
   updateSlots = async (selectedDate) => {
     const { service, token } = this.props;
@@ -131,7 +140,7 @@ class CalendarPage extends Component<Props> {
     });
     this.checkForErrors(data);
     this.setState({ data, selectedTime: '' });
-  }
+  };
 
   selectDate = async (newDate) => {
     const { dates, selectedDate } = this.state;
@@ -155,9 +164,10 @@ class CalendarPage extends Component<Props> {
   showAlert = ({ selectedTime, selectedDate }) => new Promise((resolve, reject) => {
     Alert.alert(
       'Confirmar',
-      `Confirmas el turno reservado el dia ${selectedDate.date.toLocaleDateString('es-ES', { dateStyle: 'full' })} a las ${
-        selectedTime.time
-      }`,
+      `Confirmas el turno reservado el dia ${selectedDate.date.toLocaleDateString(
+        'es-ES',
+        { dateStyle: 'full' },
+      )} a las ${selectedTime.time}`,
       [
         { text: 'Cancelar', onPress: () => resolve(false), style: 'cancel' },
         { text: 'Confirmar', onPress: () => resolve(true) },
@@ -166,9 +176,7 @@ class CalendarPage extends Component<Props> {
   });
 
   saveAppointment = async () => {
-    const {
-      setLoading, token, navigation,
-    } = this.props;
+    const { setLoading, token, navigation } = this.props;
     const { selectedDate, selectedTime } = this.state;
 
     setLoading(true);
@@ -184,8 +192,9 @@ class CalendarPage extends Component<Props> {
             token,
             slot: selectedTime.key,
           });
-          if (!('errors' in saved.data)) navigation.pop(2);
-          else {
+          if (!('errors' in saved.data)) {
+            navigation.pop(2);
+          } else {
             saved.data.errors.forEach((el) => {
               sendPopup(el.message);
             });
@@ -220,8 +229,8 @@ class CalendarPage extends Component<Props> {
   render() {
     const { navigation } = this.props;
     const { dates, data } = this.state;
-    const mapDates = (dates instanceof Map) ? Array.from(dates.values()) : [];
-    const mapTimes = (data instanceof Map) ? Array.from(data.values()) : [];
+    const mapDates = dates instanceof Map ? Array.from(dates.values()) : [];
+    const mapTimes = data instanceof Map ? Array.from(data.values()) : [];
     return (
       <View
         style={{
@@ -318,8 +327,18 @@ class CalendarPage extends Component<Props> {
 
               if (item.end) {
                 return (
-                  <View style={{ width: '100%', paddingVertical: 20, alignItems: 'center' }}>
-                    <Text style={{ fontSize: 25, fontFamily: 'Nunito-SemiBold' }}>{`${newTime(0, item.end)} - ${newTime(0, item.start)}`}</Text>
+                  <View
+                    style={{
+                      width: '100%',
+                      paddingVertical: 20,
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Text
+                      style={{ fontSize: 25, fontFamily: 'Nunito-SemiBold' }}
+                    >
+                      {`${newTime(0, item.end)} - ${newTime(0, item.start)}`}
+                    </Text>
                   </View>
                 );
               }
@@ -360,9 +379,10 @@ class CalendarPage extends Component<Props> {
 
                     <View
                       style={{
-                        backgroundColor: (isLast || item.isLast)
-                          ? 'transparent'
-                          : props.lineColor,
+                        backgroundColor:
+                          isLast || item.isLast
+                            ? 'transparent'
+                            : props.lineColor,
                         width: props.lineWidth,
                         height: 50,
                         marginLeft: 9,
@@ -378,7 +398,9 @@ class CalendarPage extends Component<Props> {
                         }}
                       >
                         <View style={frameStyle}>
-                          <Divider style={{ height: 1, backgroundColor: '#AAAAAA' }} />
+                          <Divider
+                            style={{ height: 1, backgroundColor: '#AAAAAA' }}
+                          />
                         </View>
                       </TouchableOpacity>
                     ),
@@ -391,7 +413,9 @@ class CalendarPage extends Component<Props> {
                         style={{}}
                       >
                         <View style={frameStyle}>
-                          <Divider style={{ height: 1, backgroundColor: '#AAAAAA' }} />
+                          <Divider
+                            style={{ height: 1, backgroundColor: '#AAAAAA' }}
+                          />
                         </View>
                       </TouchableNativeFeedback>
                     ),
@@ -424,15 +448,13 @@ class CalendarPage extends Component<Props> {
               bottom: 35,
               right: 35,
             }}
-            icon={(
-              <Icon
-                name="done"
-                size={60}
-                color="#5819E0"
-              />
-            )}
+            icon={<Icon name="done" size={60} color="#5819E0" />}
             onPress={this.saveAppointment}
-            buttonStyle={{ height: '100%', width: '100%', backgroundColor: 'transparent' }}
+            buttonStyle={{
+              height: '100%',
+              width: '100%',
+              backgroundColor: 'transparent',
+            }}
           />
         </View>
       </View>

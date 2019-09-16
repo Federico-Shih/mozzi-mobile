@@ -1,7 +1,11 @@
-import { View, Text, Animated } from 'react-native';
+import {
+  View, Text, Animated, Platform,
+} from 'react-native';
+import { Button, Icon } from 'react-native-elements';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import styles from './styles/styles';
+import buttonStyles from './styles/buttonsStyles';
 
 type Props = {};
 
@@ -89,5 +93,26 @@ export class Popup extends Component<Props> {
   }
 }
 
+const BackButtonProp = ({ navigation }) => (
+  <Button
+    icon={(
+      <Icon
+        name={Platform.select({
+          ios: 'arrow-back-ios',
+          android: 'arrow-back',
+        })}
+        size={30}
+        color="gray"
+      />
+)}
+    onPress={() => {
+      navigation.goBack();
+    }}
+    containerStyle={buttonStyles.backButtonCont}
+    buttonStyle={buttonStyles.backButton}
+  />
+);
+
+export const BackButton = BackButtonProp;
 export const Title = TitleProp;
 export const StyledTitle = LogRegTitleProp;

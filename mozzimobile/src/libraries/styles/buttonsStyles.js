@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { fontType } from './constants';
+import { fontType, platformBackColor } from './constants';
 
 export default StyleSheet.create({
   reglogButtonText: {
@@ -11,5 +11,19 @@ export default StyleSheet.create({
   reglogButton: {
     paddingVertical: 12,
     backgroundColor: '#5819E0',
+  },
+  backButtonCont: {
+    borderRadius: 50,
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    width: '100%',
+    height: 50,
+  },
+  backButton: {
+    borderRadius: 50,
+    backgroundColor: platformBackColor,
+    marginLeft: 5,
+    marginTop: 5,
   },
 });

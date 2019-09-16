@@ -5,8 +5,9 @@ import {
   Alert,
   TouchableHighlight,
   TouchableNativeFeedback,
-  ScrollView,
   FlatList,
+  RefreshControl,
+  ScrollView,
 } from 'react-native';
 import React, { Component } from 'react';
 import { Divider, Button, Icon } from 'react-native-elements';
@@ -36,6 +37,7 @@ const TouchButton = Platform.select({
 class MyAppointments extends Component<Props> {
   state = {
     appointments: new Map(),
+    refreshing: false,
   };
 
   static propTypes = {
@@ -44,7 +46,11 @@ class MyAppointments extends Component<Props> {
     }).isRequired,
   };
 
-  componentDidMount = async () => {
+  componentDidMount = () => {
+    this.loadAppointments();
+  };
+
+  loadAppointments = async () => {
     const { token } = this.props;
     const { data } = await getAppointments({ token });
     console.log(data);
@@ -58,7 +64,7 @@ class MyAppointments extends Component<Props> {
       appointments.set(appointment.uuid, appointment);
     });
     this.setState({ appointments });
-  };
+  }
 
   appointmentDelete = async (appointment) => {
     const { token } = this.props;
@@ -110,13 +116,32 @@ class MyAppointments extends Component<Props> {
     );
   });
 
+  onRefresh = () => {
+    this.setState({
+      refreshing: true,
+    });
+    this.loadAppointments();
+    this.setState({
+      refreshing: false,
+    });
+  };
+
   render() {
     const { navigation } = this.props;
-    const { appointments } = this.state;
+    const { appointments, refreshing } = this.state;
     const arrayAppointments = Array.from(appointments.values());
     arrayAppointments.sort((a, b) => a.slot.day - b.slot.day);
     return (
-      <View style={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        refreshControl={(
+          <RefreshControl
+            colors={['#9Bd35A', '#689F38']}
+            refreshing={refreshing}
+            onRefresh={this.onRefresh}
+          />
+)}
+      >
         <Button
           icon={(
             <Icon
@@ -241,7 +266,7 @@ class MyAppointments extends Component<Props> {
             )}
           />
         </View>
-      </View>
+      </ScrollView>
     );
   }
 }

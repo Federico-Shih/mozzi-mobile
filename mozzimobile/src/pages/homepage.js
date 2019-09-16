@@ -714,12 +714,18 @@ const menuStyles = StyleSheet.create({
     margin: 0,
     padding: 0,
     paddingTop: 0,
+    borderBottomRightRadius: 50,
+    borderTopRightRadius: 50,
+    overflow: 'hidden',
   },
   itemButton: {
     justifyContent: 'flex-start',
     margin: 0,
     paddingVertical: 10,
     paddingLeft: 15,
+    borderBottomRightRadius: 50,
+    borderTopRightRadius: 50,
+    borderWidth: 0,
   },
 });
 

@@ -1,6 +1,7 @@
 import { Text, View } from 'react-native';
 import React, { Component } from 'react';
 import styles from '../libraries/styles/styles';
+import { BackButton } from '../libraries/props';
 
 type Props = {};
 
@@ -8,9 +9,10 @@ export default class ConfigPage extends Component<Props> {
   state = {};
 
   render() {
+    const { navigation } = this.props;
     return (
       <View style={styles.container}>
-        <Text>Configuración</Text>
+        <BackButton navigation={navigation} />
       </View>
     );
   }

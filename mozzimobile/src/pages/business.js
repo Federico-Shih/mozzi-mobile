@@ -49,7 +49,7 @@ function Services({ el }) {
           <Text>{`${formatted}`}</Text>
         </View>
         <View style={{ flex: 1 }} />
-        <Text>{`$ ${el.price}`}</Text>
+        <Text style={{ marginRight: 10 }}>{`$ ${el.price}`}</Text>
       </View>
     </View>
   );
