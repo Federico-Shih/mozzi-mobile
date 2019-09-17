@@ -23,11 +23,16 @@ import {
   getUsableTimeFormat as hour,
   sendPopup,
   newTime,
+  units,
 } from '../libraries/helpers';
 import { platformBackColor } from '../libraries/styles/constants';
 import { ADD_BUSINESS_UUID } from '../actions';
 
 type Props = {};
+
+const {
+  vmax, vmin, vh, vw,
+} = units;
 
 const TouchButton = Platform.select({
   ios: TouchableHighlight,
@@ -64,7 +69,7 @@ class MyAppointments extends Component<Props> {
       appointments.set(appointment.uuid, appointment);
     });
     this.setState({ appointments });
-  }
+  };
 
   appointmentDelete = async (appointment) => {
     const { token } = this.props;
@@ -132,16 +137,7 @@ class MyAppointments extends Component<Props> {
     const arrayAppointments = Array.from(appointments.values());
     arrayAppointments.sort((a, b) => a.slot.day - b.slot.day);
     return (
-      <ScrollView
-        contentContainerStyle={styles.container}
-        refreshControl={(
-          <RefreshControl
-            colors={['#9Bd35A', '#689F38']}
-            refreshing={refreshing}
-            onRefresh={this.onRefresh}
-          />
-)}
-      >
+      <View contentContainerStyle={styles.container}>
         <Button
           icon={(
             <Icon
@@ -173,8 +169,7 @@ class MyAppointments extends Component<Props> {
         />
         <View
           style={{
-            width: '100%',
-            paddingLeft: 20,
+            width: 100 * vw,
             fontSize: 36,
             paddingTop: 10,
           }}
@@ -182,91 +177,104 @@ class MyAppointments extends Component<Props> {
           <Text
             style={{
               fontSize: 36,
+              paddingLeft: 20,
             }}
           >
             Turnos
           </Text>
-          <Divider style={{ height: 2, width: '100%' }} />
-          <FlatList
-            data={arrayAppointments}
-            keyExtractor={item => item.uuid}
-            renderItem={({ item }) => (
-              <View key={item.uuid} style={{ flexDirection: 'column' }}>
-                <TouchButton
-                  onPress={() => {
-                    this.navToStore(item.service.business.uuid);
-                  }}
+          <Divider style={{ height: 2, width: 100 * vw, marginLeft: 20 }} />
+          <View style={{ width: 100 * vw, height: 80 * vh }}>
+            <FlatList
+              data={arrayAppointments}
+              refreshControl={(
+                <RefreshControl
+                  colors={['#9Bd35A', '#689F38']}
+                  refreshing={refreshing}
+                  onRefresh={this.onRefresh}
+                />
+)}
+              keyExtractor={item => item.uuid}
+              renderItem={({ item }) => (
+                <View
+                  key={item.uuid}
+                  style={{ flexDirection: 'column', paddingLeft: 20 }}
                 >
-                  <View style={{ flexDirection: 'row' }}>
-                    <View
-                      style={{
-                        flexDirection: 'column',
-                        paddingLeft: 5,
-                      }}
-                    >
-                      <Text style={{ paddingTop: 5, fontSize: 20 }}>
-                        {item.service.business.name}
-                      </Text>
-                      <View style={{ flexDirection: 'row' }}>
-                        <Text
-                          style={{
-                            fontSize: 14,
-                            width: 100,
-                            alignSelf: 'center',
-                          }}
-                        >
-                          {item.service.name}
+                  <TouchButton
+                    onPress={() => {
+                      this.navToStore(item.service.business.uuid);
+                    }}
+                  >
+                    <View style={{ flexDirection: 'row' }}>
+                      <View
+                        style={{
+                          flexDirection: 'column',
+                          paddingLeft: 5,
+                        }}
+                      >
+                        <Text style={{ paddingTop: 5, fontSize: 20 }}>
+                          {item.service.business.name}
                         </Text>
-                        <Text style={{ alignSelf: 'center', fontSize: 20 }}>
-                          {`$${item.service.price}`}
+                        <View style={{ flexDirection: 'row' }}>
+                          <Text
+                            style={{
+                              fontSize: 14,
+                              width: 100,
+                              alignSelf: 'center',
+                            }}
+                          >
+                            {item.service.name}
+                          </Text>
+                          <Text style={{ alignSelf: 'center', fontSize: 20 }}>
+                            {`$${item.service.price}`}
+                          </Text>
+                        </View>
+                      </View>
+                      <View style={{ flex: 1 }} />
+                      <View
+                        style={{
+                          flexDirection: 'column',
+                          marginRight: 10,
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <Text>
+                          {new Date(
+                            item.slot.day * 24 * 60 * 60 * 1000
+                              + item.slot.start * 60 * 1000,
+                          ).toDateString()}
+                        </Text>
+                        <Text>
+                          {`${newTime(0, item.slot.start)}~${newTime(
+                            0,
+                            item.slot.finish,
+                          )}`}
                         </Text>
                       </View>
+                      <Icon
+                        name="clear"
+                        type="material"
+                        containerStyle={{
+                          justifyContent: 'center',
+                          marginRight: 10,
+                        }}
+                        iconStyle={{
+                          paddingHorizontal: 15,
+                          paddingVertical: 15,
+                          borderRadius: 50,
+                        }}
+                        onPress={() => {
+                          this.appointmentDelete(item);
+                        }}
+                      />
                     </View>
-                    <View style={{ flex: 1 }} />
-                    <View
-                      style={{
-                        flexDirection: 'column',
-                        marginRight: 10,
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <Text>
-                        {new Date(
-                          item.slot.day * 24 * 60 * 60 * 1000
-                            + item.slot.start * 60 * 1000,
-                        ).toDateString()}
-                      </Text>
-                      <Text>
-                        {`${newTime(0, item.slot.start)}~${newTime(
-                          0,
-                          item.slot.finish,
-                        )}`}
-                      </Text>
-                    </View>
-                    <Icon
-                      name="clear"
-                      type="material"
-                      containerStyle={{
-                        justifyContent: 'center',
-                        marginRight: 10,
-                      }}
-                      iconStyle={{
-                        paddingHorizontal: 15,
-                        paddingVertical: 15,
-                        borderRadius: 50,
-                      }}
-                      onPress={() => {
-                        this.appointmentDelete(item);
-                      }}
-                    />
-                  </View>
-                </TouchButton>
-                <Divider style={{ width: '100%' }} />
-              </View>
-            )}
-          />
+                  </TouchButton>
+                  <Divider style={{ width: '100%' }} />
+                </View>
+              )}
+            />
+          </View>
         </View>
-      </ScrollView>
+      </View>
     );
   }
 }

@@ -138,6 +138,22 @@ const BusinessSchema = {
   },
 };
 
+export function alphabetize(array, compareKey = 'name') {
+  const res = {};
+  array.forEach((el) => {
+    const letter = el[compareKey];
+    const key = letter[0].toUpperCase();
+    if (!(key in res)) res[key] = [];
+    res[key].push(el);
+  });
+  const keys = Object.keys(res);
+  keys.forEach((key) => {
+    res[key].sort((a, b) => a[compareKey] - b[compareKey]);
+  });
+
+  return res;
+}
+
 export const UserData = {
   loadRealm: () => new Promise((resolve) => {
     try {

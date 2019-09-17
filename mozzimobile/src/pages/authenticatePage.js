@@ -29,7 +29,6 @@ import {
 import { register, login } from '../libraries/connect/auth';
 
 import styles from '../libraries/styles/styles';
-import { StyledTitle, Popup } from '../libraries/props';
 import { LOADING, GET_TOKEN } from '../actions';
 import buttonStyle from '../libraries/styles/buttonsStyles';
 
@@ -99,6 +98,10 @@ class Authenticate extends Component<Props> {
     email: styles.inputText,
     password: styles.inputText,
   };
+
+  async componentDidMount() {
+    await UserData.loadRealm();
+  }
 
   // Error and Style handlers
   setErrorState = (incomingJson) => {
@@ -377,8 +380,9 @@ class Authenticate extends Component<Props> {
           duration,
         }),
         Animated.timing(slideValue, {
-          toValue: -ScreenSizeWidth,
+          toValue: 1,
           slideDuration,
+          useNativeDriver: true,
         }),
         Animated.timing(underLinePosition, {
           toValue: 3 * vw + (100 * vw * 5) / 10,
@@ -411,6 +415,7 @@ class Authenticate extends Component<Props> {
         Animated.timing(slideValue, {
           toValue: 0,
           slideDuration,
+          useNativeDriver: true,
         }),
         Animated.timing(underLinePosition, {
           toValue: 1 * vw + (100 * vw) / 10,
@@ -423,7 +428,7 @@ class Authenticate extends Component<Props> {
   togglePassword = (name) => {
     const passState = this.state[name];
     let passwordEmpty;
-    switch (name) { 
+    switch (name) {
       case 'showPassLogin':
         passwordEmpty = (this.state.loginState.password === '');
         break;
@@ -438,10 +443,6 @@ class Authenticate extends Component<Props> {
     }
     if (!passwordEmpty) this.setState({ [name]: !passState });
   };
-
-  async componentDidMount() {
-    await UserData.loadRealm();
-  }
 
   render() {
     const {
@@ -460,6 +461,11 @@ class Authenticate extends Component<Props> {
     const { name, surname } = registerState;
     const { navigation, loading } = this.props;
     units.update();
+
+    const newSlideValue = slideValue.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, -ScreenSizeWidth],
+    });
 
     return (
       <SafeAreaView style={{ backgroundColor: '#5819E0', flex: 1 }}>
@@ -558,7 +564,8 @@ class Authenticate extends Component<Props> {
             <Animated.View
               style={{
                 width: '100%',
-                left: slideValue,
+                // left: slideValue,
+                transform: [{ translateX: newSlideValue }],
               }}
               overflow="scroll"
             >
@@ -683,8 +690,9 @@ class Authenticate extends Component<Props> {
               style={{
                 width: (ScreenSizeWidth * 4) / 5,
                 height: '100%',
-                left: slideValue,
+                // left: slideValue,
                 marginLeft: 80,
+                transform: [{ translateX: newSlideValue }],
               }}
               overflow="scroll"
             >

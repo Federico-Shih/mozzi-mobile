@@ -4,6 +4,8 @@ import {
   TouchableOpacity,
   TouchableNativeFeedback,
   Platform,
+  ActivityIndicator,
+  ScrollView,
 } from 'react-native';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -12,10 +14,12 @@ import {
   Image, Divider, Button, Icon,
 } from 'react-native-elements';
 import newUUID from 'uuid';
+import AtoZList from 'react-native-atoz-list';
 
-import { ScrollView } from 'react-native-gesture-handler';
 import styles from '../libraries/styles/styles';
-import { sendPopup, UserData } from '../libraries/helpers';
+import {
+  sendPopup, UserData, units, alphabetize,
+} from '../libraries/helpers';
 import {
   LOADING,
   REMOVE_BUSINESS_UUID,
@@ -25,6 +29,13 @@ import {
 import { getBusiness } from '../libraries/connect/businessCalls';
 
 type Props = {};
+
+const { vh, vw } = units;
+
+const ServiceButton = Platform.select({
+  ios: TouchableOpacity,
+  android: TouchableNativeFeedback,
+});
 
 // Services template which shows brief info of each service
 function Services({ el }) {
@@ -75,6 +86,7 @@ class Business extends Component<Props> {
       services: [],
       image: null,
     },
+    favorite: false,
   };
 
   // Validates props
@@ -124,6 +136,15 @@ uuid: "845a0a9e-7ac3-4f71-8a02-11a51f5275a7"
     }
   };
 
+  toggleFavorite = (business) => {
+    const { favorite } = this.state;
+    const { user } = this.props;
+    this.setState({ favorite: !favorite });
+    if (favorite) {
+      UserData.removeUserFavorites({ uuid: user.uuid, business });
+    }
+  };
+
   // Depending on the service id, navigates to the calendar and uses redux to save the service selected
   navToCalendar = (id) => {
     const { addService, navigation } = this.props;
@@ -133,11 +154,13 @@ uuid: "845a0a9e-7ac3-4f71-8a02-11a51f5275a7"
 
   // Main render process
   render() {
-    const { business } = this.state;
+    const { business, favorite } = this.state;
     const { navigation, navigateToSearcher } = this.props;
     const {
       street, zone, number, postal,
     } = business;
+
+    const alphabetizedList = alphabetize(business.services);
     return (
       <View style={styles.container}>
         <View
@@ -151,8 +174,8 @@ uuid: "845a0a9e-7ac3-4f71-8a02-11a51f5275a7"
               uri: 'https://semantic-ui.com/images/wireframe/image.png',
             }}
             style={{
-              width: 1000,
-              height: 160,
+              width: 100 * vw,
+              height: 20 * vh,
               borderWidth: 30,
               resizeMode: 'contain',
               opacity: 0.9,
@@ -161,7 +184,8 @@ uuid: "845a0a9e-7ac3-4f71-8a02-11a51f5275a7"
           />
           <View
             style={{
-              marginTop: 30,
+              marginTop: 20,
+              top: 20 * vw,
               width: '100%',
             }}
           >
@@ -177,10 +201,11 @@ uuid: "845a0a9e-7ac3-4f71-8a02-11a51f5275a7"
             </Text>
             <Divider
               style={{
-                height: 1,
+                height: 1.5,
                 width: '100%',
                 marginTop: 5,
                 marginLeft: 10,
+                backgroundColor: '#E8E8E8',
               }}
             />
 
@@ -189,53 +214,32 @@ uuid: "845a0a9e-7ac3-4f71-8a02-11a51f5275a7"
                 width: '100%',
               }}
             >
-              {business.services.map(el => Platform.select({
-                ios: (
-                  <TouchableOpacity
-                    key={newUUID()}
-                    onPress={() => {
-                      this.navToCalendar(el.uuid);
-                    }}
-                  >
-                    <View style={{}}>
-                      <View style={{ paddingVertical: 20, marginLeft: 20 }}>
-                        <Services el={el} />
-                      </View>
-                      <Divider
-                        style={{
-                          height: 1,
-                          width: '100%',
-                          backgroundColor: 'grey',
-                        }}
-                      />
+              {business.services.map(el => (
+                <ServiceButton
+                  key={newUUID()}
+                  background={Platform.select({
+                    android: TouchableNativeFeedback.Ripple('#DDD'),
+                  })}
+                  conta
+                  onPress={() => {
+                    this.navToCalendar(el.uuid);
+                  }}
+                >
+                  <View style={{}}>
+                    <View style={{ paddingVertical: 20, marginLeft: 20 }}>
+                      <Services el={el} />
                     </View>
-                  </TouchableOpacity>
-                ),
-                android: (
-                  <TouchableNativeFeedback
-                    key={newUUID()}
-                    background={TouchableNativeFeedback.Ripple('#DDD')}
-                    conta
-                    onPress={() => {
-                      this.navToCalendar(el.uuid);
-                    }}
-                  >
-                    <View style={{}}>
-                      <View style={{ paddingVertical: 20, marginLeft: 20 }}>
-                        <Services el={el} />
-                      </View>
-                      <Divider
-                        style={{
-                          height: 1,
-                          width: '100%',
-                          backgroundColor: 'grey',
-                          marginLeft: 10,
-                        }}
-                      />
-                    </View>
-                  </TouchableNativeFeedback>
-                ),
-              }))}
+                    <Divider
+                      style={{
+                        height: 1,
+                        width: '100%',
+                        backgroundColor: 'grey',
+                        marginLeft: 10,
+                      }}
+                    />
+                  </View>
+                </ServiceButton>
+              ))}
             </ScrollView>
           </View>
         </View>
@@ -245,30 +249,47 @@ uuid: "845a0a9e-7ac3-4f71-8a02-11a51f5275a7"
           style={{
             position: 'absolute',
             alignItems: 'flex-start',
-            left: 20,
-            paddingTop: 65,
+            left: 5 * vw,
+            paddingTop: 20 * vh - 20 * vw,
+            flexDirection: 'row',
           }}
         >
+          <Image
+            source={{
+              uri: 'https://semantic-ui.com/images/wireframe/image.png',
+            }}
+            style={{
+              resizeMode: 'cover',
+              opacity: 0.9,
+              width: 35 * vw,
+              height: 35 * vw,
+            }}
+            containerStyle={{
+              backgroundColor: 'white',
+              borderRadius: 20 * vw,
+              overflow: 'hidden',
+              borderWidth: 8,
+              borderColor: 'white',
+            }}
+          />
           <View
             style={{
               height: 'auto',
               width: 'auto',
             }}
           >
-            <Text style={{ fontSize: 30, color: 'white' }}>
+            <Text
+              style={{
+                fontSize: 30,
+                color: 'black',
+                fontFamily: 'Nunito-SemiBold',
+                top: 22 * vw,
+                left: 2 * vw,
+              }}
+            >
               {business.name}
             </Text>
           </View>
-          <Text
-            numberOfLines={2}
-            style={{
-              fontSize: 15,
-              paddingTop: 5,
-              color: 'white',
-            }}
-          >
-            {business.description}
-          </Text>
         </View>
 
         {/* INFO BUTTONS ON THE TOP RIGHT */}
@@ -287,10 +308,33 @@ uuid: "845a0a9e-7ac3-4f71-8a02-11a51f5275a7"
                 color="white"
               />
 )}
-            containerStyle={{}}
             onPress={() => {
               /* TEMPORARY, REPLACE WITH INFORMATION PAGE */
               alert(`${street} ${number}, ${zone}. Codigo Postal ${postal}.`);
+            }}
+            buttonStyle={{ backgroundColor: 'transparent' }}
+          />
+          <Button
+            icon={(
+              <Icon
+                name={favorite ? 'favorite' : 'favorite-border'}
+                type="material"
+                size={35}
+                color="black"
+              />
+)}
+            containerStyle={{
+              top: 7 * vh,
+              right: 2 * vw,
+              borderRadius: 60,
+              overflow: 'hidden',
+            }}
+            onPress={() => {
+              this.toggleFavorite({
+                uuid: business.uuid,
+                name: business.name,
+                description: business.description,
+              });
             }}
             buttonStyle={{ backgroundColor: 'transparent' }}
           />
