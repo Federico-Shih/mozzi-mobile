@@ -14,7 +14,6 @@ import {
   Image, Divider, Button, Icon,
 } from 'react-native-elements';
 import newUUID from 'uuid';
-import AtoZList from 'react-native-atoz-list';
 
 import styles from '../libraries/styles/styles';
 import {
