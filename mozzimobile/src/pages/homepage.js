@@ -24,7 +24,6 @@ import {
 } from 'react-native-elements';
 import PropTypes from 'prop-types';
 import { ScrollView } from 'react-native-gesture-handler';
-import SideMenu from 'react-native-side-menu-over';
 import { connect } from 'react-redux';
 import { NavigationEvents } from 'react-navigation';
 
@@ -98,12 +97,9 @@ class Homepage extends Component<Props> {
         });
       } else {
         const { me } = data.data;
-        addUser(me);
-        this.setState({
-          profile: {
-            ...me,
-            image: 'https://pickaface.net/gallery/avatar/Opi51c74d0125fd4.png',
-          },
+        addUser({
+          ...me,
+          image: 'https://pickaface.net/gallery/avatar/Opi51c74d0125fd4.png',
         });
         if (!UserData.checkUser(me.uuid)) {
           UserData.createUser(me.uuid);
@@ -117,9 +113,8 @@ class Homepage extends Component<Props> {
 
   toggle() {
     const { isOpen } = this.state;
-    this.setState({
-      isOpen: !isOpen,
-    });
+    const { navigation } = this.props;
+    navigation.openDrawer();
   }
 
   updateMenuState(isOpen) {
@@ -146,18 +141,7 @@ class Homepage extends Component<Props> {
     const { navigation, token, navigateToBusiness } = this.props;
     const { isOpen, searchBarIsOpen, collections } = this.state;
     return (
-      <SideMenu
-        menu={(
-          <Menu
-            navigation={navigation}
-            props={this.props}
-            state={this.state}
-            searchModal={this.searchModal}
-          />
-)}
-        isOpen={isOpen}
-        onChange={open => this.updateMenuState(open)}
-      >
+      <View style={{ flex: 1 }}>
         <NavigationEvents
           onWillFocus={(payload) => {
             const { current } = this.searchModal;
@@ -304,7 +288,7 @@ class Homepage extends Component<Props> {
           }}
           navigateToBusiness={navigateToBusiness}
         />
-      </SideMenu>
+      </View>
     );
   }
 }
@@ -628,189 +612,6 @@ function MainSection(props) {
     </Card>
   ));
   return listCards;
-}
-
-/*
-====================
-SIDEBAR MENU SECTION
-====================
-*/
-
-// PROFILE DISPLAYED ON SIDEBAR MENU
-
-const buttons = [
-  {
-    title: 'Tus Turnos',
-    nav: 'Turns',
-    id: 'turns',
-    icon: 'event',
-  },
-  {
-    title: 'Mi Perfil',
-    nav: 'Profile',
-    id: 'profile',
-    icon: 'person',
-  },
-  {
-    title: 'Recientes',
-    nav: 'Recent',
-    id: 'recent',
-    icon: 'restore',
-  },
-  {
-    title: 'Favoritos',
-    nav: 'Favs',
-    id: 'favs',
-    icon: 'star',
-  },
-  {
-    title: 'Configuración',
-    nav: 'Config',
-    id: 'config',
-    icon: 'settings',
-  },
-];
-
-// Pretty self explanatory
-const menuStyles = StyleSheet.create({
-  menu: {
-    flex: 1,
-    width: '100%',
-    backgroundColor: 'white',
-    padding: 0,
-    paddingLeft: 0,
-  },
-  avatarContainer: {
-    marginBottom: 20,
-    marginTop: 20,
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  avatar: {
-    width: 140,
-    height: 140,
-    borderRadius: 100,
-  },
-  name: {
-    left: 0,
-    paddingTop: 20,
-    fontSize: 25,
-    color: 'black',
-    fontFamily: 'Nunito-SemiBold',
-  },
-  item: {
-    fontSize: 18,
-    fontWeight: 'normal',
-    fontFamily: 'Nunito-SemiBold',
-    paddingTop: 0,
-    margin: 0,
-    color: 'black',
-    textAlign: 'left',
-    paddingLeft: 10,
-  },
-  itemContainer: {
-    width: '100%',
-    justifyContent: 'flex-start',
-    margin: 0,
-    padding: 0,
-    paddingTop: 0,
-    borderBottomRightRadius: 50,
-    borderTopRightRadius: 50,
-    overflow: 'hidden',
-  },
-  itemButton: {
-    justifyContent: 'flex-start',
-    margin: 0,
-    paddingVertical: 10,
-    paddingLeft: 15,
-    borderBottomRightRadius: 50,
-    borderTopRightRadius: 50,
-    borderWidth: 0,
-  },
-});
-
-// MENU DISPLAYED ON SIDEBAR MENU
-function Menu({
-  navigation, props, state, searchModal,
-}) {
-  return (
-    <ScrollView
-      scrollsToTop={false}
-      style={menuStyles.menu}
-      contentContainerStyle={{ height: '100%', justifyContent: 'flex-end' }}
-    >
-      <View style={menuStyles.avatarContainer}>
-        <Image
-          style={menuStyles.avatar}
-          source={{ uri: state.profile.image }}
-        />
-        <Text style={menuStyles.name}>
-          {`${state.profile.name} ${state.profile.lastname}`}
-        </Text>
-      </View>
-
-      <SideMenuButtons
-        buttons={buttons}
-        navigation={navigation}
-        searchModal={searchModal}
-      />
-      <View style={{ flex: 1 }} />
-      <Button
-        containerStyle={{ width: '100%' }}
-        icon={<Icon name="exit-to-app" color="#5819E0" size={25} />}
-        titleStyle={{
-          color: 'black',
-          fontFamily: 'Nunito-SemiBold',
-          left: 10,
-          fontSize: 20,
-        }}
-        buttonStyle={{
-          justifyContent: 'center',
-          paddingRight: 20,
-          paddingVertical: 10,
-        }}
-        type="clear"
-        onPress={() => {
-          props.removeToken();
-          props.removeUser();
-          navigation.replace('Auth');
-        }}
-        title="Cerrar Sesión"
-      />
-    </ScrollView>
-  );
-}
-
-Menu.propTypes = {
-  props: PropTypes.shape({
-    removeToken: PropTypes.func,
-  }).isRequired,
-  navigation: PropTypes.shape({
-    replace: PropTypes.func,
-    navigate: PropTypes.func,
-  }).isRequired,
-  state: PropTypes.shape({
-    profile: PropTypes.object,
-  }).isRequired,
-};
-
-function SideMenuButtons(props) {
-  const listButtons = props.buttons.map(btn => (
-    <Button
-      title={btn.title}
-      key={btn.id}
-      type="clear"
-      containerStyle={menuStyles.itemContainer}
-      titleStyle={menuStyles.item}
-      onPress={() => {
-        props.navigation.navigate(btn.nav);
-        props.searchModal.current.removeHandler();
-      }}
-      buttonStyle={menuStyles.itemButton}
-      icon={<Icon name={btn.icon} color="#5819E0" size={25} />}
-    />
-  ));
-  return listButtons;
 }
 
 function mapStateToProps(state) {

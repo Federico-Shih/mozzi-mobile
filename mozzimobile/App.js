@@ -1,34 +1,49 @@
 import React, { Component } from 'react';
 import { createStackNavigator, createAppContainer } from 'react-navigation';
+import { createDrawerNavigator } from 'react-navigation-drawer';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import { View, PermissionsAndroid, Platform } from 'react-native';
 import Toast from 'react-native-easy-toast';
 import { EventRegister } from 'react-native-event-listeners';
+import {
+  Icon,
+} from 'react-native-elements';
 
 import * as scr from './src/pages/pages';
 import reducer from './src/reducer';
 import { units } from './src/libraries/helpers';
-import { Popup } from './src/libraries/props';
+import { Popup, Menu } from './src/libraries/props';
 
 type Props = {};
 
 // Store creation
 const store = createStore(reducer);
 
-// Navigation
-const AppNavigator = createStackNavigator(
+const DrawerNavigator = createDrawerNavigator(
   {
-    Main: scr.MainPage,
-    Register: scr.Register,
-    Login: scr.Login,
     Home: scr.HomePage,
-    Forgot: scr.Forgot,
     Recent: scr.Recent,
     Turns: scr.Turns,
     Profile: scr.Profile,
-    Config: scr.Config,
     Favs: scr.Favs,
+    Config: scr.Config,
+  },
+  {
+    initialRouteName: 'Home',
+    order: ['Home', 'Turns', 'Favs', 'Recent', 'Profile', 'Config'],
+    contentComponent: Menu,
+    defaultNavigationOptions: {
+      header: null,
+    },
+  },
+);
+
+// Navigation
+const AppNavigator = createStackNavigator(
+  {
+    Home: DrawerNavigator,
+    Forgot: scr.Forgot,
     Business: scr.Business,
     Calendar: scr.CalendarTemp,
     Auth: scr.Auth,

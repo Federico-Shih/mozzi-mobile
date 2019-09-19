@@ -19,6 +19,7 @@ const initialState = {
     name: '',
     lastname: '',
     uuid: '',
+    image: '',
   },
 };
 

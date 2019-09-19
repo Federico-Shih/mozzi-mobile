@@ -149,6 +149,8 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-screens')
+    implementation project(':react-native-reanimated')
     implementation project(':realm')
     implementation project(':react-native-vector-icons')
     implementation project(':react-native-gesture-handler')

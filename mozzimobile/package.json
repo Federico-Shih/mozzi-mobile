@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest",
-    "lint": "eslint *.js **/*.js"
+    "lint": "eslint *.js **/*.js",
+    "postinstall": "jetifier -r"
   },
   "dependencies": {
     "@react-native-community/netinfo": "^3.2.1",
@@ -21,11 +22,14 @@
     "react-native-elements": "^1.2.0",
     "react-native-event-listeners": "^1.0.3",
     "react-native-gesture-handler": "^1.4.1",
+    "react-native-reanimated": "^1.2.0",
+    "react-native-screens": "^1.0.0-alpha.23",
     "react-native-side-menu-over": "0.0.2",
     "react-native-timeline-feed": "^2.0.0",
     "react-native-vector-icons": "^6.6.0",
     "react-native-viewport-units": "0.0.5",
     "react-navigation": "^3.12.1",
+    "react-navigation-drawer": "^2.2.1",
     "react-redux": "^7.1.1",
     "realm": "^2.29.2",
     "redux": "^4.0.4",
