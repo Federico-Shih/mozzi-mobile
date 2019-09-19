@@ -1,26 +1,18 @@
 import {
-  Dimensions,
-  StyleSheet,
   View,
-  Image,
   Text,
   KeyboardAvoidingView,
-  Animated,
   Platform,
-  Keyboard,
   TouchableOpacity,
   TouchableNativeFeedback,
-  BackHandler,
 } from 'react-native';
 import React, { Component } from 'react';
 import {
-  SearchBar,
   Button,
   Header,
   Icon,
   Card,
   ListItem,
-  Divider,
 } from 'react-native-elements';
 import PropTypes from 'prop-types';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -44,6 +36,7 @@ import {
 import styles from '../libraries/styles/styles';
 import { getStores, getCollections } from '../libraries/connect/businessCalls';
 import { getProfile } from '../libraries/connect/auth';
+import SearchBarSlideUp from './searchbar';
 
 const devMode = true;
 type Props = {};
@@ -112,34 +105,23 @@ class Homepage extends Component<Props> {
   }
 
   toggle() {
-    const { isOpen } = this.state;
     const { navigation } = this.props;
     navigation.openDrawer();
   }
 
-  updateMenuState(isOpen) {
-    this.setState({
-      isOpen,
-    });
-  }
-
   closeSearchBar() {
-    this.setState({
-      searchBarIsOpen: false,
-    });
+    const { current } = this.searchModal;
+    current.close();
   }
 
   toggleSearchBar() {
-    const { searchBarIsOpen } = this.state;
     const { current } = this.searchModal;
-    this.setState({
-      searchBarIsOpen: !searchBarIsOpen,
-    });
+    current.toggle();
   }
 
   render() {
     const { navigation, token, navigateToBusiness } = this.props;
-    const { isOpen, searchBarIsOpen, collections } = this.state;
+    const { collections } = this.state;
     return (
       <View style={{ flex: 1 }}>
         <NavigationEvents
@@ -147,7 +129,7 @@ class Homepage extends Component<Props> {
             const { current } = this.searchModal;
             current.resetSearch();
             if (payload.action.type === 'Navigation/POP') {
-              this.setState({ searchBarIsOpen: false });
+              current.close();
               current.resetSearch();
             } else if (payload.action.type === 'Navigation/BACK') {
               current.addGoBackEvent();
@@ -276,271 +258,15 @@ class Homepage extends Component<Props> {
           </ScrollView>
         </KeyboardAvoidingView>
         <SearchBarSlideUp
-          open={searchBarIsOpen}
           navigation={navigation}
           token={token}
           ref={this.searchModal}
-          toggle={() => {
-            this.toggleSearchBar();
-          }}
-          close={() => {
-            this.closeSearchBar();
-          }}
           navigateToBusiness={navigateToBusiness}
         />
       </View>
     );
   }
 }
-
-const slideUpDuration = 300;
-
-class SearchBarSlideUp extends Component<Props> {
-  state = {
-    anim: new Animated.Value(20),
-    search: '',
-    loading: false,
-    searchResults: [],
-  };
-
-  static propTypes = {
-    open: PropTypes.bool.isRequired,
-    toggle: PropTypes.func.isRequired,
-    token: PropTypes.string.isRequired,
-    navigateToBusiness: PropTypes.func.isRequired,
-    navigation: PropTypes.object.isRequired,
-  };
-
-  componentDidMount() {
-    const { open } = this.props;
-    const { anim } = this.state;
-    if (open) {
-      Animated.timing(anim, {
-        toValue: 0,
-        duration: slideUpDuration,
-      }).start();
-    } else {
-      this.setState({
-        anim: new Animated.Value(Dimensions.get('window').height),
-      });
-    }
-  }
-
-  componentDidUpdate(prevProps) {
-    const { open } = this.props;
-    const { anim } = this.state;
-    if (open !== prevProps.open) {
-      if (open) {
-        Animated.timing(anim, {
-          toValue: 0,
-          duration: slideUpDuration,
-        }).start();
-        this.textInput.focus();
-      } else {
-        Animated.timing(anim, {
-          toValue: Dimensions.get('window').height,
-          duration: slideUpDuration,
-        }).start();
-      }
-    }
-    this.addGoBackEvent();
-  }
-
-  componentWillUnmount() {
-    if (this.backHandler) this.backHandler.remove();
-  }
-
-  goBack = () => {
-    const { close, navigation, open } = this.props;
-    if (open) {
-      close();
-      this.resetSearch();
-      return true;
-    }
-    return false;
-  };
-
-  removeHandler = () => {
-    if (this.backHandler) this.backHandler.remove();
-  };
-
-  updateSearch = (search) => {
-    this.setState({ search });
-  };
-
-  resetSearch = () => {
-    this.setState({ searchResults: [], search: '' });
-  };
-
-  sendToPage = (uuid) => {
-    const { navigateToBusiness, navigation } = this.props;
-    navigateToBusiness(uuid);
-    navigation.navigate('Business');
-    this.backHandler.remove();
-  };
-
-  addGoBackEvent() {
-    this.backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      this.goBack,
-    );
-  }
-
-  render() {
-    const {
-      anim, search, loading, searchResults,
-    } = this.state;
-    const { toggle, token } = this.props;
-    return (
-      <Animated.View
-        style={{
-          ...styles.container,
-          backgroundColor: platformBackColor,
-          flex: 1,
-          width: Dimensions.get('window').width,
-          height: Dimensions.get('window').height,
-          position: 'absolute',
-          top: anim,
-        }}
-      >
-        <Button
-          icon={(
-            <Icon
-              name={Platform.select({
-                ios: 'arrow-back-ios',
-                android: 'arrow-back',
-              })}
-              size={30}
-              color="gray"
-            />
-)}
-          onPress={() => {
-            Keyboard.dismiss();
-            toggle();
-            this.resetSearch();
-          }}
-          containerStyle={{
-            borderRadius: 50,
-            flexDirection: 'row',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            width: '100%',
-            height: 50,
-          }}
-          buttonStyle={{
-            borderRadius: 50,
-            backgroundColor: platformBackColor,
-            marginLeft: 5,
-            marginTop: 5,
-          }}
-        />
-        <SearchBar
-          ref={(ref) => {
-            this.textInput = ref;
-          }}
-          placeholder="Buscar..."
-          onChangeText={text => this.updateSearch(text)}
-          value={search}
-          lightTheme
-          showLoading={loading}
-          onSubmitEditing={async () => {
-            this.setState({ loading: true });
-            if (!(search.length <= 1 || search.length > 25)) {
-              const storeResults = await getStores({ search, token });
-              const { data } = storeResults;
-              if (data.errors) {
-                data.errors.forEach((el) => {
-                  sendPopup(el.message);
-                });
-              } else if (data.data.businessSearch === null) {
-                this.setState({ searchResults: [] });
-              } else {
-                this.setState({ searchResults: data.data.businessSearch });
-              }
-            } else if (search.length === 1) {
-              sendPopup(errorMessages.notEnoughLength);
-            } else if (search.length > 25) {
-              sendPopup(errorMessages.tooMuchLength);
-            }
-            // CHANGE WHEN API IS HERE
-            this.setState({ loading: false });
-          }}
-          round
-          containerStyle={{
-            width: '90%',
-            height: 60,
-            backgroundColor: platformBackColor,
-            borderWidth: 0,
-            borderBottomWidth: 0,
-            borderTopWidth: 0,
-          }}
-        />
-        <Divider
-          style={{ backgroundColor: '#DDDDDD', width: '100%', height: 2 }}
-        />
-        <ScrollView
-          style={{
-            width: '100%',
-            marginTop: 10,
-          }}
-        >
-          {searchResults.map((el, o) => (
-            <View key={o}>
-              <MyButton
-                background={TouchableNativeFeedback.Ripple('#DDD')}
-                onPress={() => {
-                  this.sendToPage(el.uuid);
-                }}
-              >
-                <View>
-                  <SearchElement el={el} />
-                </View>
-              </MyButton>
-              <Divider
-                style={{
-                  backgroundColor: '#DDDDDD',
-                  width: 300,
-                  height: 0.9,
-                  alignSelf: 'flex-end',
-                }}
-              />
-            </View>
-          ))}
-        </ScrollView>
-      </Animated.View>
-    );
-  }
-}
-
-function SearchElement({ el }) {
-  return (
-    <View
-      style={{
-        flexDirection: 'row',
-        paddingLeft: 30,
-        paddingVertical: 20,
-        alignItems: 'center',
-      }}
-    >
-      <Image
-        source={{ uri: 'https://semantic-ui.com/images/wireframe/image.png' }}
-        style={{ width: 60, height: 60, borderRadius: 10 }}
-      />
-      <View style={{ flexDirection: 'column', paddingLeft: 20 }}>
-        <Text style={{ fontSize: 20 }}>{el.name}</Text>
-        <Text style={{ fontSize: 15, maxWidth: 290 }}>{el.description}</Text>
-      </View>
-    </View>
-  );
-}
-
-SearchElement.propTypes = {
-  el: PropTypes.shape({
-    image: PropTypes.string,
-    name: PropTypes.string,
-    description: PropTypes.string,
-  }).isRequired,
-};
 
 // STRUCTURE OF THE MAIN SECTION OF THE MAINPAGE. THINGS LIKE RECENT STORES, CHANGE structure ONLOAD TO LOAD THE API DATA
 const structure = [
