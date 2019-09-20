@@ -100,12 +100,6 @@ class Business extends Component<Props> {
     addService: PropTypes.func.isRequired,
   };
 
-  /*
-lastname: "Shih"
-name: "Federico"
-uuid: "845a0a9e-7ac3-4f71-8a02-11a51f5275a7"
-
-  */
   // Gets the business when it mounts
   componentDidMount = async () => {
     /*
@@ -119,15 +113,20 @@ uuid: "845a0a9e-7ac3-4f71-8a02-11a51f5275a7"
         sendPopup(el.message);
       });
     } else {
-      const { business } = data.data;
-      this.setState({ business });
+      const { business: response } = data.data;
+      this.setState({ business: response });
+      console.log(response);
       if (UserData.checkUser(user.uuid)) {
         UserData.updateUserRecents({
           uuid: user.uuid,
           business: {
-            name: business.name,
-            description: business.description,
+            name: response.name,
+            description: response.description,
             uuid,
+            street: response.street,
+            number: response.number,
+            zone: response.zone,
+            category: (response.category) ? response.category : '',
           },
         });
         console.log(UserData.getRecents(user.uuid)[0]);

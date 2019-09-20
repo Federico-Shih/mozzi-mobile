@@ -135,6 +135,10 @@ const BusinessSchema = {
     uuid: 'string',
     name: 'string',
     description: 'string',
+    street: 'string',
+    number: 'int',
+    zone: 'string',
+    category: 'string',
   },
 };
 
