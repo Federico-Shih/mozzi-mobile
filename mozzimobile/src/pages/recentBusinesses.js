@@ -7,25 +7,32 @@ import {
   ScrollView,
   TouchableOpacity,
   TouchableNativeFeedback,
+  RefreshControl,
+  FlatList,
 } from 'react-native';
 import React, { Component } from 'react';
-import { Button, Icon, Header } from 'react-native-elements';
+import {
+  Button, Icon, Header, Image,
+} from 'react-native-elements';
 import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
 
 import styles from '../libraries/styles/styles';
-import { BackButton } from '../libraries/props';
-import { UserData } from '../libraries/helpers';
+import { BackButton, BusinessButton, SearchButton } from '../libraries/props';
+import { UserData, units } from '../libraries/helpers';
 import SearchBarSlideUp from './searchbar';
 import { ADD_BUSINESS_UUID } from '../actions';
 import { platformBackColor } from '../libraries/styles/constants';
 
 type Props = {};
 
+const { vh, vw } = units;
+
 class Recents extends Component<Props> {
   state = {
     contentList: [],
+    refreshing: false,
   };
 
   static propTypes = {
@@ -40,13 +47,26 @@ class Recents extends Component<Props> {
   constructor(props) {
     super(props);
     this.searchModal = React.createRef();
+    this.onRefresh = this.onRefresh.bind(this);
+    this.navToStore = this.navToStore.bind(this);
   }
 
   componentDidMount = () => {
+    this.onRefresh();
+  };
+
+  onRefresh() {
     const { user } = this.props;
+    this.setState({ refreshing: true });
     const contentList = [];
     UserData.getRecents(user.uuid).forEach(el => contentList.push(el));
-    this.setState({ contentList });
+    this.setState({ contentList, refreshing: false });
+  }
+
+  navToStore = (uuid) => {
+    const { navigateToBusiness, navigation } = this.props;
+    navigateToBusiness(uuid);
+    navigation.navigate('Business');
   };
 
   toggle() {
@@ -67,6 +87,7 @@ class Recents extends Component<Props> {
 
   render() {
     const { navigation, token, navigateToBusiness } = this.props;
+    const { contentList, refreshing } = this.state;
     return (
       <View style={styles.container}>
         <Header
@@ -87,7 +108,17 @@ class Recents extends Component<Props> {
           }}
           placement="left"
         />
-        <ScrollView style={{ width: '100%', top: 5 }} scrollEnabled>
+        <ScrollView
+          style={{ width: '100%', top: 5 }}
+          scrollEnabled
+          refreshControl={(
+            <RefreshControl
+              colors={['#9Bd35A', '#689F38']}
+              refreshing={refreshing}
+              onRefresh={this.onRefresh}
+            />
+)}
+        >
           <View
             style={{
               justifyContent: 'center',
@@ -96,20 +127,9 @@ class Recents extends Component<Props> {
               alignItems: 'center',
             }}
           >
-            <Button
-              icon={<Icon name="search" size={22} color="gray" />}
-              // title="¿A dónde querés comprar?"
+            <SearchButton
               onPress={() => {
                 this.toggleSearchBar();
-              }}
-              containerStyle={{ width: '80%' }}
-              titleStyle={{ fontSize: 13, left: 10, color: 'grey' }}
-              buttonStyle={{
-                borderRadius: 15,
-                justifyContent: 'flex-start',
-                paddingVertical: 10,
-                backgroundColor: '#E0E0E0',
-                width: '100%',
               }}
             />
             <Button
@@ -130,6 +150,34 @@ class Recents extends Component<Props> {
               }}
             />
           </View>
+          <Text
+            style={{
+              fontFamily: 'Nunito-SemiBold',
+              fontSize: 25,
+              color: 'black',
+              marginTop: 25,
+              left: 12,
+            }}
+          >
+            {' '}
+            Recientes
+            {' '}
+          </Text>
+          <View style={{ flex: 1, alignItems: 'center' }}>
+            <FlatList
+              data={contentList}
+              keyExtractor={item => item.uuid}
+              renderItem={({ item }) => (
+                <BusinessButton
+                  item={item}
+                  navigation={navigation}
+                  onPress={() => {
+                    this.navToStore(item.uuid);
+                  }}
+                />
+              )}
+            />
+          </View>
         </ScrollView>
         <SearchBarSlideUp
           navigation={navigation}
@@ -141,6 +189,18 @@ class Recents extends Component<Props> {
     );
   }
 }
+
+/*
+
+    category: (...)
+description: (...)
+name: (...)
+number: (...)
+street: (...)
+uuid: (...)
+zone: (...)
+
+    */
 
 function mapStateToProps(state) {
   return {

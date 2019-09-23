@@ -126,10 +126,9 @@ class Business extends Component<Props> {
             street: response.street,
             number: response.number,
             zone: response.zone,
-            category: (response.category) ? response.category : '',
+            category: response.category ? response.category : '',
           },
         });
-        console.log(UserData.getRecents(user.uuid)[0]);
       }
     }
   };
@@ -174,11 +173,9 @@ class Business extends Component<Props> {
             style={{
               width: 100 * vw,
               height: 20 * vh,
-              borderWidth: 30,
               resizeMode: 'contain',
               opacity: 0.9,
             }}
-            containerStyle={{ backgroundColor: 'black' }}
           />
           <View
             style={{
@@ -348,7 +345,7 @@ class Business extends Component<Props> {
               ios: 'arrow-back-ios',
               android: 'arrow-back',
             })}
-            size={25}
+            size={28}
             onPress={() => {
               navigateToSearcher();
               navigation.goBack();

@@ -33,6 +33,7 @@ import {
   ADD_USER,
   REMOVE_USER,
 } from '../actions';
+import { SearchButton } from '../libraries/props';
 import styles from '../libraries/styles/styles';
 import { getStores, getCollections } from '../libraries/connect/businessCalls';
 import { getProfile } from '../libraries/connect/auth';
@@ -169,20 +170,9 @@ class Homepage extends Component<Props> {
                 alignItems: 'center',
               }}
             >
-              <Button
-                icon={<Icon name="search" size={22} color="gray" />}
-                // title="¿A dónde querés comprar?"
+              <SearchButton
                 onPress={() => {
                   this.toggleSearchBar();
-                }}
-                containerStyle={{ width: '80%' }}
-                titleStyle={{ fontSize: 13, left: 10, color: 'grey' }}
-                buttonStyle={{
-                  borderRadius: 15,
-                  justifyContent: 'flex-start',
-                  paddingVertical: 10,
-                  backgroundColor: '#E0E0E0',
-                  width: '100%',
                 }}
               />
               <Button

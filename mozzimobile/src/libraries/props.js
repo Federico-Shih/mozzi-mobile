@@ -6,6 +6,8 @@ import {
   SafeAreaView,
   ScrollView,
   StyleSheet,
+  TouchableOpacity,
+  TouchableNativeFeedback,
 } from 'react-native';
 import { Button, Icon, Image } from 'react-native-elements';
 import PropTypes from 'prop-types';
@@ -303,3 +305,76 @@ export const Menu = connect(
   mapStateToProps,
   mapDispatchToProps,
 )(MenuProp);
+
+const PressedElement = Platform.select({
+  ios: TouchableOpacity,
+  android: TouchableNativeFeedback,
+});
+
+export const SearchButton = ({ onPress }) => (
+  <Button
+    icon={<Icon name="search" size={22} color="gray" />}
+    // title="¿A dónde querés comprar?"
+    onPress={onPress}
+    containerStyle={{ width: 80 * vw }}
+    titleStyle={{ fontSize: 13, left: 10, color: 'grey' }}
+    buttonStyle={{
+      borderRadius: 15,
+      justifyContent: 'flex-start',
+      paddingVertical: 10,
+      backgroundColor: '#E0E0E0',
+      width: '100%',
+    }}
+  />
+);
+
+export const BusinessButton = ({ item, navigation, onPress }) => {
+  const {
+    name, category, description, street, number, zone,
+  } = item;
+  return (
+    <PressedElement onPress={onPress}>
+      <View
+        style={{
+          height: 16 * vh,
+          width: 90 * vw,
+          marginTop: 8,
+          flexDirection: 'row',
+          alignItems: 'center',
+        }}
+      >
+        <Image
+          source={{ uri: 'https://semantic-ui.com/images/wireframe/image.png' }}
+          style={{ width: 14 * vh, height: 14 * vh }}
+        />
+        <View
+          style={{
+            flex: 1,
+            marginVertical: 1 * vh,
+            left: 14,
+          }}
+        >
+          <Text
+            style={{
+              fontFamily: 'Nunito-SemiBold',
+              fontSize: 22,
+              color: 'black',
+            }}
+          >
+            {name}
+          </Text>
+          <Text style={{ height: 2 * vh, fontSize: 18, color: 'black' }}>
+            {category}
+          </Text>
+          <Text style={{ width: 60 * vw, fontSize: 13, color: '#5F5F5F' }}>
+            {description}
+          </Text>
+          <Text style={{ fontSize: 16, color: 'black', marginTop: 3 }}>
+            {`${street} ${number}, ${zone}`}
+          </Text>
+          <View style={{ flex: 1 }} />
+        </View>
+      </View>
+    </PressedElement>
+  );
+};
