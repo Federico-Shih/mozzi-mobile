@@ -97,4 +97,4 @@ export const removeAppointments = ({ token, uuid }) => axios.post(
       Authorization: token,
     },
   },
-);;
+);

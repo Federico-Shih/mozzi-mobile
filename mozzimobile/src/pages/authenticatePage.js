@@ -17,6 +17,7 @@ import { Input, Button, Icon } from 'react-native-elements';
 import NetInfo from '@react-native-community/netinfo';
 import PropTypes from 'prop-types';
 import update from 'immutability-helper';
+import { PanGestureHandler, State } from 'react-native-gesture-handler';
 
 // codes
 import {
@@ -53,7 +54,6 @@ class Authenticate extends Component<Props> {
     loginHeight: new Animated.Value(34),
     registerSize: new Animated.Value(5 * vw),
     registerHeight: new Animated.Value(27),
-    slideValue: new Animated.Value(0),
     underLinePosition: new Animated.Value(ScreenSizeWidth / 10 + 4),
     isLoginShow: true,
     connection: null,
@@ -72,6 +72,10 @@ class Authenticate extends Component<Props> {
     showPassRegister: false,
     showConfirmRegister: false,
   };
+
+  slideValue = new Animated.Value(0);
+
+  lastOffsetX = 0;
 
   registerError = {
     name: '',
@@ -101,6 +105,17 @@ class Authenticate extends Component<Props> {
 
   async componentDidMount() {
     await UserData.loadRealm();
+  }
+
+  onHandlerStateChange = (event) => {
+    if (event.nativeEvent.oldState === State.ACTIVE) {
+      console.log(event);
+    }
+  }
+
+  onPanGestureEvent = (e) => {
+    console.log(e);
+    this.slideValue.setValue(e.nativeEvent.translationX);
   }
 
   // Error and Style handlers
@@ -363,7 +378,6 @@ class Authenticate extends Component<Props> {
     const {
       loginSize,
       registerSize,
-      slideValue,
       underLinePosition,
       isLoginShow,
     } = this.state;
@@ -379,7 +393,7 @@ class Authenticate extends Component<Props> {
           toValue: 6 * vw,
           duration,
         }),
-        Animated.timing(slideValue, {
+        Animated.timing(this.slideValue, {
           toValue: 1,
           slideDuration,
           useNativeDriver: true,
@@ -396,7 +410,6 @@ class Authenticate extends Component<Props> {
     const {
       loginSize,
       registerSize,
-      slideValue,
       underLinePosition,
       isLoginShow,
     } = this.state;
@@ -412,7 +425,7 @@ class Authenticate extends Component<Props> {
           toValue: 5 * vw,
           duration,
         }),
-        Animated.timing(slideValue, {
+        Animated.timing(this.slideValue, {
           toValue: 0,
           slideDuration,
           useNativeDriver: true,
@@ -451,7 +464,6 @@ class Authenticate extends Component<Props> {
       registerSize,
       registerHeight,
       loginState,
-      slideValue,
       registerState,
       underLinePosition,
       showPassLogin,
@@ -462,7 +474,7 @@ class Authenticate extends Component<Props> {
     const { navigation, loading } = this.props;
     units.update();
 
-    const newSlideValue = slideValue.interpolate({
+    const newSlideValue = this.slideValue.interpolate({
       inputRange: [0, 1],
       outputRange: [0, -ScreenSizeWidth],
     });
@@ -551,339 +563,343 @@ class Authenticate extends Component<Props> {
               backgroundColor: '#4600DA',
             }}
           />
-          <View
-            style={{
-              marginTop: 40,
-              width: '80%',
-              height: '100%',
-              alignSelf: 'center',
-              flexDirection: 'row',
-            }}
+          <PanGestureHandler
+            onGestureEvent={this.onPanGestureEvent}
           >
-            {/* LOGIN COMPONENT */}
-            <Animated.View
+            <View
               style={{
-                width: '100%',
-                // left: slideValue,
-                transform: [{ translateX: newSlideValue }],
-              }}
-              overflow="scroll"
-            >
-              <Input
-                keyboardType="email-address"
-                placeholder="Email"
-                inputStyle={{
-                  fontFamily: 'Nunito-SemiBold',
-                  fontWeight: '100',
-                }}
-                onChangeText={(text) => {
-                  this.setState({
-                    loginState: update(loginState, { email: { $set: text } }),
-                  });
-                }}
-                onSubmitEditing={() => {
-                  this.checkIfValidEmailAndSet();
-                }}
-                inputContainerStyle={{ ...this.loginStyle.email }}
-                leftIcon={{
-                  type: 'material',
-                  name: 'email',
-                  color: '#AAAAAA',
-                  iconStyle: { left: 0 },
-                }}
-                shake
-              />
-
-              <View style={{ height: 20, justifyContent: 'flex-start' }}>
-                {this.displayErrorMessage('email')}
-              </View>
-              <Input
-                secureTextEntry={!showPassLogin}
-                placeholder="Password"
-                inputStyle={{
-                  fontFamily: 'Nunito-SemiBold',
-                  fontWeight: '100',
-                }}
-                onChangeText={(text) => {
-                  this.setState({
-                    loginState: update(loginState, {
-                      password: { $set: text },
-                    }),
-                  });
-                }}
-                onSubmitEditing={() => {
-                  this.checkIfValidPasswordAndSet();
-                }}
-                inputContainerStyle={{ ...this.loginStyle.password }}
-                leftIcon={{ type: 'material', name: 'lock', color: '#AAAAAA' }}
-                rightIcon={(
-                  <Icon
-                    clear
-                    name="remove-red-eye"
-                    type="material"
-                    color="#AAAAAA"
-                    onPress={() => {
-                      this.togglePassword('showPassLogin');
-                    }}
-                  />
-)}
-              />
-
-              <View style={{ height: 20 }}>
-                {this.displayErrorMessage('password')}
-              </View>
-
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'flex-start',
-                  justifyContent: 'flex-end',
-                  marginTop: -10,
-                }}
-              >
-                <Button
-                  title="¿Olvidaste tu contraseña?"
-                  type="clear"
-                  titleStyle={styles.forgotPassword}
-                  containerStyle={{}}
-                  onPress={() => {
-                    navigation.navigate('Forgot');
-                  }}
-                />
-              </View>
-              <Button
-                title="Iniciar Sesión"
-                raised
-                type="outline"
-                loading={loading}
-                onPress={() => {
-                  this.checkAndLogin();
-                }}
-                titleStyle={buttonStyle.reglogButtonText}
-                buttonStyle={{ ...buttonStyle.reglogButton }}
-                containerStyle={{
-                  marginTop: 4 * vh,
-                }}
-              />
-              <View
-                style={{
-                  flexDirection: 'row',
-                  marginTop: 10,
-                  alignSelf: 'center',
-                }}
-              >
-                <Text style={{ ...styles.smallLogInText, alignSelf: 'center' }}>
-                  ¿No tienes cuenta?
-                </Text>
-                <Button
-                  title="Registrate."
-                  type="clear"
-                  titleStyle={styles.smallLogInText}
-                  containerStyle={{}}
-                  onPress={this.changeToRegister}
-                />
-              </View>
-              <View style={{ flex: 1 }} />
-            </Animated.View>
-            {/* REGISTER COMPONENT */}
-            <Animated.View
-              style={{
-                width: (ScreenSizeWidth * 4) / 5,
+                marginTop: 40,
+                width: '80%',
                 height: '100%',
-                // left: slideValue,
-                marginLeft: 80,
-                transform: [{ translateX: newSlideValue }],
+                alignSelf: 'center',
+                flexDirection: 'row',
               }}
-              overflow="scroll"
             >
-              <Input
-                placeholder="Name"
-                inputStyle={{
-                  fontFamily: 'Nunito-SemiBold',
-                  fontWeight: '100',
-                }}
-                onChangeText={(text) => {
-                  this.setState({
-                    registerState: update(registerState, {
-                      name: { $set: text },
-                    }),
-                  });
-                }}
-                value={name}
-                inputContainerStyle={{
-                  ...this.registerStyle.name,
-                }}
-                onSubmitEditing={() => {
-                  this.checkIfInputIsEmpty('name');
-                }}
-                leftIcon={{
-                  type: 'material',
-                  name: 'account-circle',
-                  color: '#AAAAAA',
-                }}
-              />
-              <View style={{ height: 20 }}>
-                {this.displayErrorMessage('name')}
-              </View>
-
-              <Input
-                placeholder="Surname"
-                inputStyle={{
-                  fontFamily: 'Nunito-SemiBold',
-                  fontWeight: '100',
-                }}
-                onChangeText={(text) => {
-                  this.setState({
-                    registerState: update(registerState, {
-                      surname: { $set: text },
-                    }),
-                  });
-                }}
-                value={surname}
-                inputContainerStyle={{ ...this.registerStyle.surname }}
-                onSubmitEditing={() => {
-                  this.checkIfInputIsEmpty('surname');
-                }}
-                leftIcon={{
-                  type: 'material',
-                  name: 'perm-identity',
-                  color: '#AAAAAA',
-                }}
-              />
-              <View style={{ height: 20 }}>
-                {this.displayErrorMessage('surname')}
-              </View>
-
-              <Input
-                keyboardType="email-address"
-                placeholder="Email"
-                inputStyle={{
-                  fontFamily: 'Nunito-SemiBold',
-                  fontWeight: '100',
-                }}
-                onChangeText={(text) => {
-                  this.setState({
-                    registerState: update(registerState, {
-                      email: { $set: text.trim() },
-                    }),
-                  });
-                }}
-                onSubmitEditing={() => {
-                  this.checkIfValidEmailAndSet();
-                }}
-                inputContainerStyle={{ ...this.registerStyle.email }}
-                leftIcon={{ type: 'material', name: 'email', color: '#AAAAAA' }}
-              />
-              <View style={{ height: 20 }}>
-                {this.displayErrorMessage('email')}
-              </View>
-              <Input
-                secureTextEntry={!showPassRegister}
-                placeholder="Password"
-                inputStyle={{
-                  fontFamily: 'Nunito-SemiBold',
-                  fontWeight: '100',
-                }}
-                onChangeText={(text) => {
-                  this.setState({
-                    registerState: update(registerState, {
-                      password: { $set: text },
-                    }),
-                  });
-                }}
-                rightIcon={(
-                  <Icon
-                    clear
-                    name="remove-red-eye"
-                    type="material"
-                    color="#AAAAAA"
-                    onPress={() => {
-                      this.togglePassword('showPassRegister');
-                    }}
-                  />
-)}
-                onSubmitEditing={() => {
-                  this.checkIfValidPasswordAndSet();
-                }}
-                inputContainerStyle={{ ...this.registerStyle.password }}
-                leftIcon={{ type: 'material', name: 'lock', color: '#AAAAAA' }}
-              />
-              <View style={{ height: 20 }}>
-                {this.displayErrorMessage('password')}
-              </View>
-              <Input
-                secureTextEntry={!showConfirmRegister}
-                inputStyle={{
-                  fontFamily: 'Nunito-SemiBold',
-                  fontWeight: '100',
-                }}
-                placeholder="Confirm Password"
-                onChangeText={(text) => {
-                  this.setState({
-                    registerState: update(registerState, {
-                      tempConfirmedPassword: { $set: text },
-                    }),
-                  });
-                }}
-                rightIcon={(
-                  <Icon
-                    clear
-                    name="remove-red-eye"
-                    type="material"
-                    color="#AAAAAA"
-                    onPress={() => {
-                      this.togglePassword('showConfirmRegister');
-                    }}
-                  />
-)}
-                onSubmitEditing={() => {
-                  this.checkIfPasswordsMatchAndSet();
-                }}
-                inputContainerStyle={{ ...this.registerStyle.confirmpassword }}
-                leftIcon={{ type: 'material', name: 'lock', color: '#AAAAAA' }}
-              />
-              <View style={{ height: 20 }}>
-                {this.displayErrorMessage('confirmpassword')}
-              </View>
-
-              <Button
-                title="Crear cuenta"
-                raised
-                type="outline"
-                loading={loading}
-                onPress={() => {
-                  this.checkAndRegister();
-                }}
-                titleStyle={buttonStyle.reglogButtonText}
-                buttonStyle={{ ...buttonStyle.reglogButton }}
-                containerStyle={{
-                  marginTop: 4 * vh,
-                }}
-              />
-
-              <View
+              {/* LOGIN COMPONENT */}
+              <Animated.View
                 style={{
-                  flexDirection: 'row',
-                  marginTop: 10,
-                  alignSelf: 'center',
+                  width: '100%',
+                  // left: slideValue,
+                  transform: [{ translateX: newSlideValue }],
                 }}
+                overflow="scroll"
               >
-                <Text style={{ ...styles.smallLogInText, alignSelf: 'center' }}>
-                  ¿Ya tenés una cuenta registrada?
-                </Text>
+                <Input
+                  keyboardType="email-address"
+                  placeholder="Email"
+                  inputStyle={{
+                    fontFamily: 'Nunito-SemiBold',
+                    fontWeight: '100',
+                  }}
+                  onChangeText={(text) => {
+                    this.setState({
+                      loginState: update(loginState, { email: { $set: text } }),
+                    });
+                  }}
+                  onSubmitEditing={() => {
+                    this.checkIfValidEmailAndSet();
+                  }}
+                  inputContainerStyle={{ ...this.loginStyle.email }}
+                  leftIcon={{
+                    type: 'material',
+                    name: 'email',
+                    color: '#AAAAAA',
+                    iconStyle: { left: 0 },
+                  }}
+                  shake
+                />
+
+                <View style={{ height: 20, justifyContent: 'flex-start' }}>
+                  {this.displayErrorMessage('email')}
+                </View>
+                <Input
+                  secureTextEntry={!showPassLogin}
+                  placeholder="Password"
+                  inputStyle={{
+                    fontFamily: 'Nunito-SemiBold',
+                    fontWeight: '100',
+                  }}
+                  onChangeText={(text) => {
+                    this.setState({
+                      loginState: update(loginState, {
+                        password: { $set: text },
+                      }),
+                    });
+                  }}
+                  onSubmitEditing={() => {
+                    this.checkIfValidPasswordAndSet();
+                  }}
+                  inputContainerStyle={{ ...this.loginStyle.password }}
+                  leftIcon={{ type: 'material', name: 'lock', color: '#AAAAAA' }}
+                  rightIcon={(
+                    <Icon
+                      clear
+                      name="remove-red-eye"
+                      type="material"
+                      color="#AAAAAA"
+                      onPress={() => {
+                        this.togglePassword('showPassLogin');
+                      }}
+                    />
+)}
+                />
+
+                <View style={{ height: 20 }}>
+                  {this.displayErrorMessage('password')}
+                </View>
+
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'flex-start',
+                    justifyContent: 'flex-end',
+                    marginTop: -10,
+                  }}
+                >
+                  <Button
+                    title="¿Olvidaste tu contraseña?"
+                    type="clear"
+                    titleStyle={styles.forgotPassword}
+                    containerStyle={{}}
+                    onPress={() => {
+                      navigation.navigate('Forgot');
+                    }}
+                  />
+                </View>
                 <Button
-                  title="Inicia sesión."
-                  type="clear"
-                  titleStyle={styles.smallLogInText}
-                  containerStyle={{}}
+                  title="Iniciar Sesión"
+                  raised
+                  type="outline"
+                  loading={loading}
                   onPress={() => {
-                    this.changeToLogin();
+                    this.checkAndLogin();
+                  }}
+                  titleStyle={buttonStyle.reglogButtonText}
+                  buttonStyle={{ ...buttonStyle.reglogButton }}
+                  containerStyle={{
+                    marginTop: 4 * vh,
                   }}
                 />
-              </View>
-              <View style={{ flex: 1 }} />
-            </Animated.View>
-          </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    marginTop: 10,
+                    alignSelf: 'center',
+                  }}
+                >
+                  <Text style={{ ...styles.smallLogInText, alignSelf: 'center' }}>
+                  ¿No tienes cuenta?
+                  </Text>
+                  <Button
+                    title="Registrate."
+                    type="clear"
+                    titleStyle={styles.smallLogInText}
+                    containerStyle={{}}
+                    onPress={this.changeToRegister}
+                  />
+                </View>
+                <View style={{ flex: 1 }} />
+              </Animated.View>
+              {/* REGISTER COMPONENT */}
+              <Animated.View
+                style={{
+                  width: (ScreenSizeWidth * 4) / 5,
+                  height: '100%',
+                  // left: slideValue,
+                  marginLeft: 80,
+                  transform: [{ translateX: newSlideValue }],
+                }}
+                overflow="scroll"
+              >
+                <Input
+                  placeholder="Name"
+                  inputStyle={{
+                    fontFamily: 'Nunito-SemiBold',
+                    fontWeight: '100',
+                  }}
+                  onChangeText={(text) => {
+                    this.setState({
+                      registerState: update(registerState, {
+                        name: { $set: text },
+                      }),
+                    });
+                  }}
+                  value={name}
+                  inputContainerStyle={{
+                    ...this.registerStyle.name,
+                  }}
+                  onSubmitEditing={() => {
+                    this.checkIfInputIsEmpty('name');
+                  }}
+                  leftIcon={{
+                    type: 'material',
+                    name: 'account-circle',
+                    color: '#AAAAAA',
+                  }}
+                />
+                <View style={{ height: 20 }}>
+                  {this.displayErrorMessage('name')}
+                </View>
+
+                <Input
+                  placeholder="Surname"
+                  inputStyle={{
+                    fontFamily: 'Nunito-SemiBold',
+                    fontWeight: '100',
+                  }}
+                  onChangeText={(text) => {
+                    this.setState({
+                      registerState: update(registerState, {
+                        surname: { $set: text },
+                      }),
+                    });
+                  }}
+                  value={surname}
+                  inputContainerStyle={{ ...this.registerStyle.surname }}
+                  onSubmitEditing={() => {
+                    this.checkIfInputIsEmpty('surname');
+                  }}
+                  leftIcon={{
+                    type: 'material',
+                    name: 'perm-identity',
+                    color: '#AAAAAA',
+                  }}
+                />
+                <View style={{ height: 20 }}>
+                  {this.displayErrorMessage('surname')}
+                </View>
+
+                <Input
+                  keyboardType="email-address"
+                  placeholder="Email"
+                  inputStyle={{
+                    fontFamily: 'Nunito-SemiBold',
+                    fontWeight: '100',
+                  }}
+                  onChangeText={(text) => {
+                    this.setState({
+                      registerState: update(registerState, {
+                        email: { $set: text.trim() },
+                      }),
+                    });
+                  }}
+                  onSubmitEditing={() => {
+                    this.checkIfValidEmailAndSet();
+                  }}
+                  inputContainerStyle={{ ...this.registerStyle.email }}
+                  leftIcon={{ type: 'material', name: 'email', color: '#AAAAAA' }}
+                />
+                <View style={{ height: 20 }}>
+                  {this.displayErrorMessage('email')}
+                </View>
+                <Input
+                  secureTextEntry={!showPassRegister}
+                  placeholder="Password"
+                  inputStyle={{
+                    fontFamily: 'Nunito-SemiBold',
+                    fontWeight: '100',
+                  }}
+                  onChangeText={(text) => {
+                    this.setState({
+                      registerState: update(registerState, {
+                        password: { $set: text },
+                      }),
+                    });
+                  }}
+                  rightIcon={(
+                    <Icon
+                      clear
+                      name="remove-red-eye"
+                      type="material"
+                      color="#AAAAAA"
+                      onPress={() => {
+                        this.togglePassword('showPassRegister');
+                      }}
+                    />
+)}
+                  onSubmitEditing={() => {
+                    this.checkIfValidPasswordAndSet();
+                  }}
+                  inputContainerStyle={{ ...this.registerStyle.password }}
+                  leftIcon={{ type: 'material', name: 'lock', color: '#AAAAAA' }}
+                />
+                <View style={{ height: 20 }}>
+                  {this.displayErrorMessage('password')}
+                </View>
+                <Input
+                  secureTextEntry={!showConfirmRegister}
+                  inputStyle={{
+                    fontFamily: 'Nunito-SemiBold',
+                    fontWeight: '100',
+                  }}
+                  placeholder="Confirm Password"
+                  onChangeText={(text) => {
+                    this.setState({
+                      registerState: update(registerState, {
+                        tempConfirmedPassword: { $set: text },
+                      }),
+                    });
+                  }}
+                  rightIcon={(
+                    <Icon
+                      clear
+                      name="remove-red-eye"
+                      type="material"
+                      color="#AAAAAA"
+                      onPress={() => {
+                        this.togglePassword('showConfirmRegister');
+                      }}
+                    />
+)}
+                  onSubmitEditing={() => {
+                    this.checkIfPasswordsMatchAndSet();
+                  }}
+                  inputContainerStyle={{ ...this.registerStyle.confirmpassword }}
+                  leftIcon={{ type: 'material', name: 'lock', color: '#AAAAAA' }}
+                />
+                <View style={{ height: 20 }}>
+                  {this.displayErrorMessage('confirmpassword')}
+                </View>
+
+                <Button
+                  title="Crear cuenta"
+                  raised
+                  type="outline"
+                  loading={loading}
+                  onPress={() => {
+                    this.checkAndRegister();
+                  }}
+                  titleStyle={buttonStyle.reglogButtonText}
+                  buttonStyle={{ ...buttonStyle.reglogButton }}
+                  containerStyle={{
+                    marginTop: 4 * vh,
+                  }}
+                />
+
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    marginTop: 10,
+                    alignSelf: 'center',
+                  }}
+                >
+                  <Text style={{ ...styles.smallLogInText, alignSelf: 'center' }}>
+                  ¿Ya tenés una cuenta registrada?
+                  </Text>
+                  <Button
+                    title="Inicia sesión."
+                    type="clear"
+                    titleStyle={styles.smallLogInText}
+                    containerStyle={{}}
+                    onPress={() => {
+                      this.changeToLogin();
+                    }}
+                  />
+                </View>
+                <View style={{ flex: 1 }} />
+              </Animated.View>
+            </View>
+          </PanGestureHandler>
         </View>
       </SafeAreaView>
     );
