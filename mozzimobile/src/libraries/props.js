@@ -1,5 +1,11 @@
 import {
-  View, Text, Animated, Platform, SafeAreaView, ScrollView, StyleSheet,
+  View,
+  Text,
+  Animated,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
 } from 'react-native';
 import { Button, Icon, Image } from 'react-native-elements';
 import PropTypes from 'prop-types';
@@ -10,10 +16,7 @@ import { DrawerNavigatorItems } from 'react-navigation-drawer';
 import { units } from './helpers';
 import styles from './styles/styles';
 import buttonStyles from './styles/buttonsStyles';
-import {
-  REMOVE_TOKEN,
-  REMOVE_USER,
-} from '../actions';
+import { REMOVE_TOKEN, REMOVE_USER } from '../actions';
 
 type Props = {};
 
@@ -102,6 +105,12 @@ const BackButtonProp = ({ navigation }) => (
 );
 
 const buttons = [
+  {
+    title: 'Inicio',
+    nav: 'Home',
+    id: 'home',
+    icon: 'home',
+  },
   {
     title: 'Tus Turnos',
     nav: 'Turns',
@@ -241,14 +250,18 @@ const MenuProp = (props) => {
     <View style={{ flex: 1 }}>
       <ScrollView>
         <SafeAreaView
-          style={{ flex: 1, flexDirection: 'column', justifyContent: 'flex-end' }}
+          style={{
+            flex: 1,
+            flexDirection: 'column',
+            justifyContent: 'flex-end',
+          }}
           forceInset={{ top: 'always', horizontal: 'never' }}
         >
           <View style={menuStyles.avatarContainer}>
             <View style={menuStyles.avatar}>
               <Image
                 style={menuStyles.avatar}
-                source={user.image ? { uri: (user.image) } : null}
+                source={user.image ? { uri: user.image } : null}
               />
             </View>
             <Text style={menuStyles.name}>
@@ -256,10 +269,7 @@ const MenuProp = (props) => {
             </Text>
           </View>
 
-          <SideMenuButtons
-            buttons={buttons}
-            navigation={navigation}
-          />
+          <SideMenuButtons buttons={buttons} navigation={navigation} />
         </SafeAreaView>
       </ScrollView>
       <Button
@@ -288,6 +298,8 @@ const MenuProp = (props) => {
   );
 };
 
-
 export const BackButton = BackButtonProp;
-export const Menu = connect(mapStateToProps, mapDispatchToProps)(MenuProp);
+export const Menu = connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(MenuProp);

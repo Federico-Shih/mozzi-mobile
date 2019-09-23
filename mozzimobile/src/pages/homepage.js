@@ -52,16 +52,6 @@ const MyButton = Platform.select({
 
 // Main homepage class
 class Homepage extends Component<Props> {
-  state = {
-    isOpen: false,
-    searchBarIsOpen: false,
-    profile: {
-      name: '',
-      image: null,
-    },
-    collections: [],
-  };
-
   static propTypes = {
     navigation: PropTypes.shape({
       navigate: PropTypes.func.isRequired,
@@ -71,6 +61,11 @@ class Homepage extends Component<Props> {
     navigateToBusiness: PropTypes.func.isRequired,
   };
 
+  state = {
+    searchBarIsOpen: false,
+    collections: [],
+  };
+
   constructor(props) {
     super(props);
     this.searchModal = React.createRef();
@@ -78,7 +73,6 @@ class Homepage extends Component<Props> {
 
   async componentDidMount() {
     const { navigation, token, addUser } = this.props;
-
     if (token === '' && !devMode) {
       navigation.replace('Login');
       sendPopup('El cliente no tiene una sesión valida');
@@ -111,11 +105,22 @@ class Homepage extends Component<Props> {
 
   closeSearchBar() {
     const { current } = this.searchModal;
+    const { navigation } = this.props;
+    navigation.setParams({
+      searchBarIsOpen: false,
+    });
+    this.setState({ searchBarIsOpen: false });
     current.close();
   }
 
   toggleSearchBar() {
     const { current } = this.searchModal;
+    const { navigation } = this.props;
+    const { searchBarIsOpen } = this.state;
+    navigation.setParams({
+      searchBarIsOpen: !searchBarIsOpen,
+    });
+    this.setState({ searchBarIsOpen: !searchBarIsOpen });
     current.toggle();
   }
 
@@ -155,7 +160,6 @@ class Homepage extends Component<Props> {
             }}
             placement="left"
           />
-
           <ScrollView style={{ width: '100%', top: 5 }} scrollEnabled>
             <View
               style={{

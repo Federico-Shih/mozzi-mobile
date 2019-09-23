@@ -10,9 +10,14 @@ import {
   ScrollView,
 } from 'react-native';
 import React, { Component } from 'react';
-import { Divider, Button, Icon } from 'react-native-elements';
+import {
+  Divider, Button, Icon,
+  SearchBar,
+  Header,
+} from 'react-native-elements';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+
 
 import {
   getAppointments,
@@ -131,6 +136,11 @@ class MyAppointments extends Component<Props> {
     });
   };
 
+  toggle() {
+    const { navigation } = this.props;
+    navigation.openDrawer();
+  }
+
   render() {
     const { navigation } = this.props;
     const { appointments, refreshing } = this.state;
@@ -138,34 +148,23 @@ class MyAppointments extends Component<Props> {
     arrayAppointments.sort((a, b) => a.slot.day - b.slot.day);
     return (
       <View contentContainerStyle={styles.container}>
-        <Button
-          icon={(
-            <Icon
-              name={Platform.select({
-                ios: 'arrow-back-ios',
-                android: 'arrow-back',
-              })}
-              size={30}
-              color="gray"
+        <Header
+          leftComponent={(
+            <Button
+              containerStyle={{ bottom: '50%' }}
+              icon={<Icon name="menu" size={30} />}
+              type="clear"
+              onPress={() => {
+                this.toggle();
+              }}
             />
 )}
-          onPress={() => {
-            navigation.goBack();
-          }}
           containerStyle={{
-            borderRadius: 50,
-            flexDirection: 'row',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            width: '100%',
-            height: 50,
-          }}
-          buttonStyle={{
-            borderRadius: 50,
+            height: 60,
             backgroundColor: platformBackColor,
-            marginLeft: 5,
-            marginTop: 5,
+            borderWidth: 0,
           }}
+          placement="left"
         />
         <View
           style={{

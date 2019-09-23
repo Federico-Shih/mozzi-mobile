@@ -3,12 +3,12 @@ import { createStackNavigator, createAppContainer } from 'react-navigation';
 import { createDrawerNavigator } from 'react-navigation-drawer';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
-import { View, PermissionsAndroid, Platform } from 'react-native';
+import {
+  View, PermissionsAndroid, Platform, Text,
+} from 'react-native';
 import Toast from 'react-native-easy-toast';
 import { EventRegister } from 'react-native-event-listeners';
-import {
-  Icon,
-} from 'react-native-elements';
+import { Icon } from 'react-native-elements';
 
 import * as scr from './src/pages/pages';
 import reducer from './src/reducer';
@@ -33,16 +33,15 @@ const DrawerNavigator = createDrawerNavigator(
     initialRouteName: 'Home',
     order: ['Home', 'Turns', 'Favs', 'Recent', 'Profile', 'Config'],
     contentComponent: Menu,
-    defaultNavigationOptions: {
-      header: null,
-    },
   },
 );
 
 // Navigation
 const AppNavigator = createStackNavigator(
   {
-    Home: DrawerNavigator,
+    Home: {
+      screen: DrawerNavigator,
+    },
     Forgot: scr.Forgot,
     Business: scr.Business,
     Calendar: scr.CalendarTemp,

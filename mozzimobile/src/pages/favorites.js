@@ -7,19 +7,19 @@ import {
   ScrollView,
   TouchableOpacity,
   TouchableNativeFeedback,
-  BackHandler,
-  Keyboard,
 } from 'react-native';
 import React, { Component } from 'react';
 import {
-  SearchBar, Button, Icon, Divider,
+  SearchBar, Button, Icon, Divider, Header,
 } from 'react-native-elements';
 import PropTypes from 'prop-types';
 
 import styles from '../libraries/styles/styles';
 import { BackButton } from '../libraries/props';
 import { platformBackColor } from '../libraries/styles/constants';
-import { sendPopup, errorMessages, units, UserData } from '../libraries/helpers';
+import {
+  sendPopup, errorMessages, units, UserData,
+} from '../libraries/helpers';
 
 type Props = {};
 
@@ -31,11 +31,32 @@ const MyButton = Platform.select({
 export default class Favorites extends Component<Props> {
   state = {};
 
-  render() {
+  toggle() {
     const { navigation } = this.props;
+    navigation.openDrawer();
+  }
+
+  render() {
     return (
       <View style={styles.container}>
-        <BackButton navigation={navigation} />
+        <Header
+          leftComponent={(
+            <Button
+              containerStyle={{ bottom: '50%' }}
+              icon={<Icon name="menu" size={30} />}
+              type="clear"
+              onPress={() => {
+                this.toggle();
+              }}
+            />
+)}
+          containerStyle={{
+            height: 60,
+            backgroundColor: platformBackColor,
+            borderWidth: 0,
+          }}
+          placement="left"
+        />
       </View>
     );
   }
