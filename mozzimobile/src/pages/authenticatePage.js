@@ -50,11 +50,6 @@ const slideDuration = 500;
 
 class Authenticate extends Component<Props> {
   state = {
-    loginSize: new Animated.Value(6 * vw),
-    loginHeight: new Animated.Value(34),
-    registerSize: new Animated.Value(5 * vw),
-    registerHeight: new Animated.Value(27),
-    underLinePosition: new Animated.Value(ScreenSizeWidth / 10 + 4),
     isLoginShow: true,
     connection: null,
     loginState: {
@@ -74,6 +69,8 @@ class Authenticate extends Component<Props> {
   };
 
   slideValue = new Animated.Value(0);
+
+  nativeSlideValue = new Animated.Value(0);
 
   lastOffsetX = 0;
 
@@ -107,15 +104,21 @@ class Authenticate extends Component<Props> {
     await UserData.loadRealm();
   }
 
-  onHandlerStateChange = (event) => {
-    if (event.nativeEvent.oldState === State.ACTIVE) {
-      console.log(event);
+  handleStateChange = ({ nativeEvent }) => {
+    if (nativeEvent.oldState === State.ACTIVE) {
+      const { isLoginShow } = this.state;
+      if (isLoginShow) this.changeToRegister();
     }
   }
 
   onPanGestureEvent = (e) => {
-    console.log(e);
-    this.slideValue.setValue(e.nativeEvent.translationX);
+    console.log(e.nativeEvent.translationX);
+    const { translationX } = e.nativeEvent;
+    const { isLoginShow } = this.state;
+    if (isLoginShow && translationX < 0) {
+      this.slideValue.setValue(Math.abs(translationX) / 100);
+      this.nativeSlideValue.setValue(Math.abs(translationX) / 100);
+    }
   }
 
   // Error and Style handlers
@@ -376,31 +379,21 @@ class Authenticate extends Component<Props> {
 
   changeToRegister = () => {
     const {
-      loginSize,
-      registerSize,
-      underLinePosition,
       isLoginShow,
     } = this.state;
     if (isLoginShow) {
       Keyboard.dismiss();
       this.setState({ isLoginShow: false });
       Animated.parallel([
-        Animated.timing(loginSize, {
-          toValue: 5 * vw,
-          duration,
-        }),
-        Animated.timing(registerSize, {
-          toValue: 6 * vw,
-          duration,
-        }),
         Animated.timing(this.slideValue, {
           toValue: 1,
           slideDuration,
-          useNativeDriver: true,
+          // useNativeDriver: true,
         }),
-        Animated.timing(underLinePosition, {
-          toValue: 3 * vw + (100 * vw * 5) / 10,
+        Animated.timing(this.nativeSlideValue, {
+          toValue: 1,
           slideDuration,
+          useNativeDriver: true,
         }),
       ]).start();
     }
@@ -408,31 +401,21 @@ class Authenticate extends Component<Props> {
 
   changeToLogin = () => {
     const {
-      loginSize,
-      registerSize,
-      underLinePosition,
       isLoginShow,
     } = this.state;
     if (!isLoginShow) {
       Keyboard.dismiss();
       this.setState({ isLoginShow: true });
       Animated.parallel([
-        Animated.timing(loginSize, {
-          toValue: 6 * vw,
-          duration,
-        }),
-        Animated.timing(registerSize, {
-          toValue: 5 * vw,
-          duration,
-        }),
         Animated.timing(this.slideValue, {
           toValue: 0,
           slideDuration,
-          useNativeDriver: true,
+          // useNativeDriver: true,
         }),
-        Animated.timing(underLinePosition, {
-          toValue: 1 * vw + (100 * vw) / 10,
+        Animated.timing(this.nativeSlideValue, {
+          toValue: 0,
           slideDuration,
+          useNativeDriver: true,
         }),
       ]).start();
     }
@@ -459,13 +442,10 @@ class Authenticate extends Component<Props> {
 
   render() {
     const {
-      loginSize,
       loginHeight,
-      registerSize,
       registerHeight,
       loginState,
       registerState,
-      underLinePosition,
       showPassLogin,
       showPassRegister,
       showConfirmRegister,
@@ -477,6 +457,21 @@ class Authenticate extends Component<Props> {
     const newSlideValue = this.slideValue.interpolate({
       inputRange: [0, 1],
       outputRange: [0, -ScreenSizeWidth],
+    });
+
+    const loginSize = this.slideValue.interpolate({
+      inputRange: [0, 1],
+      outputRange: [6 * vw, 5 * vw],
+    });
+
+    const registerSize = this.slideValue.interpolate({
+      inputRange: [0, 1],
+      outputRange: [5 * vw, 6 * vw],
+    });
+
+    const underLinePosition = this.slideValue.interpolate({
+      inputRange: [0, 1],
+      outputRange: [ScreenSizeWidth / 10 + 4, 3 * vw + (100 * vw * 5) / 10],
     });
 
     return (
@@ -565,6 +560,7 @@ class Authenticate extends Component<Props> {
           />
           <PanGestureHandler
             onGestureEvent={this.onPanGestureEvent}
+            onHandlerStateChange={this.handleStateChange}
           >
             <View
               style={{
