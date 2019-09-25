@@ -15,7 +15,6 @@ import {
   Button, Icon, Header, Image,
 } from 'react-native-elements';
 import PropTypes from 'prop-types';
-
 import { connect } from 'react-redux';
 
 import styles from '../libraries/styles/styles';
@@ -49,6 +48,7 @@ class Recents extends Component<Props> {
     this.searchModal = React.createRef();
     this.onRefresh = this.onRefresh.bind(this);
     this.navToStore = this.navToStore.bind(this);
+    this.deleteBusiness = this.deleteBusiness.bind(this);
   }
 
   componentDidMount = () => {
@@ -68,6 +68,12 @@ class Recents extends Component<Props> {
     navigateToBusiness(uuid);
     navigation.navigate('Business');
   };
+
+  deleteBusiness(business) {
+    const { user } = this.props;
+    UserData.removeUserRecents({ uuid: user.uuid, business });
+    this.onRefresh();
+  }
 
   toggle() {
     const { navigation } = this.props;
@@ -174,6 +180,7 @@ class Recents extends Component<Props> {
                   onPress={() => {
                     this.navToStore(item.uuid);
                   }}
+                  deleteBusiness={this.deleteBusiness}
                 />
               )}
             />

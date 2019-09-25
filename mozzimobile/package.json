@@ -25,6 +25,7 @@
     "react-native-reanimated": "^1.2.0",
     "react-native-screens": "^1.0.0-alpha.23",
     "react-native-side-menu-over": "0.0.2",
+    "react-native-swipeout": "^2.3.6",
     "react-native-timeline-feed": "^2.0.0",
     "react-native-vector-icons": "^6.6.0",
     "react-native-viewport-units": "0.0.5",

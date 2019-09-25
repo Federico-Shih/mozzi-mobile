@@ -13,7 +13,7 @@ import { Button, Icon, Image } from 'react-native-elements';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { DrawerNavigatorItems } from 'react-navigation-drawer';
+import Swipeout from 'react-native-swipeout';
 
 import { units } from './helpers';
 import styles from './styles/styles';
@@ -328,53 +328,72 @@ export const SearchButton = ({ onPress }) => (
   />
 );
 
-export const BusinessButton = ({ item, navigation, onPress }) => {
+const RemoveIcon = (
+  <Icon
+    name="delete"
+    type="material"
+    color="black"
+    size={35}
+    containerStyle={{ flex: 1, justifyContent: 'center' }}
+  />
+);
+
+export const BusinessButton = ({
+  item, navigation, onPress, deleteBusiness,
+}) => {
   const {
-    name, category, description, street, number, zone,
+    name, category, description, street, number, zone, uuid,
   } = item;
   return (
-    <PressedElement onPress={onPress}>
-      <View
-        style={{
-          height: 16 * vh,
-          width: 90 * vw,
-          marginTop: 8,
-          flexDirection: 'row',
-          alignItems: 'center',
-        }}
-      >
-        <Image
-          source={{ uri: 'https://semantic-ui.com/images/wireframe/image.png' }}
-          style={{ width: 14 * vh, height: 14 * vh }}
-        />
+    <Swipeout
+      right={[{
+        text: '', onPress: () => { deleteBusiness(item); }, type: 'delete', component: RemoveIcon,
+      }]}
+      backgroundColor="#FFF"
+    >
+      <PressedElement onPress={onPress}>
         <View
           style={{
-            flex: 1,
-            marginVertical: 1 * vh,
-            left: 14,
+            height: 16 * vh,
+            width: 100 * vw,
+            marginTop: 8,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
-          <Text
+          <Image
+            source={{ uri: 'https://semantic-ui.com/images/wireframe/image.png' }}
+            style={{ width: 14 * vh, height: 14 * vh }}
+          />
+          <View
             style={{
-              fontFamily: 'Nunito-SemiBold',
-              fontSize: 22,
-              color: 'black',
+              marginVertical: 1 * vh,
+              marginLeft: 14,
             }}
           >
-            {name}
-          </Text>
-          <Text style={{ height: 2 * vh, fontSize: 18, color: 'black' }}>
-            {category}
-          </Text>
-          <Text style={{ width: 60 * vw, fontSize: 13, color: '#5F5F5F' }}>
-            {description}
-          </Text>
-          <Text style={{ fontSize: 16, color: 'black', marginTop: 3 }}>
-            {`${street} ${number}, ${zone}`}
-          </Text>
-          <View style={{ flex: 1 }} />
+            <Text
+              style={{
+                fontFamily: 'Nunito-SemiBold',
+                fontSize: 22,
+                color: 'black',
+              }}
+            >
+              {name}
+            </Text>
+            <Text style={{ height: 2 * vh, fontSize: 18, color: 'black' }}>
+              {category}
+            </Text>
+            <Text style={{ width: 60 * vw, fontSize: 13, color: '#5F5F5F' }}>
+              {description}
+            </Text>
+            <Text style={{ fontSize: 16, color: 'black', marginTop: 3 }}>
+              {`${street} ${number}, ${zone}`}
+            </Text>
+            <View style={{ flex: 1 }} />
+          </View>
         </View>
-      </View>
-    </PressedElement>
+      </PressedElement>
+    </Swipeout>
   );
 };

@@ -249,6 +249,7 @@ export const UserData = {
       const { recents } = user;
       // Probable efficiency leak
       const newRecents = recents.filter(val => val.uuid !== business.uuid);
+      console.log(newRecents);
       this.realm.create(
         'User',
         {
