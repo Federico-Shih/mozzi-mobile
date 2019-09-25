@@ -19,3 +19,8 @@ instalar react-native-cli como global
 
 
 usar .\react-native en vez de react-native
+
+
+PARA LINUX
+chmod 755 android/gradlew 
+ni idea por que
