@@ -17,7 +17,7 @@ import {
 } from 'react-native-elements';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-
+import { NavigationEvents } from 'react-navigation';
 
 import {
   getAppointments,
@@ -148,6 +148,13 @@ class MyAppointments extends Component<Props> {
     arrayAppointments.sort((a, b) => a.slot.day - b.slot.day);
     return (
       <View contentContainerStyle={styles.container}>
+        <NavigationEvents
+          onWillFocus={(payload) => {
+            if (payload.action.type === 'Navigation/NAVIGATE') {
+              this.loadAppointments();
+            }
+          }}
+        />
         <Header
           leftComponent={(
             <Button

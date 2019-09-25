@@ -89,6 +89,7 @@ export default class SearchBarSlideUp extends Component<Props> {
     const { open } = this.state;
     const { navigation } = this.props;
     if (open) {
+      this.close();
       this.resetSearch();
       return true;
     }
