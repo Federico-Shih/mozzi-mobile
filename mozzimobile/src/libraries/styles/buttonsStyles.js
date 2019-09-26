@@ -1,5 +1,8 @@
 import { StyleSheet } from 'react-native';
 import { fontType, platformBackColor } from './constants';
+import { units } from '../helpers';
+
+const { vw, vh } = units;
 
 export default StyleSheet.create({
   reglogButtonText: {
@@ -11,6 +14,7 @@ export default StyleSheet.create({
   reglogButton: {
     paddingVertical: 12,
     backgroundColor: '#5819E0',
+    height: vh * 7,
   },
   backButtonCont: {
     borderRadius: 50,

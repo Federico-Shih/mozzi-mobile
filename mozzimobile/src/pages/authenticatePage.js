@@ -411,11 +411,13 @@ class Authenticate extends Component<Props> {
       Animated.parallel([
         Animated.timing(this.slideValue, {
           toValue: 1,
-          slideDuration,
+          // eslint-disable-next-line no-underscore-dangle
+          duration: slideDuration * (1 - this.slideValue._value),
         }),
         Animated.timing(this.nativeSlideValue, {
           toValue: 1,
-          slideDuration,
+          // eslint-disable-next-line no-underscore-dangle
+          duration: slideDuration * (1 - this.slideValue._value),
           useNativeDriver: true,
         }),
       ]).start();
@@ -430,12 +432,14 @@ class Authenticate extends Component<Props> {
       Animated.parallel([
         Animated.timing(this.slideValue, {
           toValue: 0,
-          slideDuration,
+          // eslint-disable-next-line no-underscore-dangle
+          duration: slideDuration * this.slideValue._value,
           // useNativeDriver: true,
         }),
         Animated.timing(this.nativeSlideValue, {
           toValue: 0,
-          slideDuration,
+          // eslint-disable-next-line no-underscore-dangle
+          duration: slideDuration * this.slideValue._value,
           useNativeDriver: true,
         }),
       ]).start();
