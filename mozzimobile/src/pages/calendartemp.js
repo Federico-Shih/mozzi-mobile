@@ -65,15 +65,43 @@ function Box(props) {
 }
 
 function ShowImage({ length }) {
-  const imageSource = require('../assets/shisus.jpg');
+  const imageSource = require('../assets/images/noAppointmentsAvailable.png');
   if (length > 0) {
     return null;
   }
   return (
-    <Image
-      source={imageSource}
-      style={{ alignSelf: 'center', marginTop: vh * 15 }}
-    />
+    <View style={{ flex: 1, alignItems: 'center', marginTop: 15 * vh }}>
+      <Image
+        source={imageSource}
+        style={{
+          alignSelf: 'center',
+          height: 35 * vw,
+          width: 35 * vw,
+          shadowColor: 'black',
+          shadowOffset: { width: 0, height: 0.5 * 1 },
+          shadowOpacity: 0.3,
+          shadowRadius: 0.8 * 1,
+        }}
+      />
+      <Text style={{
+        fontFamily: 'Nunito-SemiBold', fontSize: 20, color: 'black', textAlign: 'center',
+      }}
+      >
+        No hay turnos
+      </Text>
+      <Text style={{
+        fontFamily: 'Nunito-SemiBold', fontSize: 20, color: 'black', textAlign: 'center',
+      }}
+      >
+        disponibles en este dia
+      </Text>
+      <Text style={{
+        fontFamily: 'Nunito-SemiBold', fontSize: 16, color: 'grey', textAlign: 'center',
+      }}
+      >
+         Intenta con otros días
+      </Text>
+    </View>
   );
 }
 

@@ -170,20 +170,43 @@ class Recents extends Component<Props> {
             {' '}
           </Text>
           <View style={{ flex: 1, alignItems: 'center' }}>
-            <FlatList
-              data={contentList}
-              keyExtractor={item => item.uuid}
-              renderItem={({ item }) => (
-                <BusinessButton
-                  item={item}
-                  navigation={navigation}
-                  onPress={() => {
-                    this.navToStore(item.uuid);
+            {
+              (contentList.length === 0) ? (
+                <View style={{
+                  flex: 1, height: 80 * vh, justifyContent: 'center', alignItems: 'center', paddingBottom: 150,
+                }}
+                >
+                  <Image
+                    style={{ width: 30 * vw, height: 30 * vw }}
+                    source={require('../assets/images/noRecents.png')}
+                  />
+                  <Text style={{
+                    fontFamily: 'Nunito-SemiBold', fontSize: 22, color: 'black', textAlign: 'center',
                   }}
-                  deleteBusiness={this.deleteBusiness}
+                  >
+                    No tienes negocios recientes todavía
+                  </Text>
+                  <Text style={{ fontFamily: 'Nunito-SemiBold' }}>
+              Empeza a buscar!
+                  </Text>
+                </View>
+              ) : (
+                <FlatList
+                  data={contentList}
+                  keyExtractor={item => item.uuid}
+                  renderItem={({ item }) => (
+                    <BusinessButton
+                      item={item}
+                      navigation={navigation}
+                      onPress={() => {
+                        this.navToStore(item.uuid);
+                      }}
+                      deleteBusiness={this.deleteBusiness}
+                    />
+                  )}
                 />
-              )}
-            />
+              )
+            }
           </View>
         </ScrollView>
         <SearchBarSlideUp
