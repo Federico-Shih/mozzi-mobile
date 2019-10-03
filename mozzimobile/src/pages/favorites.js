@@ -185,13 +185,19 @@ class Favorites extends Component<Props> {
                     source={require('../assets/images/noFavorites.png')}
                   />
                   <Text style={{
+                    fontFamily: 'Nunito-SemiBold', fontSize: 22, color: 'black', textAlign: 'center', marginTop: 10,
+                  }}
+                  >
+                    No tienes negocios
+                  </Text>
+                  <Text style={{
                     fontFamily: 'Nunito-SemiBold', fontSize: 22, color: 'black', textAlign: 'center',
                   }}
                   >
-                    No tienes negocios favoritos todavía
+                    favoritos todavía
                   </Text>
-                  <Text style={{ fontFamily: 'Nunito-SemiBold' }}>
-              Empeza a buscar!
+                  <Text style={{ fontFamily: 'Nunito-SemiBold', fontSize: 16 }}>
+                  Empezá a buscar!
                   </Text>
                 </View>
               ) : (

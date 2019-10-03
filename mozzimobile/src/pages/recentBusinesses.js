@@ -181,12 +181,18 @@ class Recents extends Component<Props> {
                     source={require('../assets/images/noRecents.png')}
                   />
                   <Text style={{
+                    fontFamily: 'Nunito-SemiBold', fontSize: 22, color: 'black', textAlign: 'center', marginTop: 10,
+                  }}
+                  >
+                    No tienes negocios
+                  </Text>
+                  <Text style={{
                     fontFamily: 'Nunito-SemiBold', fontSize: 22, color: 'black', textAlign: 'center',
                   }}
                   >
-                    No tienes negocios recientes todavía
+                    recientes todavía
                   </Text>
-                  <Text style={{ fontFamily: 'Nunito-SemiBold' }}>
+                  <Text style={{ fontFamily: 'Nunito-SemiBold', fontSize: 16 }}>
               Empeza a buscar!
                   </Text>
                 </View>

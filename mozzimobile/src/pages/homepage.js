@@ -266,66 +266,19 @@ class Homepage extends Component<Props> {
 const structure = [
   {
     title: 'Recientes',
-    items: [
-      {
-        title: 'tienda 1',
-        desc: 'no se',
-      },
-      {
-        title: 'tienda 1',
-        desc: 'no se',
-      },
-      {
-        title: 'tienda 1',
-        desc: 'no se',
-      },
-    ],
+    items:  [],
   },
 
   {
     title: 'Favoritos',
     items: [],
   },
-  {
-    title: 'Recientes',
-    items: [
-      {
-        title: 'tienda 1',
-        desc: 'no se',
-      },
-      {
-        title: 'tienda 1',
-        desc: 'no se',
-      },
-      {
-        title: 'tienda 1',
-        desc: 'no se',
-      },
-    ],
-  },
-  {
-    title: 'Recientes',
-    items: [
-      {
-        title: 'tienda 1',
-        desc: 'no se',
-      },
-      {
-        title: 'tienda 1',
-        desc: 'no se',
-      },
-      {
-        title: 'tienda 1',
-        desc: 'no se',
-      },
-    ],
-  },
 ];
 
 // TO CHANGE ELEMENTS THAT WILL BE DISPLAYED ON THE MAINSECTION OF THE MAINPAGE
 function MainSection(props) {
   const listCards = structure.map((el, i) => (
-    <Card title={el.title} key={i}>
+    <Card title={el.title} key={i} containerStyle={{ height: 30 * vh }}>
       {el.items.map((stores, k) => (
         <ListItem key={k} title={stores.title} />
       ))}
