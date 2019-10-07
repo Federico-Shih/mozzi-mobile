@@ -48,6 +48,8 @@ const ScreenSizeWidth = Dimensions.get('window').width;
 
 const slideDuration = 500;
 
+const minSlideDuration = 200;
+
 class Authenticate extends Component<Props> {
   state = {
     isLoginShow: true,
@@ -110,7 +112,7 @@ class Authenticate extends Component<Props> {
     const eventState = state === State.END || state === State.CANCELLED;
     if (eventState) {
       const { isLoginShow } = this.state;
-      if (this.threshholdReached || Math.abs(velocityX) > 100) {
+      if (this.threshholdReached) {
         if (isLoginShow && velocityX < 0) this.changeToRegister();
         else if (!isLoginShow && velocityX > 0) this.changeToLogin();
         this.threshholdReached = false;
@@ -123,7 +125,7 @@ class Authenticate extends Component<Props> {
   };
 
   onPanGestureEvent = (e) => {
-    const { translationX } = e.nativeEvent;
+    const { translationX, velocityX } = e.nativeEvent;
     const { isLoginShow } = this.state;
     if (Math.abs(translationX) <= maxSlideDistance) {
       if (
@@ -133,15 +135,19 @@ class Authenticate extends Component<Props> {
         const slideX = Math.abs(translationX) / maxSlideDistance;
         this.slideValue.setValue(slideX);
         this.nativeSlideValue.setValue(slideX);
-        if (1 - slideX < 0.4) {
+        if (slideX >= 0.4) {
           this.threshholdReached = true;
+        } else {
+          this.threshholdReached = false;
         }
       } else if (!isLoginShow && translationX > 0) {
         const slideX = 1 - Math.abs(translationX) / maxSlideDistance;
         this.slideValue.setValue(slideX);
         this.nativeSlideValue.setValue(slideX);
-        if (1 - slideX > 0.6) {
+        if (1 - slideX >= 0.4) {
           this.threshholdReached = true;
+        } else {
+          this.threshholdReached = false;
         }
       }
     }
@@ -405,19 +411,20 @@ class Authenticate extends Component<Props> {
 
   changeToRegister = (override) => {
     const { isLoginShow } = this.state;
+    // eslint-disable-next-line no-underscore-dangle
+    const animDuration = (slideDuration - minSlideDuration) * (1 - this.slideValue._value) + minSlideDuration;
     if (isLoginShow || override) {
       Keyboard.dismiss();
       this.setState({ isLoginShow: false });
       Animated.parallel([
         Animated.timing(this.slideValue, {
           toValue: 1,
-          // eslint-disable-next-line no-underscore-dangle
-          duration: slideDuration * (1 - this.slideValue._value),
+          duration: animDuration,
         }),
         Animated.timing(this.nativeSlideValue, {
           toValue: 1,
           // eslint-disable-next-line no-underscore-dangle
-          duration: slideDuration * (1 - this.slideValue._value),
+          duration: animDuration,
           useNativeDriver: true,
         }),
       ]).start();
@@ -426,6 +433,8 @@ class Authenticate extends Component<Props> {
 
   changeToLogin = (override) => {
     const { isLoginShow } = this.state;
+    // eslint-disable-next-line no-underscore-dangle
+    const animDuration = (slideDuration - minSlideDuration) * (this.slideValue._value) + minSlideDuration;
     if (!isLoginShow || override) {
       Keyboard.dismiss();
       this.setState({ isLoginShow: true });
@@ -433,13 +442,13 @@ class Authenticate extends Component<Props> {
         Animated.timing(this.slideValue, {
           toValue: 0,
           // eslint-disable-next-line no-underscore-dangle
-          duration: slideDuration * this.slideValue._value,
+          duration: animDuration,
           // useNativeDriver: true,
         }),
         Animated.timing(this.nativeSlideValue, {
           toValue: 0,
           // eslint-disable-next-line no-underscore-dangle
-          duration: slideDuration * this.slideValue._value,
+          duration: animDuration,
           useNativeDriver: true,
         }),
       ]).start();
