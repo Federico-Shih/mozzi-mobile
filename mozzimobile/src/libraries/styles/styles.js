@@ -60,7 +60,10 @@ export default StyleSheet.create({
     borderColor: '#AAAAAA',
     width: '100%',
     alignSelf: 'center',
-    height: 5 * vh,
+  },
+  inputTextStyle: {
+    fontFamily: 'Nunito-SemiBold',
+    fontWeight: '100',
   },
   popup: {
     flexDirection: 'row',
