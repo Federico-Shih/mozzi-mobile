@@ -16,7 +16,7 @@ import { validateEmail, errorMessages } from '../libraries/helpers';
 // import { recoverPassword } from '../libraries/connect/auth';
 import styles from '../libraries/styles/styles';
 import buttonStyle from '../libraries/styles/buttonsStyles';
-import { StyledTitle, Popup } from '../libraries/props';
+import { Popup } from '../libraries/props';
 import { LOADING } from '../actions';
 
 type Props = {};
@@ -258,7 +258,9 @@ class ForgotPassword extends Component<Props> {
           this.resetErrorPopup(true);
         }}
       >
-        <StyledTitle text="Recuperar Contraseña" style={styles.logregTitle} />
+        <Text style={styles.logregTitle}>
+          Recuperar Contraseña
+        </Text>
 
         <Input
           keyboardType="email-address"
