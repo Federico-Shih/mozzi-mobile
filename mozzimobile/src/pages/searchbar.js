@@ -11,6 +11,7 @@ import {
   BackHandler,
 } from 'react-native';
 import React, { Component } from 'react';
+import { NavigationEvents } from 'react-navigation';
 import {
   SearchBar,
   Button,
@@ -136,6 +137,7 @@ export default class SearchBarSlideUp extends Component<Props> {
   }
 
   open() {
+    this.textInput.focus();
     this.setState({
       open: true,
     });
@@ -158,6 +160,17 @@ export default class SearchBarSlideUp extends Component<Props> {
           top: anim,
         }}
       >
+        <NavigationEvents
+          onWillFocus={(payload) => {
+            this.resetSearch();
+            if (payload.action.type === 'Navigation/POP') {
+              this.close();
+              this.resetSearch();
+            } else if (payload.action.type === 'Navigation/BACK') {
+              this.addGoBackEvent();
+            }
+          }}
+        />
         <Button
           icon={(
             <Icon

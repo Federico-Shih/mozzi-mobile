@@ -88,6 +88,8 @@ class Business extends Component<Props> {
     favorite: false,
   };
 
+  titleSize = 0;
+
   // Validates props
   static propTypes = {
     token: PropTypes.string.isRequired,
@@ -114,8 +116,8 @@ class Business extends Component<Props> {
       });
     } else {
       const { business: response } = data.data;
+      this.titleSize = Math.min((80 * vw) / response.name.length, 30);
       this.setState({ business: response });
-      console.log(response);
       if (UserData.checkUser(user.uuid)) {
         UserData.updateUserRecents({
           uuid: user.uuid,
@@ -275,11 +277,13 @@ class Business extends Component<Props> {
           >
             <Text
               style={{
-                fontSize: 30,
                 color: 'black',
                 fontFamily: 'Nunito-SemiBold',
                 top: 22 * vw,
                 left: 2 * vw,
+                width: vw * 53,
+                height: 100,
+                fontSize: this.titleSize,
               }}
             >
               {business.name}

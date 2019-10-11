@@ -109,14 +109,14 @@ class Authenticate extends Component<Props> {
   }
 
   handleStateChange = ({ nativeEvent }) => {
-    const { state, velocityX } = nativeEvent;
+    const { state, translationX } = nativeEvent;
     console.log(nativeEvent);
     const eventState = state === State.END || state === State.CANCELLED;
     if (eventState) {
       const { isLoginShow } = this.state;
       if (this.threshholdReached) {
-        if (isLoginShow && velocityX < 0) this.changeToRegister();
-        else if (!isLoginShow && velocityX > 0) this.changeToLogin();
+        if (isLoginShow && translationX < 0) this.changeToRegister();
+        else if (!isLoginShow && translationX > 0) this.changeToLogin();
         this.threshholdReached = false;
       } else if (isLoginShow) {
         this.changeToLogin(true);

@@ -17,7 +17,6 @@ import {
 import PropTypes from 'prop-types';
 import { ScrollView } from 'react-native-gesture-handler';
 import { connect } from 'react-redux';
-import { NavigationEvents } from 'react-navigation';
 
 import {
   errorMessages,
@@ -130,18 +129,6 @@ class Homepage extends Component<Props> {
     const { collections } = this.state;
     return (
       <View style={{ flex: 1 }}>
-        <NavigationEvents
-          onWillFocus={(payload) => {
-            const { current } = this.searchModal;
-            current.resetSearch();
-            if (payload.action.type === 'Navigation/POP') {
-              current.close();
-              current.resetSearch();
-            } else if (payload.action.type === 'Navigation/BACK') {
-              current.addGoBackEvent();
-            }
-          }}
-        />
         <KeyboardAvoidingView style={styles.avoidContainer}>
           <Header
             leftComponent={(
@@ -266,7 +253,7 @@ class Homepage extends Component<Props> {
 const structure = [
   {
     title: 'Recientes',
-    items:  [],
+    items: [],
   },
 
   {
