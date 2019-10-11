@@ -60,7 +60,7 @@ const business = {
 };
 
 const collections = {
-  name: 'Odontologos',
+  name: 'lol',
   businesses: [],
   id: 'huh',
 };

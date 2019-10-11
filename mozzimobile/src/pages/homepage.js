@@ -183,22 +183,23 @@ class Homepage extends Component<Props> {
             <View
               style={{
                 height: vh * 23,
-                width: 100 * vw,
+                width: 92 * vw,
                 marginTop: 2 * vh,
                 flexDirection: 'row',
                 flexWrap: 'wrap',
                 justifyContent: 'center',
                 alignItems: 'center',
+                alignSelf: 'center',
               }}
             >
               {collections.map(el => (
                 <View
                   key={el.uuid}
                   style={{
-                    marginVertical: 10,
-                    marginHorizontal: 8,
                     alignItems: 'center',
                     justifyContent: 'center',
+                    width: 23 * vw,
+                    height: 23 * vw,
                   }}
                 >
                   <View

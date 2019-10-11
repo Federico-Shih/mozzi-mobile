@@ -137,7 +137,6 @@ export default class SearchBarSlideUp extends Component<Props> {
   }
 
   open() {
-    this.textInput.focus();
     this.setState({
       open: true,
     });
