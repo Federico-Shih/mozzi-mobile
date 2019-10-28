@@ -19,6 +19,7 @@ import {
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
+import { ADD_BUSINESS_UUID } from '../actions';
 import styles from '../libraries/styles/styles';
 import { BackButton, SearchButton, BusinessButton } from '../libraries/props';
 import { platformBackColor } from '../libraries/styles/constants';

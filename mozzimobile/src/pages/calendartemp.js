@@ -42,6 +42,11 @@ function getNextDay(nDays) {
   return new Date(date.setSeconds(date.getSeconds() + 60 * 60 * 24 * nDays));
 }
 
+const CustomButton = Platform.select({
+  ios: TouchableOpacity,
+  android: TouchableNativeFeedback,
+});
+
 function Box(props) {
   const { element } = props;
   return (
@@ -304,25 +309,16 @@ class CalendarPage extends Component<Props> {
               const style = item.selected
                 ? styles.dateStyleSelected
                 : styles.dateStyle;
-              return Platform.select({
-                ios: (
-                  <TouchableOpacity onPress={() => this.selectDate(item.date)}>
-                    <View style={item.style}>
-                      <Box element={item} />
-                    </View>
-                  </TouchableOpacity>
-                ),
-                android: (
-                  <TouchableNativeFeedback
-                    background={TouchableNativeFeedback.Ripple('#CCC')}
-                    onPress={() => this.selectDate(item)}
-                  >
-                    <View style={style}>
-                      <Box element={item} />
-                    </View>
-                  </TouchableNativeFeedback>
-                ),
-              });
+              return (
+                <CustomButton
+                  background={TouchableNativeFeedback.Ripple('#CCC')}
+                  onPress={() => this.selectDate(item)}
+                >
+                  <View style={style}>
+                    <Box element={item} />
+                  </View>
+                </CustomButton>
+              );
             }}
           />
         </View>
@@ -365,7 +361,7 @@ class CalendarPage extends Component<Props> {
                     <Text
                       style={{ fontSize: 25, fontFamily: 'Nunito-SemiBold' }}
                     >
-                      {`${newTime(0, item.end)} - ${newTime(0, item.start)}`}
+                      {`${newTime(0, item.start)} - ${newTime(0, item.end)}`}
                     </Text>
                   </View>
                 );
@@ -383,17 +379,27 @@ class CalendarPage extends Component<Props> {
                 >
                   <View
                     style={{
-                      backgroundColor: 'rgba(50, 50, 200, 0.3)',
-                      borderRadius: 20,
+                      // backgroundColor: 'rgba(50, 50, 200, 0.3)',
+                      // borderRadius: 20,
                       height: 25,
                       paddingVertical: 5,
                       paddingHorizontal: 5,
                       alignItems: 'center',
                       marginRight: 5,
-                      top: -2,
+                      top: -8,
                     }}
                   >
-                    <Text>{item.time}</Text>
+                    <Text style={
+                      {
+                        fontSize: 16,
+                        fontFamily: 'Nunito-SemiBold',
+                        color: 'black',
+                      }
+                    }
+                    >
+                      {item.time}
+
+                    </Text>
                   </View>
                   <View style={{ flexDirection: 'column' }}>
                     <View

@@ -20,6 +20,7 @@ import {
 } from 'react-native-elements';
 import PropTypes from 'prop-types';
 import { ScrollView } from 'react-native-gesture-handler';
+import update from 'immutability-helper';
 
 import styles from '../libraries/styles/styles';
 import { getStores } from '../libraries/connect/businessCalls';
@@ -41,6 +42,9 @@ export default class SearchBarSlideUp extends Component<Props> {
     loading: false,
     searchResults: [],
     open: false,
+    style: {
+      underlineColor: '#C4C4C4',
+    },
   };
 
   static propTypes = {
@@ -144,7 +148,7 @@ export default class SearchBarSlideUp extends Component<Props> {
 
   render() {
     const {
-      anim, search, loading, searchResults,
+      anim, search, loading, searchResults, style,
     } = this.state;
     const { token } = this.props;
     return (
@@ -232,18 +236,32 @@ export default class SearchBarSlideUp extends Component<Props> {
             // CHANGE WHEN API IS HERE
             this.setState({ loading: false });
           }}
-          round
           containerStyle={{
             width: '90%',
-            height: 60,
             backgroundColor: platformBackColor,
             borderWidth: 0,
             borderBottomWidth: 0,
             borderTopWidth: 0,
           }}
-        />
-        <Divider
-          style={{ backgroundColor: '#DDDDDD', width: '100%', height: 2 }}
+          inputContainerStyle={{
+            backgroundColor: platformBackColor,
+            borderBottomColor: style.underlineColor,
+            borderBottomWidth: 2,
+            borderRadius: 0,
+          }}
+          inputStyle={{
+            height: 30,
+            marginTop: 0,
+            marginBottom: 0,
+            paddingTop: 0,
+            paddingBottom: 0,
+          }}
+          onFocus={() => {
+            this.setState({ style: update(style, { underlineColor: { $set: '#4D9DE6' } }) });
+          }}
+          onBlur={() => {
+            this.setState({ style: update(style, { underlineColor: { $set: '#C4C4C4' } }) });
+          }}
         />
         <ScrollView
           style={{

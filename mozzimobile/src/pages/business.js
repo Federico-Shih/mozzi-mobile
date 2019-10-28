@@ -54,12 +54,21 @@ function Services({ el }) {
   return (
     <View style={{ color: 'black' }}>
       <View style={{ flex: 1, flexDirection: 'row' }}>
-        <View>
-          <Text style={{ fontSize: 16 }}>{el.name}</Text>
-          <Text>{`${formatted}`}</Text>
+        <View style={{
+          flexDirection: 'column', justifyContent: 'flex-start', height: '100%',
+        }}
+        >
+          <Text style={{ fontSize: 16, color: '#000000', fontFamily: 'Nunito-SemiBold' }}>{el.name}</Text>
+          <Text style={{ fontFamily: 'Nunito-SemiBold' }}>{`${formatted}`}</Text>
+          <View style={{ flex: 1 }} />
         </View>
         <View style={{ flex: 1 }} />
-        <Text style={{ marginRight: 10 }}>{`$ ${el.price}`}</Text>
+        <Text style={{
+          marginRight: 30, alignSelf: 'center', fontSize: 20, color: 'black', fontFamily: 'Nunito-SemiBold',
+        }}
+        >
+          {`$ ${el.price}`}
+        </Text>
       </View>
     </View>
   );
@@ -199,10 +208,10 @@ class Business extends Component<Props> {
             <Divider
               style={{
                 height: 1.5,
-                width: '100%',
+                width: '90%',
                 marginTop: 5,
                 marginLeft: 10,
-                backgroundColor: '#E8E8E8',
+                backgroundColor: 'grey',
               }}
             />
 
@@ -229,7 +238,7 @@ class Business extends Component<Props> {
                     <Divider
                       style={{
                         height: 1,
-                        width: '100%',
+                        width: '90%',
                         backgroundColor: 'grey',
                         marginLeft: 10,
                       }}

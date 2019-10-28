@@ -1,4 +1,4 @@
-import { newTime } from '../helpers';
+import { newTime, sendPopup } from '../helpers';
 
 const axios = require('axios');
 const newUUID = require('uuid');
@@ -169,7 +169,7 @@ export const getServiceTimes = ({ service, token, day }) => new Promise(async (r
     (day.date.getTime() - new Date().getTimezoneOffset() * 60 * 1000)
         / 8.64e7,
   );
-  const asd = await axios.post(
+  const response = await axios.post(
     `${serverSettings.serverURL}/graphql`,
     {
       query: `
@@ -204,27 +204,26 @@ export const getServiceTimes = ({ service, token, day }) => new Promise(async (r
     },
   );
 
-  if ('errors' in asd) {
-    resolve(asd);
+  if ('errors' in response) {
+    resolve(response);
   }
 
-  const { data } = asd.data;
+  const { data } = response.data;
   if (data.viewSlots === null) {
     resolve(new Map());
   } else {
+    // ADDING SLOTS
     const newMap = new Map();
-    let prevSchedule = '';
     const { viewSlots } = data;
+    let prevSchedule = '';
     for (let i = 0; i < viewSlots.length; i += 1) {
       const {
         start, schedule, available, uuid,
       } = viewSlots[i];
-      if (prevSchedule === '') {
-        prevSchedule = schedule.uuid;
-      } else if (schedule.uuid !== prevSchedule) {
+      if (schedule.uuid !== prevSchedule) {
         newMap.set(newMap.size, {
           start: schedule.start,
-          end: viewSlots[i - 1].schedule.finish,
+          end: schedule.finish,
         });
         prevSchedule = schedule.uuid;
       }
