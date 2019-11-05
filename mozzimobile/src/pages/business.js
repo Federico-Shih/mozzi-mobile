@@ -5,6 +5,7 @@ import {
   TouchableNativeFeedback,
   Platform,
   ActivityIndicator,
+  BackHandler,
   ScrollView,
 } from 'react-native';
 import React, { Component } from 'react';
@@ -25,7 +26,7 @@ import {
   SELECT_SERVICE,
   REMOVE_SERVICE,
 } from '../actions';
-import { getBusiness } from '../libraries/connect/businessCalls';
+import { getBusiness } from '../libraries/connect/business-calls';
 
 type Props = {};
 
@@ -116,7 +117,14 @@ class Business extends Component<Props> {
     /*
     basic catch and then when get Business receives the API call
     */
-    const { token, uuid, user } = this.props;
+    const {
+      token, uuid, user, navigation,
+    } = this.props;
+    this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      navigation.goBack();
+      this.updateFavoriteStatus();
+      return true;
+    });
     const business = await getBusiness({ token, uuid });
     const { data } = business;
     if (data.errors) {
@@ -126,17 +134,18 @@ class Business extends Component<Props> {
     } else {
       const { business: response } = data.data;
       this.titleSize = Math.min((80 * vw) / response.name.length, 30);
-      this.setState({ business: response });
+      const favorites = UserData.getFavorites(user.uuid);
+      let isFavorite = false;
+      for (let i = 0; i < favorites.length; i += 1) {
+        if (favorites[i].uuid === uuid) isFavorite = true;
+      }
+      this.setState({ business: response, favorite: isFavorite });
       if (UserData.checkUser(user.uuid)) {
         UserData.updateUserRecents({
           uuid: user.uuid,
           business: {
-            name: response.name,
-            description: response.description,
+            ...response,
             uuid,
-            street: response.street,
-            number: response.number,
-            zone: response.zone,
             category: response.category ? response.category : '',
           },
         });
@@ -144,18 +153,43 @@ class Business extends Component<Props> {
     }
   };
 
+  componentWillUnmount = () => {
+    this.backHandler.remove();
+  }
+
+  updateFavoriteStatus = () => {
+    const { favorite, business } = this.state;
+    const { user, uuid } = this.props;
+    console.log(favorite);
+    if (favorite) {
+      UserData.updateUserFavorites({
+        uuid: user.uuid,
+        business: {
+          ...business,
+          uuid,
+          category: business.category ? business.category : '',
+        },
+      });
+    } else {
+      UserData.removeUserFavorites({
+        uuid: user.uuid,
+        business: {
+          uuid,
+        },
+      });
+    }
+  }
+
   toggleFavorite = (business) => {
     const { favorite } = this.state;
     const { user } = this.props;
     this.setState({ favorite: !favorite });
-    if (favorite) {
-      UserData.removeUserFavorites({ uuid: user.uuid, business });
-    }
   };
 
   // Depending on the service id, navigates to the calendar and uses redux to save the service selected
   navToCalendar = (id) => {
     const { addService, navigation } = this.props;
+    this.updateFavoriteStatus();
     addService(id);
     navigation.navigate('Calendar');
   };
@@ -168,7 +202,7 @@ class Business extends Component<Props> {
       street, zone, number, postal,
     } = business;
 
-    const alphabetizedList = alphabetize(business.services);
+    // const alphabetizedList = alphabetize(business.services);
     return (
       <View style={styles.container}>
         <View
@@ -360,6 +394,7 @@ class Business extends Component<Props> {
             })}
             size={28}
             onPress={() => {
+              this.updateFavoriteStatus();
               navigateToSearcher();
               navigation.goBack();
             }}

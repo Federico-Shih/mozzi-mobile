@@ -1,13 +1,13 @@
 import business from './business';
-import calendar from './calendartemp';
+import calendar from './calendar-template';
 import homepage from './homepage';
-import forgotPassword from './forgotPassword';
-import recentBusinesses from './recentBusinesses';
-import turns from './myAppointments';
-import profile from './myProfile';
+import forgotPassword from './forgot-password';
+import recentBusinesses from './recent-businesses';
+import turns from './my-appointments';
+import profile from './my-profile';
 import configuration from './configuration';
 import favorites from './favorites';
-import authenticate from './authenticatePage';
+import authenticate from './authenticate-page';
 
 export const HomePage = homepage;
 export const Business = business;

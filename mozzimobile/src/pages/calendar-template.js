@@ -22,10 +22,11 @@ import styles from '../libraries/styles/styles';
 import {
   getServiceTimes,
   sendAppointment,
-} from '../libraries/connect/businessCalls';
+} from '../libraries/connect/business-calls';
 import {
   errorMessages, sendPopup, newTime, units,
 } from '../libraries/helpers';
+import noAppointmentsAvailable from '../assets/images/noAppointmentsAvailable.png';
 
 const { vh, vw } = units;
 
@@ -70,7 +71,7 @@ function Box(props) {
 }
 
 function ShowImage({ length }) {
-  const imageSource = require('../assets/images/noAppointmentsAvailable.png');
+  const imageSource = noAppointmentsAvailable;
   if (length > 0) {
     return null;
   }
@@ -194,7 +195,7 @@ class CalendarPage extends Component<Props> {
     }
   };
 
-  showAlert = ({ selectedTime, selectedDate }) => new Promise((resolve, reject) => {
+  showAlert = ({ selectedTime, selectedDate }) => new Promise((resolve) => {
     Alert.alert(
       'Confirmar',
       `Confirmas el turno reservado el dia ${selectedDate.date.toLocaleDateString(
@@ -240,22 +241,22 @@ class CalendarPage extends Component<Props> {
     setLoading(false);
   };
 
-  selectTime = (newTime) => {
+  selectTime = (incomingTime) => {
     const { data, selectedTime } = this.state;
     if (
-      !newTime.selected
-      && !newTime.occupied
-      && !(newTime.key === selectedTime.key)
+      !incomingTime.selected
+      && !incomingTime.occupied
+      && !(incomingTime.key === selectedTime.key)
     ) {
       const newTimes = data;
-      data.set(newTime.index, { ...data.get(newTime.index), selected: true });
+      data.set(incomingTime.index, { ...data.get(incomingTime.index), selected: true });
       if (selectedTime !== '') {
         data.set(selectedTime.index, {
           ...data.get(selectedTime.index),
           selected: false,
         });
       }
-      this.setState({ selectedTime: newTime, data: newTimes });
+      this.setState({ selectedTime: incomingTime, data: newTimes });
     }
   };
 

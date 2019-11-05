@@ -17,7 +17,7 @@ import Swipeout from 'react-native-swipeout';
 
 import { units } from './helpers';
 import styles from './styles/styles';
-import buttonStyles from './styles/buttonsStyles';
+import buttonStyles from './styles/button-styles';
 import { REMOVE_TOKEN, REMOVE_USER } from '../actions';
 
 type Props = {};

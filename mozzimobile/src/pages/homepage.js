@@ -34,7 +34,7 @@ import {
 } from '../actions';
 import { SearchButton } from '../libraries/props';
 import styles from '../libraries/styles/styles';
-import { getStores, getCollections } from '../libraries/connect/businessCalls';
+import { getStores, getCollections } from '../libraries/connect/business-calls';
 import { getProfile } from '../libraries/connect/auth';
 import SearchBarSlideUp from './searchbar';
 

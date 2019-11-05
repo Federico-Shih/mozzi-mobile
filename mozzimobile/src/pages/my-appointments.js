@@ -65,18 +65,22 @@ class MyAppointments extends Component<Props> {
 
   loadAppointments = async () => {
     const { token } = this.props;
-    const { data } = await getAppointments({ token });
-    console.log(data);
-    if (data.errors) {
-      data.errors.forEach((el) => {
-        sendPopup(el.message);
+    try {
+      const { data } = await getAppointments({ token });
+      if (data.errors) {
+        data.errors.forEach((el) => {
+          sendPopup(el.message);
+        });
+      }
+      const appointments = new Map();
+      data.data.me.appointments.forEach((appointment) => {
+        appointments.set(appointment.uuid, appointment);
       });
+      this.setState({ appointments });
+    } catch (e) {
+      alert(JSON.stringify(e));
     }
-    const appointments = new Map();
-    data.data.me.appointments.forEach((appointment) => {
-      appointments.set(appointment.uuid, appointment);
-    });
-    this.setState({ appointments, loaded: true });
+    this.setState({ loaded: true });
   };
 
   appointmentDelete = async (appointment) => {

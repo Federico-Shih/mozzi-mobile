@@ -23,7 +23,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import update from 'immutability-helper';
 
 import styles from '../libraries/styles/styles';
-import { getStores } from '../libraries/connect/businessCalls';
+import { getStores } from '../libraries/connect/business-calls';
 import { sendPopup, errorMessages } from '../libraries/helpers';
 import { platformBackColor } from '../libraries/styles/constants';
 

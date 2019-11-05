@@ -33,7 +33,7 @@ import { register, login } from '../libraries/connect/auth';
 
 import styles from '../libraries/styles/styles';
 import { LOADING, GET_TOKEN } from '../actions';
-import buttonStyle from '../libraries/styles/buttonsStyles';
+import buttonStyle from '../libraries/styles/button-styles';
 
 const SpecialButton = Platform.select({
   ios: TouchableHighlight,
@@ -127,7 +127,7 @@ class Authenticate extends Component<Props> {
   };
 
   onPanGestureEvent = (e) => {
-    const { translationX, velocityX } = e.nativeEvent;
+    const { translationX } = e.nativeEvent;
     const { isLoginShow } = this.state;
     if (Math.abs(translationX) <= maxSlideDistance) {
       if (

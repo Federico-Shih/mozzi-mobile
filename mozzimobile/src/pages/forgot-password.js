@@ -15,7 +15,7 @@ import PropTypes from 'prop-types';
 import { validateEmail, errorMessages } from '../libraries/helpers';
 // import { recoverPassword } from '../libraries/connect/auth';
 import styles from '../libraries/styles/styles';
-import buttonStyle from '../libraries/styles/buttonsStyles';
+import buttonStyle from '../libraries/styles/button-styles';
 import { Popup } from '../libraries/props';
 import { LOADING } from '../actions';
 
