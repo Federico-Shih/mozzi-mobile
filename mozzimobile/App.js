@@ -8,7 +8,6 @@ import {
 } from 'react-native';
 import Toast from 'react-native-easy-toast';
 import { EventRegister } from 'react-native-event-listeners';
-import { Icon } from 'react-native-elements';
 
 import * as scr from './src/pages/pages';
 import reducer from './src/reducer';

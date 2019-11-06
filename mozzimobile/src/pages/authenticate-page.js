@@ -10,7 +10,6 @@ import {
   Animated,
   TouchableNativeFeedback,
   TouchableHighlight,
-  TextInput,
   ScrollView,
 } from 'react-native';
 import React, { Component } from 'react';
@@ -78,6 +77,10 @@ class Authenticate extends Component<Props> {
 
   threshholdReached = false;
 
+  registerFocus = [];
+
+  loginFocus = [];
+
   registerError = {
     name: '',
     surname: '',
@@ -103,6 +106,17 @@ class Authenticate extends Component<Props> {
     email: styles.inputText,
     password: styles.inputText,
   };
+
+  constructor(props) {
+    super(props);
+    for (let i = 0; i < 2; i += 1) {
+      this.registerFocus.push(React.createRef());
+      this.loginFocus.push(React.createRef());
+    }
+    for (let i = 0; i < 3; i += 1) {
+      this.registerFocus.push(React.createRef());
+    }
+  }
 
   async componentDidMount() {
     await UserData.loadRealm();
@@ -369,6 +383,21 @@ class Authenticate extends Component<Props> {
     }
   };
 
+  nextFocus = (currentRef) => {
+    const { isLoginShow } = this.state;
+    if (isLoginShow) {
+      const currentIndex = this.loginFocus.indexOf(currentRef);
+      if (currentIndex !== 1) {
+        this.loginFocus[currentIndex + 1].current.input.focus();
+      }
+    } else {
+      const currentIndex = this.registerFocus.indexOf(currentRef);
+      if (currentIndex !== 4) {
+        this.registerFocus[currentIndex + 1].current.input.focus();
+      }
+    }
+  }
+
   // Create account function
   checkAndRegister = async () => {
     const checkPass = await this.checkIfValidPasswordAndSet();
@@ -625,6 +654,7 @@ class Authenticate extends Component<Props> {
                   keyboardType="email-address"
                   placeholder="Email"
                   inputStyle={styles.inputTextStyle}
+                  ref={this.loginFocus[0]}
                   onChangeText={(text) => {
                     this.setState({
                       loginState: update(loginState, {
@@ -632,8 +662,12 @@ class Authenticate extends Component<Props> {
                       }),
                     });
                   }}
-                  onSubmitEditing={() => {
-                    this.checkIfValidEmailAndSet();
+                  blurOnSubmit={false}
+                  onSubmitEditing={async () => {
+                    const isValid = await this.checkIfValidEmailAndSet();
+                    if (isValid) {
+                      this.nextFocus(this.loginFocus[0]);
+                    }
                   }}
                   inputContainerStyle={{ ...this.loginStyle.email }}
                   leftIcon={{
@@ -652,6 +686,7 @@ class Authenticate extends Component<Props> {
                   secureTextEntry={!showPassLogin}
                   placeholder="Password"
                   inputStyle={styles.inputTextStyle}
+                  ref={this.loginFocus[1]}
                   onChangeText={(text) => {
                     this.setState({
                       loginState: update(loginState, {
@@ -659,8 +694,8 @@ class Authenticate extends Component<Props> {
                       }),
                     });
                   }}
-                  onSubmitEditing={() => {
-                    this.checkIfValidPasswordAndSet();
+                  onSubmitEditing={async () => {
+                    const isValid = await this.checkIfValidPasswordAndSet();
                   }}
                   inputContainerStyle={{ ...this.loginStyle.password }}
                   leftIcon={{
@@ -755,6 +790,7 @@ class Authenticate extends Component<Props> {
                 <Input
                   placeholder="Name"
                   inputStyle={styles.inputTextStyle}
+                  ref={this.registerFocus[0]}
                   onChangeText={(text) => {
                     this.setState({
                       registerState: update(registerState, {
@@ -766,9 +802,13 @@ class Authenticate extends Component<Props> {
                   inputContainerStyle={{
                     ...this.registerStyle.name,
                   }}
-                  onSubmitEditing={() => {
-                    this.checkIfInputIsEmpty('name');
+                  onSubmitEditing={async () => {
+                    const isValid = await this.checkIfInputIsEmpty('name');
+                    if (isValid) {
+                      this.nextFocus(this.registerFocus[0]);
+                    }
                   }}
+                  blurOnSubmit={false}
                   leftIcon={{
                     type: 'material',
                     name: 'account-circle',
@@ -782,6 +822,7 @@ class Authenticate extends Component<Props> {
                 <Input
                   placeholder="Surname"
                   inputStyle={styles.inputTextStyle}
+                  ref={this.registerFocus[1]}
                   onChangeText={(text) => {
                     this.setState({
                       registerState: update(registerState, {
@@ -791,9 +832,13 @@ class Authenticate extends Component<Props> {
                   }}
                   value={surname}
                   inputContainerStyle={{ ...this.registerStyle.surname }}
-                  onSubmitEditing={() => {
-                    this.checkIfInputIsEmpty('surname');
+                  onSubmitEditing={async () => {
+                    const isValid = await this.checkIfInputIsEmpty('surname');
+                    if (isValid) {
+                      this.nextFocus(this.registerFocus[1]);
+                    }
                   }}
+                  blurOnSubmit={false}
                   leftIcon={{
                     type: 'material',
                     name: 'perm-identity',
@@ -808,6 +853,7 @@ class Authenticate extends Component<Props> {
                   keyboardType="email-address"
                   placeholder="Email"
                   inputStyle={styles.inputTextStyle}
+                  ref={this.registerFocus[2]}
                   onChangeText={(text) => {
                     this.setState({
                       registerState: update(registerState, {
@@ -815,8 +861,11 @@ class Authenticate extends Component<Props> {
                       }),
                     });
                   }}
-                  onSubmitEditing={() => {
-                    this.checkIfValidEmailAndSet();
+                  onSubmitEditing={async () => {
+                    const isValid = await this.checkIfValidEmailAndSet();
+                    if (isValid) {
+                      this.nextFocus(this.registerFocus[2]);
+                    }
                   }}
                   inputContainerStyle={{ ...this.registerStyle.email }}
                   leftIcon={{
@@ -824,6 +873,7 @@ class Authenticate extends Component<Props> {
                     name: 'email',
                     color: '#AAAAAA',
                   }}
+                  blurOnSubmit={false}
                 />
                 <View style={{ height: 20 }}>
                   {this.displayErrorMessage('email')}
@@ -832,6 +882,7 @@ class Authenticate extends Component<Props> {
                   secureTextEntry={!showPassRegister}
                   placeholder="Password"
                   inputStyle={styles.inputTextStyle}
+                  ref={this.registerFocus[3]}
                   onChangeText={(text) => {
                     this.setState({
                       registerState: update(registerState, {
@@ -850,8 +901,11 @@ class Authenticate extends Component<Props> {
                       }}
                     />
 )}
-                  onSubmitEditing={() => {
-                    this.checkIfValidPasswordAndSet();
+                  onSubmitEditing={async () => {
+                    const isValid = await this.checkIfValidPasswordAndSet();
+                    if (isValid) {
+                      this.nextFocus(this.registerFocus[3]);
+                    }
                   }}
                   inputContainerStyle={{ ...this.registerStyle.password }}
                   leftIcon={{
@@ -867,6 +921,7 @@ class Authenticate extends Component<Props> {
                   secureTextEntry={!showConfirmRegister}
                   inputStyle={styles.inputTextStyle}
                   placeholder="Confirm Password"
+                  ref={this.registerFocus[4]}
                   onChangeText={(text) => {
                     this.setState({
                       registerState: update(registerState, {

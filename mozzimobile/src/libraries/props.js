@@ -342,6 +342,7 @@ export const BusinessButton = ({
   item, navigation, onPress, deleteBusiness,
 }) => {
   const {
+    // eslint-disable-next-line react/prop-types
     name, category, description, street, number, zone, uuid,
   } = item;
   return (
@@ -378,6 +379,7 @@ export const BusinessButton = ({
                 fontSize: 22,
                 color: 'black',
               }}
+              numberOfLines={2}
             >
               {name}
             </Text>
