@@ -138,6 +138,56 @@ export const getBusiness = ({ uuid, token }) => axios.post(
 });
 */
 
+export const addFavorite = ({ businessId, token }) => new Promise(async (resolve) => {
+  const response = await axios.post(
+    `${serverSettings.serverURL}/graphql`,
+    {
+      query: `
+            mutation AddFavorite($business: ID!) {
+              favoriteAdd(business: $business) {
+                uuid
+              }
+            }
+        `,
+      variables: {
+        business: businessId,
+      },
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token,
+      },
+    },
+  );
+  resolve(response);
+});
+
+export const removeFavorite = async ({ businessId, token}) => {
+  const response = await axios.post(
+    `${serverSettings.serverURL}/graphql`,
+    {
+      query: `
+            mutation RemoveFavorite($business: ID!) {
+              favoriteDelete(business: $business) {
+                uuid
+              }
+            }
+        `,
+      variables: {
+        business: businessId,
+      },
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token,
+      },
+    },
+  );
+  resolve(response);
+}
+
 // To replace when booking appointment info is present
 export const sendAppointment = ({ slot, token }) => new Promise(async (resolve, reject) => {
   const lol = await axios.post(

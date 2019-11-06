@@ -60,6 +60,7 @@ class Favorites extends Component<Props> {
     this.searchModal = React.createRef();
     this.onRefresh = this.onRefresh.bind(this);
     this.navToStore = this.navToStore.bind(this);
+    this.deleteBusiness = this.deleteBusiness.bind(this);
   }
 
   componentDidMount = () => {
@@ -79,6 +80,12 @@ class Favorites extends Component<Props> {
     navigateToBusiness(uuid);
     navigation.navigate('Business');
   };
+
+  deleteBusiness(business) {
+    const { user } = this.props;
+    UserData.removeUserFavorites({ uuid: user.uuid, business });
+    this.onRefresh();
+  }
 
   toggle() {
     const { navigation } = this.props;
@@ -212,6 +219,7 @@ class Favorites extends Component<Props> {
                       onPress={() => {
                         this.navToStore(item.uuid);
                       }}
+                      deleteBusiness={this.deleteBusiness}
                     />
                   )}
                 />
