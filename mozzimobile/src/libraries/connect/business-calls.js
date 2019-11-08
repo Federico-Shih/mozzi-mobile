@@ -163,7 +163,7 @@ export const addFavorite = ({ businessId, token }) => new Promise(async (resolve
   resolve(response);
 });
 
-export const removeFavorite = async ({ businessId, token}) => {
+export const removeFavorite = async ({ businessId, token }) => {
   const response = await axios.post(
     `${serverSettings.serverURL}/graphql`,
     {
@@ -186,7 +186,7 @@ export const removeFavorite = async ({ businessId, token}) => {
     },
   );
   resolve(response);
-}
+};
 
 // To replace when booking appointment info is present
 export const sendAppointment = ({ slot, token }) => new Promise(async (resolve, reject) => {
@@ -212,6 +212,39 @@ export const sendAppointment = ({ slot, token }) => new Promise(async (resolve, 
     },
   );
   resolve(lol);
+});
+
+export const getRandomBusinesses = ({ token, limit }) => new Promise(async (resolve) => {
+  const response = await axios.post(
+    `${serverSettings.serverURL}/graphql`,
+    {
+      query: `
+            query random($limit: Int!) {
+              businessesRandom(limit: $limit) {
+                uuid
+                name
+                street
+                number
+                zone
+                description
+              }
+            }
+        `,
+      variables: {
+        limit,
+      },
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token,
+      },
+    },
+  ).catch(() => {
+    sendPopup('Server Error');
+  });
+
+  resolve(response.data.data.businessesRandom.map(el => ({ ...el, key: newUUID() })));
 });
 
 export const getServiceTimes = ({ service, token, day }) => new Promise(async (resolve, reject) => {
@@ -296,42 +329,6 @@ export const getServiceTimes = ({ service, token, day }) => new Promise(async (r
     }
     resolve(newMap);
   }
-
-  /*
-available: true
-day: 18136
-finish: 1060
-schedule:
-day: 3
-finish: 1090
-start: 1000
-uuid: "8b896b1d-cd8f-4b87-a123-f2b9c13ec99e"
-__proto__: Object
-start: 1030
-uuid: "cbe3f562-d189-44ed-aad5-20984109dbd9"
-  */
-
-  /*
-  const start = 8; // What time starts the service
-  const end = 20; // What hour it ends
-  const interval = 60; // Interval between each service
-  const intervals = (end - start) * (60 / interval); // Amount of intervals in the day
-  const returnVal = new Map(); // Element mapped to an index so you can find it directly
-
-  // Fills the map with the intervals
-  for (let i = 0; i <= intervals; i += 1) {
-    const key = newUuid();
-    returnVal.set(i, {
-      time: newTime(start, i * interval),
-      occupied: false,
-      selected: false,
-      key,
-      index: i,
-      isLast: i === intervals,
-    });
-  }
-  resolve(returnVal);
-  */
 });
 
 /*

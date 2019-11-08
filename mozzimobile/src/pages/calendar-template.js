@@ -24,7 +24,7 @@ import {
   sendAppointment,
 } from '../libraries/connect/business-calls';
 import {
-  errorMessages, sendPopup, newTime, units,
+  errorMessages, sendPopup, newTime, units, Calendar, UserData,
 } from '../libraries/helpers';
 import noAppointmentsAvailable from '../assets/images/noAppointmentsAvailable.png';
 
@@ -153,6 +153,7 @@ class CalendarPage extends Component<Props> {
       token,
       day: initialDate,
     });
+
     this.checkForErrors(data);
     this.setState({ dates, selectedDate: initialDate, data });
   };
@@ -210,7 +211,9 @@ class CalendarPage extends Component<Props> {
   });
 
   saveAppointment = async () => {
-    const { setLoading, token, navigation } = this.props;
+    const {
+      setLoading, token, navigation, user,
+    } = this.props;
     const { selectedDate, selectedTime } = this.state;
 
     setLoading(true);
@@ -227,6 +230,13 @@ class CalendarPage extends Component<Props> {
             slot: selectedTime.key,
           });
           if (!('errors' in saved.data)) {
+            const subStrings = selectedTime.time.split(':');
+            const time = selectedDate.date;
+            time.setHours(subStrings[0], subStrings[1], 0);
+        
+            const business = UserData.getRecents(user.uuid)[0];
+            // alert(time.toISOString());
+            Calendar.saveEvent(business, time.toISOString());
             navigation.pop(2);
           } else {
             saved.data.errors.forEach((el) => {
@@ -502,6 +512,7 @@ function mapStateToProps(state) {
     loading: state.loading,
     token: state.token,
     uuid: state.businessUuid,
+    user: state.user,
     service: state.service,
   };
 }

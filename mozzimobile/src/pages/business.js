@@ -160,7 +160,6 @@ class Business extends Component<Props> {
   updateFavoriteStatus = () => {
     const { favorite, business } = this.state;
     const { user, uuid } = this.props;
-    console.log(favorite);
     if (favorite) {
       UserData.updateUserFavorites({
         uuid: user.uuid,

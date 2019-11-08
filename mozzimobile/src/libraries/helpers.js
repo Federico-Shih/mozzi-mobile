@@ -1,5 +1,6 @@
 import { PermissionsAndroid, Platform, Dimensions } from 'react-native';
 import { EventRegister } from 'react-native-event-listeners';
+import RNCalendarEvents from 'react-native-calendar-events';
 
 const Realm = require('realm');
 
@@ -117,6 +118,21 @@ export const grantingPermissions = Platform.select({
     }
   }),
 });
+
+export const Calendar = {
+  saveEvent: async ({
+    name, street, number, zone,
+  }, dateTime) => {
+    const res = await RNCalendarEvents.saveEvent(`Turno en ${name}`, {
+      startDate: dateTime,
+      allDay: true,
+      description: `Tenes un turno en ${name} a las ${new Date(dateTime)} en ${street} ${number}, ${zone}`,
+      location: `${street} ${number}, ${zone}`,
+    }).catch((_) => {
+      sendPopup('Calendar error');
+    });
+  },
+};
 
 const UserSchema = {
   name: 'User',

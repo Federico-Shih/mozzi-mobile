@@ -16,6 +16,7 @@
     "qs": "^6.8.0",
     "react": "16.8.3",
     "react-native": "^0.59.9",
+    "react-native-calendar-events": "^1.7.3",
     "react-native-cli": "^2.0.1",
     "react-native-datepicker": "^1.7.2",
     "react-native-easy-toast": "^1.2.0",

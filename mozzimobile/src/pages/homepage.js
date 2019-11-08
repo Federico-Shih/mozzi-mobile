@@ -5,6 +5,7 @@ import {
   Platform,
   TouchableOpacity,
   TouchableNativeFeedback,
+  FlatList,
 } from 'react-native';
 import React, { Component } from 'react';
 import {
@@ -13,6 +14,7 @@ import {
   Icon,
   Card,
   ListItem,
+  Image,
 } from 'react-native-elements';
 import PropTypes from 'prop-types';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -34,7 +36,7 @@ import {
 } from '../actions';
 import { SearchButton } from '../libraries/props';
 import styles from '../libraries/styles/styles';
-import { getStores, getCollections } from '../libraries/connect/business-calls';
+import { getStores, getCollections, getRandomBusinesses } from '../libraries/connect/business-calls';
 import { getProfile } from '../libraries/connect/auth';
 import SearchBarSlideUp from './searchbar';
 
@@ -64,6 +66,7 @@ class Homepage extends Component<Props> {
   state = {
     searchBarIsOpen: false,
     collections: [],
+    recommended: [],
   };
 
   constructor(props) {
@@ -95,7 +98,8 @@ class Homepage extends Component<Props> {
     }
 
     const collections = await getCollections({ token });
-    this.setState({ collections });
+    const recommended = await getRandomBusinesses({ token, limit: 5 });
+    this.setState({ collections, recommended });
   }
 
   toggle() {
@@ -126,7 +130,7 @@ class Homepage extends Component<Props> {
 
   render() {
     const { navigation, token, navigateToBusiness } = this.props;
-    const { collections } = this.state;
+    const { collections, recommended } = this.state;
     return (
       <View style={{ flex: 1 }}>
         <KeyboardAvoidingView style={styles.avoidContainer}>
@@ -180,6 +184,9 @@ class Homepage extends Component<Props> {
                 }}
               />
             </View>
+            {
+              /*
+            }
             <View
               style={{
                 height: vh * 23,
@@ -236,7 +243,8 @@ class Homepage extends Component<Props> {
                 </View>
               ))}
             </View>
-            <MainSection />
+            */ }
+            <MainSection recommended={recommended} navigation={navigation} navUUID={navigateToBusiness} />
           </ScrollView>
         </KeyboardAvoidingView>
         <SearchBarSlideUp
@@ -265,6 +273,72 @@ const structure = [
 
 // TO CHANGE ELEMENTS THAT WILL BE DISPLAYED ON THE MAINSECTION OF THE MAINPAGE
 function MainSection(props) {
+  const { recommended, navUUID, navigation } = props;
+  const onPress = (uuid) => {
+    navUUID(uuid);
+    navigation.navigate('Business');
+  };
+  const recommendedList = (
+    <View style={{ top: 30 }}>
+      <Text style={{
+        fontFamily: 'Nunito-SemiBold', fontSize: 20, color: '#000000', left: 20,
+      }}
+      >
+        Sugerencias
+      </Text>
+      {
+        recommended.map(({
+          name, uuid, category, description, street, number, zone, key,
+        }) => (
+          <MyButton onPress={() => onPress(uuid)} key={key}>
+            <View
+              style={{
+                height: 16 * vh,
+                width: 100 * vw,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Image
+                source={{ uri: 'https://semantic-ui.com/images/wireframe/image.png' }}
+                style={{ width: 14 * vh, height: 14 * vh }}
+              />
+              <View
+                style={{
+                  marginVertical: 1 * vh,
+                  marginLeft: 14,
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: 'Nunito-SemiBold',
+                    fontSize: 22,
+                    color: 'black',
+                  }}
+                  numberOfLines={2}
+                >
+                  {name}
+                </Text>
+                <Text style={{ height: 2 * vh, fontSize: 18, color: 'black' }}>
+                  {category}
+                </Text>
+                <Text style={{ width: 60 * vw, fontSize: 13, color: '#5F5F5F' }}>
+                  {description}
+                </Text>
+                <Text style={{ fontSize: 16, color: 'black', marginTop: 3 }}>
+                  {`${street} ${number}, ${zone}`}
+                </Text>
+                <View style={{ flex: 1 }} />
+              </View>
+            </View>
+          </MyButton>
+        ))
+      }
+    </View>
+
+  );
+  /*
   const listCards = structure.map((el, i) => (
     <Card title={el.title} key={i} containerStyle={{ height: 30 * vh }}>
       {el.items.map((stores, k) => (
@@ -272,7 +346,8 @@ function MainSection(props) {
       ))}
     </Card>
   ));
-  return listCards;
+  */
+  return recommendedList;
 }
 
 function mapStateToProps(state) {
