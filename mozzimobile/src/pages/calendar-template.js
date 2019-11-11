@@ -230,13 +230,19 @@ class CalendarPage extends Component<Props> {
             slot: selectedTime.key,
           });
           if (!('errors' in saved.data)) {
-            const subStrings = selectedTime.time.split(':');
-            const time = selectedDate.date;
-            time.setHours(subStrings[0], subStrings[1], 0);
-        
             const business = UserData.getRecents(user.uuid)[0];
-            // alert(time.toISOString());
-            Calendar.saveEvent(business, time.toISOString());
+            const startTimeStrings = selectedTime.time.split(':');
+            const endTimeStrings = selectedTime.endTime.split(':');
+        
+            const startTime = new Date(selectedDate.date);
+            startTime.setHours(0, 0, 0);
+            startTime.setHours(parseInt(startTimeStrings[0], 10), parseInt(startTimeStrings[1], 10), 0);
+        
+            const endTime = new Date(selectedDate.date);
+            endTime.setHours(0, 0, 0);
+            endTime.setHours(parseInt(endTimeStrings[0], 10), parseInt(endTimeStrings[1], 10), 0);
+
+            Calendar.saveEvent(business, { startDate: startTime.toISOString(), endDate: endTime.toISOString() });
             navigation.pop(2);
           } else {
             saved.data.errors.forEach((el) => {

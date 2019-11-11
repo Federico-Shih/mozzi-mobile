@@ -122,15 +122,22 @@ export const grantingPermissions = Platform.select({
 export const Calendar = {
   saveEvent: async ({
     name, street, number, zone,
-  }, dateTime) => {
+  }, { startDate, endDate }) => {
     const res = await RNCalendarEvents.saveEvent(`Turno en ${name}`, {
-      startDate: dateTime,
+      startDate,
+      endDate,
       allDay: true,
-      description: `Tenes un turno en ${name} a las ${new Date(dateTime)} en ${street} ${number}, ${zone}`,
+      description: `Tenes un turno en ${name} a las ${new Date(startDate)} hs en ${street} ${number}, ${zone}`,
       location: `${street} ${number}, ${zone}`,
     }).catch((_) => {
       sendPopup('Calendar error');
     });
+
+    const initial = new Date(2019, 9, 1)
+    const end = new Date(2020, 1, 1)  
+
+    // const events = await RNCalendarEvents.fetchAllEvents(initial.toISOString(), end.toISOString());
+    const events = await RNCalendarEvents.findEventById(res);
   },
 };
 

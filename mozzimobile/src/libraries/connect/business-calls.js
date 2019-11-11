@@ -301,7 +301,7 @@ export const getServiceTimes = ({ service, token, day }) => new Promise(async (r
     let prevSchedule = '';
     for (let i = 0; i < viewSlots.length; i += 1) {
       const {
-        start, schedule, available, uuid,
+        start, schedule, available, uuid, finish,
       } = viewSlots[i];
       if (schedule.uuid !== prevSchedule) {
         newMap.set(newMap.size, {
@@ -324,6 +324,7 @@ export const getServiceTimes = ({ service, token, day }) => new Promise(async (r
         selected: false,
         key: uuid,
         index: newMap.size,
+        endTime: newTime(0, finish),
         isLast,
       });
     }
