@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import React, { Component } from 'react';
+import React, { Component, Fragment, createRef } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import {
@@ -20,13 +20,13 @@ import { platformBackColor } from '../libraries/styles/constants';
 import { REMOVE_SERVICE, LOADING } from '../actions';
 import styles from '../libraries/styles/styles';
 import {
-  getServiceTimes,
-  sendAppointment,
+  getServiceTimes, sendAppointment,
 } from '../libraries/connect/business-calls';
 import {
   errorMessages, sendPopup, newTime, units, Calendar, UserData,
 } from '../libraries/helpers';
 import noAppointmentsAvailable from '../assets/images/noAppointmentsAvailable.png';
+import { MozziAlert } from '../libraries/props';
 
 const { vh, vw } = units;
 
@@ -136,6 +136,11 @@ class CalendarPage extends Component<Props> {
   };
   // { title: 'Title Text', key: 'item5', style: styles.dateStyle },
 
+  constructor(props) {
+    super(props);
+    this.alert = React.createRef();
+  }
+
   componentDidMount = async () => {
     const { service, token } = this.props;
     const dates = new Map();
@@ -197,6 +202,9 @@ class CalendarPage extends Component<Props> {
   };
 
   showAlert = ({ selectedTime, selectedDate }) => new Promise((resolve) => {
+    this.alert.current.show();
+    resolve();
+    /*
     Alert.alert(
       'Confirmar',
       `Confirmas el turno reservado el dia ${selectedDate.date.toLocaleDateString(
@@ -208,6 +216,7 @@ class CalendarPage extends Component<Props> {
         { text: 'Confirmar', onPress: () => resolve(true) },
       ],
     );
+    */
   });
 
   saveAppointment = async () => {
@@ -233,11 +242,11 @@ class CalendarPage extends Component<Props> {
             const business = UserData.getRecents(user.uuid)[0];
             const startTimeStrings = selectedTime.time.split(':');
             const endTimeStrings = selectedTime.endTime.split(':');
-        
+
             const startTime = new Date(selectedDate.date);
             startTime.setHours(0, 0, 0);
             startTime.setHours(parseInt(startTimeStrings[0], 10), parseInt(startTimeStrings[1], 10), 0);
-        
+
             const endTime = new Date(selectedDate.date);
             endTime.setHours(0, 0, 0);
             endTime.setHours(parseInt(endTimeStrings[0], 10), parseInt(endTimeStrings[1], 10), 0);
@@ -282,233 +291,241 @@ class CalendarPage extends Component<Props> {
     const mapDates = dates instanceof Map ? Array.from(dates.values()) : [];
     const mapTimes = data instanceof Map ? Array.from(data.values()) : [];
     return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: platformBackColor,
-          flexDirection: 'column',
-          justifyContent: 'flex-end',
-        }}
-      >
-        <Icon
-          name={Platform.select({
-            ios: 'arrow-back-ios',
-            android: 'arrow-back',
-          })}
-          size={25}
-          onPress={() => navigation.goBack()}
-          color="black"
-          containerStyle={{
-            borderRadius: 50,
-            flexDirection: 'row',
-            justifyContent: 'flex-start',
-            marginLeft: 5,
-            marginTop: 5,
-          }}
-          iconStyle={{
-            padding: 8,
-          }}
-          underlayColor="rgba(1,1,1, 0.2)"
-        />
+      <Fragment>
+        <MozziAlert ref={this.alert} />
 
         <View
           style={{
-            height: vh * 15,
-            marginLeft: 20,
+            flex: 1,
+            backgroundColor: platformBackColor,
+            flexDirection: 'column',
+            justifyContent: 'flex-end',
           }}
         >
-          <FlatList
-            data={mapDates}
-            showsHorizontalScrollIndicator={false}
-            horizontal
-            style={{}}
-            renderItem={({ item }) => {
-              const style = item.selected
-                ? styles.dateStyleSelected
-                : styles.dateStyle;
-              return (
-                <CustomButton
-                  background={TouchableNativeFeedback.Ripple('#CCC')}
-                  onPress={() => this.selectDate(item)}
-                >
-                  <View style={style}>
-                    <Box element={item} />
-                  </View>
-                </CustomButton>
-              );
+          <Icon
+            name={Platform.select({
+              ios: 'arrow-back-ios',
+              android: 'arrow-back',
+            })}
+            size={25}
+            onPress={() => navigation.goBack()}
+            color="black"
+            containerStyle={{
+              borderRadius: 50,
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              marginLeft: 5,
+              marginTop: 5,
             }}
+            iconStyle={{
+              padding: 8,
+            }}
+            underlayColor="rgba(1,1,1, 0.2)"
           />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Divider />
-          <ShowImage length={mapTimes.length} />
-          <Timeline
-            data={mapTimes}
-            style={{ marginHorizontal: 20 }}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={(element) => {
-              const {
-                props, item, isLast, index, key,
-              } = element;
-              let frameStyle = styles.timeFrame;
+          <Text style={{
+            letterSpacing: 3, fontFamily: 'Nunito-SemiBold', fontSize: 18, alignSelf: 'center', color: 'black',
+          }}
+          >
+            MES
+          </Text>
+          <View
+            style={{
+              height: vh * 15,
+            }}
+          >
+            <FlatList
+              data={mapDates}
+              showsHorizontalScrollIndicator={false}
+              horizontal
+              style={{}}
+              renderItem={({ item }) => {
+                const style = item.selected
+                  ? styles.dateStyleSelected
+                  : styles.dateStyle;
+                return (
+                  <CustomButton
+                    background={TouchableNativeFeedback.Ripple('#CCC')}
+                    onPress={() => this.selectDate(item)}
+                  >
+                    <View style={style}>
+                      <Box element={item} />
+                    </View>
+                  </CustomButton>
+                );
+              }}
+            />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Divider />
+            <ShowImage length={mapTimes.length} />
+            <Timeline
+              data={mapTimes}
+              style={{ }}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={(element) => {
+                const {
+                  props, item, isLast, index, key,
+                } = element;
+                let frameStyle = styles.timeFrame;
 
-              if (item.occupied) {
-                frameStyle = {
-                  ...styles.timeFrame,
-                  ...styles.timeFrameOccupied,
-                };
-              }
+                if (item.occupied) {
+                  frameStyle = {
+                    ...styles.timeFrame,
+                    ...styles.timeFrameOccupied,
+                  };
+                }
 
-              if (item.selected) {
-                frameStyle = {
-                  ...styles.timeFrame,
-                  ...styles.timeFrameSelected,
-                };
-              }
+                if (item.selected) {
+                  frameStyle = {
+                    ...styles.timeFrame,
+                    ...styles.timeFrameSelected,
+                  };
+                }
 
-              if (item.end) {
+                if (item.end) {
+                  return (
+                    <View
+                      style={{
+                        width: 100 * vw,
+                        paddingVertical: 20,
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Text
+                        style={{ fontSize: 25, fontFamily: 'Nunito-SemiBold' }}
+                      >
+                        {`${newTime(0, item.start)} - ${newTime(0, item.end)}`}
+                      </Text>
+                    </View>
+                  );
+                }
+
+                const firstPadding = index === 0 ? 5 : 0;
                 return (
                   <View
+                    key={key}
                     style={{
-                      width: '100%',
-                      paddingVertical: 20,
-                      alignItems: 'center',
+                      flexDirection: 'row',
+                      paddingTop: firstPadding,
+                      width: 100 * vw,
                     }}
                   >
-                    <Text
-                      style={{ fontSize: 25, fontFamily: 'Nunito-SemiBold' }}
-                    >
-                      {`${newTime(0, item.start)} - ${newTime(0, item.end)}`}
-                    </Text>
-                  </View>
-                );
-              }
-
-              const firstPadding = index === 0 ? 5 : 0;
-              return (
-                <View
-                  key={key}
-                  style={{
-                    flexDirection: 'row',
-                    paddingTop: firstPadding,
-                    width: '100%',
-                  }}
-                >
-                  <View
-                    style={{
+                    <View
+                      style={{
                       // backgroundColor: 'rgba(50, 50, 200, 0.3)',
                       // borderRadius: 20,
-                      height: 25,
-                      paddingVertical: 5,
-                      paddingHorizontal: 5,
-                      alignItems: 'center',
-                      marginRight: 5,
-                      top: -8,
-                    }}
-                  >
-                    <Text style={
+                        height: 25,
+                        paddingVertical: 5,
+                        paddingHorizontal: 5,
+                        alignItems: 'center',
+                        marginRight: 5,
+                        top: -8,
+                      }}
+                    >
+                      <Text style={
                       {
                         fontSize: 16,
                         fontFamily: 'Nunito-SemiBold',
                         color: 'black',
                       }
                     }
-                    >
-                      {item.time}
+                      >
+                        {item.time}
 
-                    </Text>
-                  </View>
-                  <View style={{ flexDirection: 'column' }}>
-                    <View
-                      style={{
-                        backgroundColor: props.circleColor,
-                        width: 20,
-                        height: 20,
-                        borderRadius: 50,
-                      }}
-                    />
+                      </Text>
+                    </View>
+                    <View style={{ flexDirection: 'column' }}>
+                      <View
+                        style={{
+                          backgroundColor: props.circleColor,
+                          width: 20,
+                          height: 20,
+                          borderRadius: 50,
+                        }}
+                      />
 
-                    <View
-                      style={{
-                        backgroundColor:
+                      <View
+                        style={{
+                          backgroundColor:
                           isLast || item.isLast
                             ? 'transparent'
                             : props.lineColor,
-                        width: props.lineWidth,
-                        height: 50,
-                        marginLeft: 9,
-                      }}
-                    />
+                          width: props.lineWidth,
+                          height: 50,
+                          marginLeft: 9,
+                        }}
+                      />
+                    </View>
+                    {Platform.select({
+                      ios: (
+                        <TouchableOpacity
+                          style={styles.timeSelectorButton}
+                          onPress={() => {
+                            this.selectTime(item);
+                          }}
+                        >
+                          <View style={frameStyle}>
+                            <Divider
+                              style={{ height: 1, backgroundColor: '#AAAAAA' }}
+                            />
+                          </View>
+                        </TouchableOpacity>
+                      ),
+                      android: (
+                        <TouchableNativeFeedback
+                          background={TouchableNativeFeedback.Ripple('#CCC')}
+                          onPress={() => {
+                            this.selectTime(item);
+                          }}
+                          style={{}}
+                        >
+                          <View style={frameStyle}>
+                            <Divider
+                              style={{ height: 1, backgroundColor: '#AAAAAA' }}
+                            />
+                          </View>
+                        </TouchableNativeFeedback>
+                      ),
+                    })}
                   </View>
-                  {Platform.select({
-                    ios: (
-                      <TouchableOpacity
-                        style={styles.timeSelectorButton}
-                        onPress={() => {
-                          this.selectTime(item);
-                        }}
-                      >
-                        <View style={frameStyle}>
-                          <Divider
-                            style={{ height: 1, backgroundColor: '#AAAAAA' }}
-                          />
-                        </View>
-                      </TouchableOpacity>
-                    ),
-                    android: (
-                      <TouchableNativeFeedback
-                        background={TouchableNativeFeedback.Ripple('#CCC')}
-                        onPress={() => {
-                          this.selectTime(item);
-                        }}
-                        style={{}}
-                      >
-                        <View style={frameStyle}>
-                          <Divider
-                            style={{ height: 1, backgroundColor: '#AAAAAA' }}
-                          />
-                        </View>
-                      </TouchableNativeFeedback>
-                    ),
-                  })}
-                </View>
-              );
-            }}
-          />
-          <Divider />
+                );
+              }}
+            />
+            <Divider />
 
-          <Button
-            containerStyle={{
-              width: 80,
-              height: 80,
-              marginTop: 20,
-              borderWidth: 1,
-              borderColor: 'transparent',
-              borderRadius: 50,
-              backgroundColor: 'white',
-              alignSelf: 'center',
-              shadowColor: '#000',
-              shadowOffset: {
-                width: 0,
-                height: 5,
-              },
-              shadowOpacity: 0.34,
-              shadowRadius: 6.27,
-              elevation: 10,
-              position: 'absolute',
-              bottom: 35,
-              right: 35,
-            }}
-            icon={<Icon name="done" size={60} color="#5819E0" />}
-            onPress={this.saveAppointment}
-            buttonStyle={{
-              height: '100%',
-              width: '100%',
-              backgroundColor: 'transparent',
-            }}
-          />
+            <Button
+              containerStyle={{
+                width: 80,
+                height: 80,
+                marginTop: 20,
+                borderWidth: 1,
+                borderColor: 'transparent',
+                borderRadius: 50,
+                backgroundColor: 'white',
+                alignSelf: 'center',
+                shadowColor: '#000',
+                shadowOffset: {
+                  width: 0,
+                  height: 5,
+                },
+                shadowOpacity: 0.34,
+                shadowRadius: 6.27,
+                elevation: 10,
+                position: 'absolute',
+                bottom: 35,
+                right: 35,
+              }}
+              icon={<Icon name="done" size={60} color="#5819E0" />}
+              onPress={this.saveAppointment}
+              buttonStyle={{
+                height: '100%',
+                width: '100%',
+                backgroundColor: 'transparent',
+              }}
+            />
+          </View>
         </View>
-      </View>
+      </Fragment>
     );
   }
 }

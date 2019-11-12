@@ -35,6 +35,8 @@ import {
 import { platformBackColor } from '../libraries/styles/constants';
 import { ADD_BUSINESS_UUID } from '../actions';
 
+const noAppointment = require('../assets/images/noAppointment.png');
+
 type Props = {};
 
 const {
@@ -91,7 +93,6 @@ class MyAppointments extends Component<Props> {
         token,
         uuid: appointment.uuid,
       });
-      console.log(resultsAPI);
       if (resultsAPI.data.data.appointmentDelete === '0') {
         this.setState((state) => {
           const newMap = state.appointments;
@@ -148,11 +149,12 @@ class MyAppointments extends Component<Props> {
 
     if (!loaded) {
       return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <ActivityIndicator size="large" color="#AAAAAA" />
         </View>
       );
     }
+
     if (appointmentList.length !== 0) {
       return (
         <FlatList
@@ -165,83 +167,89 @@ class MyAppointments extends Component<Props> {
             />
 )}
           keyExtractor={item => item.uuid}
-          renderItem={({ item }) => (
-            <View
-              key={item.uuid}
-              style={{ flexDirection: 'column', paddingLeft: 20 }}
-            >
-              <TouchButton
-                onPress={() => {
-                  this.navToStore(item.service.business.uuid);
-                }}
+          renderItem={({ item }) => {
+            const date = new Date(
+              item.slot.day * 24 * 60 * 60 * 1000
+          + item.slot.start * 60 * 1000,
+            );
+
+            return (
+              <View
+                key={item.uuid}
+                style={{ flexDirection: 'column', paddingLeft: 20 }}
               >
-                <View style={{ flexDirection: 'row' }}>
-                  <View
-                    style={{
-                      flexDirection: 'column',
-                      paddingLeft: 5,
-                    }}
-                  >
-                    <Text style={{ paddingTop: 5, fontSize: 20 }}>
-                      {item.service.business.name}
-                    </Text>
-                    <View style={{ flexDirection: 'row' }}>
-                      <Text
-                        style={{
-                          fontSize: 14,
-                          width: 100,
-                          alignSelf: 'center',
-                        }}
-                      >
-                        {item.service.name}
+                <TouchButton
+                  onPress={() => {
+                    this.navToStore(item.service.business.uuid);
+                  }}
+                >
+                  <View style={{ flexDirection: 'row' }}>
+                    <View
+                      style={{
+                        flexDirection: 'column',
+                        paddingLeft: 30,
+                      }}
+                    >
+                      <Text style={{ paddingTop: 5, fontSize: 20, color: 'black' }}>
+                        {item.service.business.name}
                       </Text>
-                      <Text style={{ alignSelf: 'center', fontSize: 20 }}>
+                      <View style={{ flexDirection: 'row' }}>
+                        <Text
+                          style={{
+                            fontSize: 14,
+                            width: 100,
+                            alignSelf: 'center',
+                          }}
+                        >
+                          {item.service.name}
+                        </Text>
+                      </View>
+                      <View style={{ flexDirection: 'row' }}>
+                        <Text>
+                          {`${date.getDate()}/${date.getMonth() + 1} `}
+                        </Text>
+                        <Text>
+                          {`${newTime(0, item.slot.start)}hs`}
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={{ flex: 1 }} />
+                    <View
+                      style={{
+                        flexDirection: 'column',
+                        marginRight: 10,
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <Text style={{
+                        alignSelf: 'center', fontSize: 20, color: 'black', fontFamily: 'Nunito-SemiBold',
+                      }}
+                      >
                         {`$${item.service.price}`}
                       </Text>
                     </View>
+                    <Icon
+                      name="clear"
+                      type="material"
+                      containerStyle={{
+                        justifyContent: 'center',
+                        marginRight: 10,
+                      }}
+                      iconStyle={{
+                        paddingHorizontal: 15,
+                        paddingVertical: 15,
+                        borderRadius: 50,
+                      }}
+                      onPress={() => {
+                        this.appointmentDelete(item);
+                      }}
+                    />
                   </View>
-                  <View style={{ flex: 1 }} />
-                  <View
-                    style={{
-                      flexDirection: 'column',
-                      marginRight: 10,
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Text>
-                      {new Date(
-                        item.slot.day * 24 * 60 * 60 * 1000
-                              + item.slot.start * 60 * 1000,
-                      ).toDateString()}
-                    </Text>
-                    <Text>
-                      {`${newTime(0, item.slot.start)}~${newTime(
-                        0,
-                        item.slot.finish,
-                      )}`}
-                    </Text>
-                  </View>
-                  <Icon
-                    name="clear"
-                    type="material"
-                    containerStyle={{
-                      justifyContent: 'center',
-                      marginRight: 10,
-                    }}
-                    iconStyle={{
-                      paddingHorizontal: 15,
-                      paddingVertical: 15,
-                      borderRadius: 50,
-                    }}
-                    onPress={() => {
-                      this.appointmentDelete(item);
-                    }}
-                  />
-                </View>
-              </TouchButton>
-              <Divider style={{ width: '100%' }} />
-            </View>
-          )}
+                </TouchButton>
+                <Divider style={{ width: '100%' }} />
+              </View>
+            );
+          }}
         />
       );
     }
@@ -256,10 +264,13 @@ class MyAppointments extends Component<Props> {
             />
 )}
         >
-          <View style={{ flex: 1, height: 80 * vh, justifyContent: 'center', alignItems: 'center', marginBottom: 30 }}>
+          <View style={{
+            flex: 1, height: 80 * vh, justifyContent: 'center', alignItems: 'center', marginBottom: 30,
+          }}
+          >
             <Image
               style={{ width: 30 * vw, height: 30 * vw }}
-              source={require('../assets/images/noAppointment.png')}
+              source={noAppointment}
             />
             <Text style={{ fontFamily: 'Nunito-SemiBold', fontSize: 25, color: 'black' }}>
               No tienes turnos todavía
@@ -319,18 +330,21 @@ class MyAppointments extends Component<Props> {
         >
           <Text
             style={{
-              fontSize: 36,
+              fontSize: 24,
               paddingLeft: 20,
+              paddingBottom: 21,
+              fontFamily: 'Nunito-SemiBold',
+              color: 'black',
             }}
           >
-            Turnos
+            Mis Turnos
           </Text>
-          <Divider style={{ height: 2, width: 100 * vw, marginLeft: 20 }} />
-          <View style={{ width: 100 * vw, height: 80 * vh }}>
+          <Divider style={{ height: 1, width: 100 * vw, marginLeft: 20 }} />
+          <ScrollView style={{ width: 100 * vw, height: 80 * vh }}>
             {
               this.displayAppointmentContent(arrayAppointments)
             }
-          </View>
+          </ScrollView>
         </View>
       </View>
     );
