@@ -5,9 +5,11 @@ import {
   Platform,
   TouchableNativeFeedback,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   Alert,
+  Modal,
 } from 'react-native';
-import React, { Component, Fragment, createRef } from 'react';
+import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import {
@@ -19,6 +21,7 @@ import Timeline from 'react-native-timeline-feed';
 import { platformBackColor } from '../libraries/styles/constants';
 import { REMOVE_SERVICE, LOADING } from '../actions';
 import styles from '../libraries/styles/styles';
+import buttonStyle from '../libraries/styles/button-styles';
 import {
   getServiceTimes, sendAppointment,
 } from '../libraries/connect/business-calls';
@@ -26,7 +29,6 @@ import {
   errorMessages, sendPopup, newTime, units, Calendar, UserData,
 } from '../libraries/helpers';
 import noAppointmentsAvailable from '../assets/images/noAppointmentsAvailable.png';
-import { MozziAlert } from '../libraries/props';
 
 const { vh, vw } = units;
 
@@ -121,6 +123,7 @@ class CalendarPage extends Component<Props> {
     selectedDate: '',
     data: [],
     selectedTime: '',
+    show: false,
   };
 
   static propTypes = {
@@ -134,12 +137,6 @@ class CalendarPage extends Component<Props> {
     service: PropTypes.string.isRequired,
     setLoading: PropTypes.func.isRequired,
   };
-  // { title: 'Title Text', key: 'item5', style: styles.dateStyle },
-
-  constructor(props) {
-    super(props);
-    this.alert = React.createRef();
-  }
 
   componentDidMount = async () => {
     const { service, token } = this.props;
@@ -201,25 +198,11 @@ class CalendarPage extends Component<Props> {
     }
   };
 
-  showAlert = ({ selectedTime, selectedDate }) => new Promise((resolve) => {
-    this.alert.current.show();
-    resolve();
-    /*
-    Alert.alert(
-      'Confirmar',
-      `Confirmas el turno reservado el dia ${selectedDate.date.toLocaleDateString(
-        'es-ES',
-        { dateStyle: 'full' },
-      )} a las ${selectedTime.time}`,
-      [
-        { text: 'Cancelar', onPress: () => resolve(false), style: 'cancel' },
-        { text: 'Confirmar', onPress: () => resolve(true) },
-      ],
-    );
-    */
-  });
+  showAlert = () => {
+    this.setState({ show: true });
+  };
 
-  saveAppointment = async () => {
+  saveAppointment = () => {
     const {
       setLoading, token, navigation, user,
     } = this.props;
@@ -232,39 +215,46 @@ class CalendarPage extends Component<Props> {
       sendPopup(errorMessages.noTimeSelected);
     } else {
       try {
-        const confirm = await this.showAlert(this.state);
-        if (confirm) {
-          const saved = await sendAppointment({
-            token,
-            slot: selectedTime.key,
-          });
-          if (!('errors' in saved.data)) {
-            const business = UserData.getRecents(user.uuid)[0];
-            const startTimeStrings = selectedTime.time.split(':');
-            const endTimeStrings = selectedTime.endTime.split(':');
-
-            const startTime = new Date(selectedDate.date);
-            startTime.setHours(0, 0, 0);
-            startTime.setHours(parseInt(startTimeStrings[0], 10), parseInt(startTimeStrings[1], 10), 0);
-
-            const endTime = new Date(selectedDate.date);
-            endTime.setHours(0, 0, 0);
-            endTime.setHours(parseInt(endTimeStrings[0], 10), parseInt(endTimeStrings[1], 10), 0);
-
-            Calendar.saveEvent(business, { startDate: startTime.toISOString(), endDate: endTime.toISOString() });
-            navigation.pop(2);
-          } else {
-            saved.data.errors.forEach((el) => {
-              sendPopup(el.message);
-            });
-          }
-        }
+        this.showAlert();
       } catch (e) {
         sendPopup('Alert error');
       }
     }
     setLoading(false);
   };
+
+  confirmAppointment = async () => {
+    const {
+      token, navigation, user,
+    } = this.props;
+    const { selectedDate, selectedTime } = this.state;
+
+    const saved = await sendAppointment({
+      token,
+      slot: selectedTime.key,
+    });
+    if (!('errors' in saved.data)) {
+      const business = UserData.getRecents(user.uuid)[0];
+      const startTimeStrings = selectedTime.time.split(':');
+      const endTimeStrings = selectedTime.endTime.split(':');
+
+      const startTime = new Date(selectedDate.date);
+      startTime.setHours(0, 0, 0);
+      startTime.setHours(parseInt(startTimeStrings[0], 10), parseInt(startTimeStrings[1], 10), 0);
+
+      const endTime = new Date(selectedDate.date);
+      endTime.setHours(0, 0, 0);
+      endTime.setHours(parseInt(endTimeStrings[0], 10), parseInt(endTimeStrings[1], 10), 0);
+
+      Calendar.saveEvent(business, { startDate: startTime.toISOString(), endDate: endTime.toISOString() });
+      this.setState({ show: false });
+      navigation.pop(2);
+    } else {
+      saved.data.errors.forEach((el) => {
+        sendPopup(el.message);
+      });
+    }
+  }
 
   selectTime = (incomingTime) => {
     const { data, selectedTime } = this.state;
@@ -285,15 +275,85 @@ class CalendarPage extends Component<Props> {
     }
   };
 
+  dismissModal = () => {
+    this.setState({ show: false });
+  }
+
   render() {
-    const { navigation } = this.props;
-    const { dates, data } = this.state;
+    const { navigation, serviceName } = this.props;
+    const {
+      dates, data, show, selectedDate, selectedTime,
+    } = this.state;
     const mapDates = dates instanceof Map ? Array.from(dates.values()) : [];
     const mapTimes = data instanceof Map ? Array.from(data.values()) : [];
     return (
       <Fragment>
-        <MozziAlert ref={this.alert} />
+        <View>
+          <Modal
+            animationType="fade"
+            visible={show}
+            transparent
+            onDismiss={() => { this.dismissModal(); }}
+            onRequestClose={() => { this.dismissModal(); }}
+          >
+            <TouchableWithoutFeedback
+              onPress={() => { this.dismissModal(); }}
+            >
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignContent: 'center',
+                  alignSelf: 'center',
+                  width: 100 * vw,
+                  backgroundColor: 'rgba(100, 100, 100, 0.7)',
+                  flex: 1,
+                }}
+              >
+                <View
+                  style={{
+                    width: 90 * vw,
+                    height: 300,
+                    backgroundColor: 'white',
+                    borderRadius: 15,
+                    alignSelf: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <View style={{
+                    margin: 38, alignItems: 'flex-start', height: 240, width: 72 * vw,
+                  }}
+                  >
+                    <Text style={{ fontFamily: 'Nunito-SemiBold', fontSize: 18, color: 'black' }}>Tu reserva es de</Text>
+                    <Text style={{
+                      color: 'black', fontSize: 22, fontFamily: 'Nunito-SemiBold', marginTop: 20,
+                    }}
+                    >
+                      {`${serviceName},`}
 
+                    </Text>
+                    <Text style={{ fontSize: 22, fontFamily: 'Nunito-SemiBold' }}>
+                      {`para el día ${
+                        (selectedDate.date) ? selectedDate.date.toLocaleDateString('es-ES', { dateStyle: 'full' }) : ''
+                      } a las ${selectedTime.time} hs`}
+                    </Text>
+                    <Button
+                      onPress={() => this.confirmAppointment()}
+                      titleStyle={{ ...buttonStyle.reglogButtonText, fontSize: 17 }}
+                      buttonStyle={{ ...buttonStyle.reglogButton, width: 72 * vw }}
+                      containerStyle={{
+                        marginTop: 4 * vh,
+                        alignSelf: 'center',
+                      }}
+                      raised
+                      type="outline"
+                      title="Confirmá tu turno"
+                    />
+                  </View>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
+        </View>
         <View
           style={{
             flex: 1,
@@ -537,6 +597,7 @@ function mapStateToProps(state) {
     uuid: state.businessUuid,
     user: state.user,
     service: state.service,
+    serviceName: state.serviceName,
   };
 }
 

@@ -9,3 +9,4 @@ export const SELECT_SERVICE = 'SELECT_SERVICE';
 export const REMOVE_SERVICE = 'REMOVE_SERVICE';
 export const ADD_USER = 'ADD_USER';
 export const REMOVE_USER = 'REMOVE_USER';
+export const ADD_SERVICE_NAME = 'ADD_SERVICE_NAME';

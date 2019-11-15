@@ -8,6 +8,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   TouchableNativeFeedback,
+  Modal,
 } from 'react-native';
 import { Button, Icon, Image } from 'react-native-elements';
 import PropTypes from 'prop-types';
@@ -246,87 +247,8 @@ function mapDispatchToProps(dispatch) {
 
 const duration = 1000;
 
-export class MozziAlert extends Component<Props> {
   state = {
-    animationLoad: new Animated.Value(0),
-    animationNonNative: new Animated.Value(0),
   }
-
-  constructor(props) {
-    super(props);
-    this.hide = this.hide.bind(this);
-  }
-
-  hide = () => {
-    Animated.parallel(
-      [
-        Animated.timing(
-          this.state.animationLoad,
-          {
-            toValue: 0,
-            duration,
-          },
-        ),
-        Animated.timing(
-          this.state.animationNonNative,
-          {
-            toValue: 0,
-            duration,
-          },
-        ),
-      ],
-    ).start();
-  }
-
-  show = () => {
-    Animated.parallel(
-      [
-        Animated.timing(
-          this.state.animationLoad,
-          {
-            toValue: 100,
-            duration,
-          },
-        ),
-        Animated.timing(
-          this.state.animationNonNative,
-          {
-            toValue: 100,
-            duration,
-          },
-        ),
-      ],
-    ).start();
-  }
-
-  render() {
-    const { animationLoad, animationNonNative } = this.state;
-    return (
-      <Animated.View
-        style={{
-          width: 100 * vw,
-          height: 100 * vh,
-          backgroundColor: 'black',
-          opacity: animationLoad.interpolate({
-            inputRange: [0, 100],
-            outputRange: [0, 0.6],
-          }),
-          zIndex: animationNonNative.interpolate({
-            inputRange: [0, 100],
-            outputRange: [0, 10],
-          }),
-          position: 'absolute',
-        }}
-        onStartShouldSetResponder={() => {
-          this.hide();
-        }}
-      >
-
-      </Animated.View>
-    );
-  }
-}
-
 const MenuProp = (props) => {
   const {
     user, navigation, removeToken, removeUser,

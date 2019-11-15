@@ -107,6 +107,12 @@ class Homepage extends Component<Props> {
     navigation.openDrawer();
   }
 
+  onPress = (uuid) => {
+    const { navigateToBusiness, navigation } = this.props;
+    navigateToBusiness(uuid);
+    navigation.navigate('Business');
+  };
+
   closeSearchBar() {
     const { current } = this.searchModal;
     const { navigation } = this.props;
@@ -184,67 +190,63 @@ class Homepage extends Component<Props> {
                 }}
               />
             </View>
-            {
-              /*
-            }
-            <View
-              style={{
-                height: vh * 23,
-                width: 92 * vw,
-                marginTop: 2 * vh,
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                justifyContent: 'center',
-                alignItems: 'center',
-                alignSelf: 'center',
-              }}
+            <Text style={{
+              fontFamily: 'Nunito-SemiBold', fontSize: 20, color: '#000000', left: 20, marginTop: 20,
+            }}
             >
-              {collections.map(el => (
-                <View
-                  key={el.uuid}
-                  style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: 23 * vw,
-                    height: 23 * vw,
-                  }}
-                >
-                  <View
-                    style={{
-                      borderRadius: 50,
-                      overflow: 'hidden',
-                      height: 14 * vmin,
-                      width: 14 * vmin,
-                      backgroundColor: '#6A32E3',
-                    }}
-                  >
-                    <MyButton
-                      background={TouchableNativeFeedback.Ripple('#AAF', false)}
-                    >
+                  Sugerencias
+            </Text>
+            <View style={{ }}>
+              {
+                  recommended.map(({
+                    name, uuid, category, description, street, number, zone, key,
+                  }) => (
+                    <MyButton onPress={() => this.onPress(uuid)} key={key}>
                       <View
                         style={{
-                          height: '100%',
-                          width: '100%',
+                          height: 16 * vh,
+                          width: 100 * vw,
+                          flexDirection: 'row',
                           alignItems: 'center',
                           justifyContent: 'center',
                         }}
                       >
-                        <Icon
-                          name="accessibility"
-                          size={10 * vmin}
-                          color="white"
+                        <Image
+                          source={{ uri: 'https://semantic-ui.com/images/wireframe/image.png' }}
+                          style={{ width: 14 * vh, height: 14 * vh }}
                         />
+                        <View
+                          style={{
+                            marginVertical: 1 * vh,
+                            marginLeft: 14,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontFamily: 'Nunito-SemiBold',
+                              fontSize: 22,
+                              color: 'black',
+                            }}
+                            numberOfLines={2}
+                          >
+                            {name}
+                          </Text>
+                          <Text style={{ height: 2 * vh, fontSize: 18, color: 'black' }}>
+                            {category}
+                          </Text>
+                          <Text style={{ width: 60 * vw, fontSize: 13, color: '#5F5F5F' }}>
+                            {description}
+                          </Text>
+                          <Text style={{ fontSize: 16, color: 'black', marginTop: 3 }}>
+                            {`${street} ${number}, ${zone}`}
+                          </Text>
+                          <View style={{ flex: 1 }} />
+                        </View>
                       </View>
                     </MyButton>
-                  </View>
-                  <Text style={{ fontFamily: 'Nunito-SemiBold', fontSize: 14 }}>
-                    {el.name}
-                  </Text>
-                </View>
-              ))}
+                  ))
+                }
             </View>
-            */ }
-            <MainSection recommended={recommended} navigation={navigation} navUUID={navigateToBusiness} />
           </ScrollView>
         </KeyboardAvoidingView>
         <SearchBarSlideUp
@@ -258,97 +260,66 @@ class Homepage extends Component<Props> {
   }
 }
 
-// STRUCTURE OF THE MAIN SECTION OF THE MAINPAGE. THINGS LIKE RECENT STORES, CHANGE structure ONLOAD TO LOAD THE API DATA
-const structure = [
-  {
-    title: 'Recientes',
-    items: [],
-  },
-
-  {
-    title: 'Favoritos',
-    items: [],
-  },
-];
-
-// TO CHANGE ELEMENTS THAT WILL BE DISPLAYED ON THE MAINSECTION OF THE MAINPAGE
-function MainSection(props) {
-  const { recommended, navUUID, navigation } = props;
-  const onPress = (uuid) => {
-    navUUID(uuid);
-    navigation.navigate('Business');
-  };
-  const recommendedList = (
-    <View style={{ top: 30 }}>
-      <Text style={{
-        fontFamily: 'Nunito-SemiBold', fontSize: 20, color: '#000000', left: 20,
-      }}
-      >
-        Sugerencias
-      </Text>
-      {
-        recommended.map(({
-          name, uuid, category, description, street, number, zone, key,
-        }) => (
-          <MyButton onPress={() => onPress(uuid)} key={key}>
-            <View
-              style={{
-                height: 16 * vh,
-                width: 100 * vw,
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Image
-                source={{ uri: 'https://semantic-ui.com/images/wireframe/image.png' }}
-                style={{ width: 14 * vh, height: 14 * vh }}
-              />
-              <View
-                style={{
-                  marginVertical: 1 * vh,
-                  marginLeft: 14,
-                }}
-              >
-                <Text
-                  style={{
-                    fontFamily: 'Nunito-SemiBold',
-                    fontSize: 22,
-                    color: 'black',
-                  }}
-                  numberOfLines={2}
-                >
-                  {name}
-                </Text>
-                <Text style={{ height: 2 * vh, fontSize: 18, color: 'black' }}>
-                  {category}
-                </Text>
-                <Text style={{ width: 60 * vw, fontSize: 13, color: '#5F5F5F' }}>
-                  {description}
-                </Text>
-                <Text style={{ fontSize: 16, color: 'black', marginTop: 3 }}>
-                  {`${street} ${number}, ${zone}`}
-                </Text>
-                <View style={{ flex: 1 }} />
-              </View>
-            </View>
-          </MyButton>
-        ))
-      }
-    </View>
-
-  );
-  /*
-  const listCards = structure.map((el, i) => (
-    <Card title={el.title} key={i} containerStyle={{ height: 30 * vh }}>
-      {el.items.map((stores, k) => (
-        <ListItem key={k} title={stores.title} />
-      ))}
-    </Card>
-  ));
-  */
-  return recommendedList;
+/*
 }
+<View
+  style={{
+    height: vh * 23,
+    width: 92 * vw,
+    marginTop: 2 * vh,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+  }}
+>
+  {collections.map(el => (
+    <View
+      key={el.uuid}
+      style={{
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: 23 * vw,
+        height: 23 * vw,
+      }}
+    >
+      <View
+        style={{
+          borderRadius: 50,
+          overflow: 'hidden',
+          height: 14 * vmin,
+          width: 14 * vmin,
+          backgroundColor: '#6A32E3',
+        }}
+      >
+        <MyButton
+          background={TouchableNativeFeedback.Ripple('#AAF', false)}
+        >
+          <View
+            style={{
+              height: '100%',
+              width: '100%',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Icon
+              name="accessibility"
+              size={10 * vmin}
+              color="white"
+            />
+          </View>
+        </MyButton>
+      </View>
+      <Text style={{ fontFamily: 'Nunito-SemiBold', fontSize: 14 }}>
+        {el.name}
+      </Text>
+    </View>
+  ))}
+</View>
+*/
+
 
 function mapStateToProps(state) {
   return {

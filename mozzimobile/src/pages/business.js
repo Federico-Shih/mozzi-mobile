@@ -25,6 +25,7 @@ import {
   REMOVE_BUSINESS_UUID,
   SELECT_SERVICE,
   REMOVE_SERVICE,
+  ADD_SERVICE_NAME,
 } from '../actions';
 import { getBusiness } from '../libraries/connect/business-calls';
 
@@ -186,10 +187,10 @@ class Business extends Component<Props> {
   };
 
   // Depending on the service id, navigates to the calendar and uses redux to save the service selected
-  navToCalendar = (id) => {
+  navToCalendar = (id, name) => {
     const { addService, navigation } = this.props;
     this.updateFavoriteStatus();
-    addService(id);
+    addService(id, name);
     navigation.navigate('Calendar');
   };
 
@@ -261,7 +262,7 @@ class Business extends Component<Props> {
                   })}
                   conta
                   onPress={() => {
-                    this.navToCalendar(el.uuid);
+                    this.navToCalendar(el.uuid, el.name);
                   }}
                 >
                   <View style={{}}>
@@ -441,10 +442,14 @@ function mapDispatchToProps(dispatch) {
         type: REMOVE_SERVICE,
       });
     },
-    addService: (id) => {
+    addService: (id, name) => {
       dispatch({
         type: SELECT_SERVICE,
         id,
+      });
+      dispatch({
+        type: ADD_SERVICE_NAME,
+        name,
       });
     },
   };
