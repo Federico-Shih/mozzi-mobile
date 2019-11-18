@@ -3,6 +3,8 @@ import {
   View,
   Platform,
   Alert,
+  Modal,
+  TouchableWithoutFeedback,
   TouchableHighlight,
   TouchableNativeFeedback,
   FlatList,
@@ -34,6 +36,7 @@ import {
 } from '../libraries/helpers';
 import { platformBackColor } from '../libraries/styles/constants';
 import { ADD_BUSINESS_UUID } from '../actions';
+import buttonStyle from '../libraries/styles/button-styles';
 
 const noAppointment = require('../assets/images/noAppointment.png');
 
@@ -53,6 +56,11 @@ class MyAppointments extends Component<Props> {
     appointments: new Map(),
     refreshing: false,
     loaded: false,
+    show: false,
+    toRemove: {
+      service: '',
+      slot: '',
+    },
   };
 
   static propTypes = {
@@ -87,25 +95,22 @@ class MyAppointments extends Component<Props> {
 
   appointmentDelete = async (appointment) => {
     const { token } = this.props;
-    const confirmar = await this.showAlert(appointment);
-    if (confirmar) {
-      const resultsAPI = await removeAppointments({
-        token,
-        uuid: appointment.uuid,
+    const resultsAPI = await removeAppointments({
+      token,
+      uuid: appointment.uuid,
+    });
+    if (resultsAPI.data.data.appointmentDelete === '0') {
+      this.setState((state) => {
+        const newMap = state.appointments;
+        newMap.delete(appointment.uuid);
+        return newMap;
       });
-      if (resultsAPI.data.data.appointmentDelete === '0') {
-        this.setState((state) => {
-          const newMap = state.appointments;
-          newMap.delete(appointment.uuid);
-          return newMap;
-        });
-      } else if (resultsAPI.data.errors) {
-        resultsAPI.data.errors.forEach((el) => {
-          sendPopup(el.message);
-        });
-      } else {
-        sendPopup('El servidor no ha respondido');
-      }
+    } else if (resultsAPI.data.errors) {
+      resultsAPI.data.errors.forEach((el) => {
+        sendPopup(el.message);
+      });
+    } else {
+      sendPopup('El servidor no ha respondido');
     }
   };
 
@@ -115,24 +120,13 @@ class MyAppointments extends Component<Props> {
     navigation.navigate('Business');
   };
 
-  showAlert = appointment => new Promise((resolve) => {
-    const { service, slot } = appointment;
-    Alert.alert(
-      'Confirmar',
-      `Confirmas la eliminación del servicio de ${service.name} del negocio ${
-        service.business.name
-      } de la fecha ${new Date(
-        slot.day * 24 * 60 * 60 * 1000 + slot.start * 60 * 1000,
-      ).toDateString()} desde las ${newTime(
-        0,
-        slot.start,
-      )} hasta las ${newTime(0, slot.finish)}?`,
-      [
-        { text: 'Cancelar', onPress: () => resolve(false), style: 'cancel' },
-        { text: 'Eliminar', onPress: () => resolve(true) },
-      ],
-    );
-  });
+  dismissModal = () => {
+    this.setState({ show: false });
+  }
+
+  showAlert = (appointment) => {
+    this.setState({ show: true, toRemove: appointment });
+  }
 
   onRefresh = () => {
     this.setState({
@@ -241,7 +235,7 @@ class MyAppointments extends Component<Props> {
                         borderRadius: 50,
                       }}
                       onPress={() => {
-                        this.appointmentDelete(item);
+                        this.showAlert(item);
                       }}
                     />
                   </View>
@@ -290,12 +284,89 @@ class MyAppointments extends Component<Props> {
   }
 
   render() {
-    const { navigation } = this.props;
-    const { appointments, refreshing, loaded } = this.state;
+    const { appointments, show, toRemove } = this.state;
+    const { service, slot } = toRemove;
     const arrayAppointments = Array.from(appointments.values());
     arrayAppointments.sort((a, b) => a.slot.day - b.slot.day);
     return (
       <View contentContainerStyle={styles.container}>
+        <View>
+          <Modal
+            animationType="fade"
+            visible={show}
+            transparent
+            onDismiss={() => { this.dismissModal(); }}
+            onRequestClose={() => { this.dismissModal(); }}
+          >
+            <TouchableWithoutFeedback
+              onPress={() => { this.dismissModal(); }}
+            >
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignContent: 'center',
+                  alignSelf: 'center',
+                  width: 100 * vw,
+                  backgroundColor: 'rgba(100, 100, 100, 0.7)',
+                  flex: 1,
+                }}
+              >
+                <TouchableWithoutFeedback>
+                  <View
+                    style={{
+                      width: 90 * vw,
+                      height: 300,
+                      backgroundColor: 'white',
+                      borderRadius: 15,
+                      alignSelf: 'center',
+                      alignItems: 'center',
+                      borderColor: '#ff1e00',
+                      borderWidth: 3,
+                    }}
+                  >
+                    <View style={{
+                      margin: 38, alignItems: 'flex-start', height: 240, width: 72 * vw,
+                    }}
+                    >
+                      <Text style={{ fontFamily: 'Nunito-SemiBold', fontSize: 18, color: 'black' }}>Confirmás la eliminación del turno</Text>
+                      <Text style={{
+                        color: 'black', fontSize: 22, fontFamily: 'Nunito-SemiBold', marginTop: 20,
+                      }}
+                      >
+                        {`${service.name},`}
+
+                      </Text>
+                      <Text style={{ fontSize: 22, fontFamily: 'Nunito-SemiBold' }}>
+                        {`del día ${new Date(
+                          slot.day * 24 * 60 * 60 * 1000 + slot.start * 60 * 1000,
+                        ).toLocaleDateString('es-ES', { dateStyle: 'full' })} desde las ${newTime(
+                          0,
+                          slot.start,
+                        )} hasta las ${newTime(0, slot.finish)} hs`}
+                      </Text>
+                      <Button
+                        onPress={() => {
+                          this.appointmentDelete(toRemove);
+                          this.dismissModal();
+                        }
+}
+                        titleStyle={{ ...buttonStyle.reglogButtonText, fontSize: 17 }}
+                        buttonStyle={{ ...buttonStyle.reglogButton, width: 72 * vw, backgroundColor: '#ff1e00' }}
+                        containerStyle={{
+                          marginTop: 4 * vh,
+                          alignSelf: 'center',
+                        }}
+                        raised
+                        type="outline"
+                        title="Confirmar"
+                      />
+                    </View>
+                  </View>
+                </TouchableWithoutFeedback>
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
+        </View>
         <NavigationEvents
           onWillFocus={(payload) => {
             if (payload.action.type === 'Navigation/NAVIGATE') {

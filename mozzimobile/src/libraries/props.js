@@ -247,8 +247,6 @@ function mapDispatchToProps(dispatch) {
 
 const duration = 1000;
 
-  state = {
-  }
 const MenuProp = (props) => {
   const {
     user, navigation, removeToken, removeUser,

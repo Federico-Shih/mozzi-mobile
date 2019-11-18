@@ -1,12 +1,7 @@
 import {
   Text,
   View,
-  Animated,
-  Platform,
-  Dimensions,
   ScrollView,
-  TouchableOpacity,
-  TouchableNativeFeedback,
   RefreshControl,
   FlatList,
 } from 'react-native';
@@ -16,6 +11,7 @@ import {
 } from 'react-native-elements';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { NavigationEvents } from 'react-navigation';
 
 import styles from '../libraries/styles/styles';
 import { BackButton, BusinessButton, SearchButton } from '../libraries/props';
@@ -96,6 +92,11 @@ class Recents extends Component<Props> {
     const { contentList, refreshing } = this.state;
     return (
       <View style={styles.container}>
+        <NavigationEvents
+          onWillFocus={() => {
+            this.onRefresh();
+          }}
+        />
         <Header
           leftComponent={(
             <Button

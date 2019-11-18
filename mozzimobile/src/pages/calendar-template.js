@@ -309,47 +309,49 @@ class CalendarPage extends Component<Props> {
                   flex: 1,
                 }}
               >
-                <View
-                  style={{
-                    width: 90 * vw,
-                    height: 300,
-                    backgroundColor: 'white',
-                    borderRadius: 15,
-                    alignSelf: 'center',
-                    alignItems: 'center',
-                  }}
-                >
-                  <View style={{
-                    margin: 38, alignItems: 'flex-start', height: 240, width: 72 * vw,
-                  }}
+                <TouchableWithoutFeedback>
+                  <View
+                    style={{
+                      width: 90 * vw,
+                      height: 300,
+                      backgroundColor: 'white',
+                      borderRadius: 15,
+                      alignSelf: 'center',
+                      alignItems: 'center',
+                    }}
                   >
-                    <Text style={{ fontFamily: 'Nunito-SemiBold', fontSize: 18, color: 'black' }}>Tu reserva es de</Text>
-                    <Text style={{
-                      color: 'black', fontSize: 22, fontFamily: 'Nunito-SemiBold', marginTop: 20,
+                    <View style={{
+                      margin: 38, alignItems: 'flex-start', height: 240, width: 72 * vw,
                     }}
                     >
-                      {`${serviceName},`}
-
-                    </Text>
-                    <Text style={{ fontSize: 22, fontFamily: 'Nunito-SemiBold' }}>
-                      {`para el día ${
-                        (selectedDate.date) ? selectedDate.date.toLocaleDateString('es-ES', { dateStyle: 'full' }) : ''
-                      } a las ${selectedTime.time} hs`}
-                    </Text>
-                    <Button
-                      onPress={() => this.confirmAppointment()}
-                      titleStyle={{ ...buttonStyle.reglogButtonText, fontSize: 17 }}
-                      buttonStyle={{ ...buttonStyle.reglogButton, width: 72 * vw }}
-                      containerStyle={{
-                        marginTop: 4 * vh,
-                        alignSelf: 'center',
+                      <Text style={{ fontFamily: 'Nunito-SemiBold', fontSize: 18, color: 'black' }}>Tu reserva es de</Text>
+                      <Text style={{
+                        color: 'black', fontSize: 22, fontFamily: 'Nunito-SemiBold', marginTop: 20,
                       }}
-                      raised
-                      type="outline"
-                      title="Confirmá tu turno"
-                    />
+                      >
+                        {`${serviceName},`}
+
+                      </Text>
+                      <Text style={{ fontSize: 22, fontFamily: 'Nunito-SemiBold' }}>
+                        {`para el día ${
+                          (selectedDate.date) ? selectedDate.date.toLocaleDateString('es-ES', { dateStyle: 'full' }) : ''
+                        } a las ${selectedTime.time} hs`}
+                      </Text>
+                      <Button
+                        onPress={() => this.confirmAppointment()}
+                        titleStyle={{ ...buttonStyle.reglogButtonText, fontSize: 17 }}
+                        buttonStyle={{ ...buttonStyle.reglogButton, width: 72 * vw }}
+                        containerStyle={{
+                          marginTop: 4 * vh,
+                          alignSelf: 'center',
+                        }}
+                        raised
+                        type="outline"
+                        title="Confirmá tu turno"
+                      />
+                    </View>
                   </View>
-                </View>
+                </TouchableWithoutFeedback>
               </View>
             </TouchableWithoutFeedback>
           </Modal>

@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import React, { Component } from 'react';
 import {
-  SearchBar,
   Button,
   Icon,
   Image,
@@ -18,25 +17,19 @@ import {
 } from 'react-native-elements';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { NavigationEvents } from 'react-navigation';
 
 import { ADD_BUSINESS_UUID } from '../actions';
 import styles from '../libraries/styles/styles';
 import { SearchButton, BusinessButton } from '../libraries/props';
 import { platformBackColor } from '../libraries/styles/constants';
 import {
-  sendPopup,
-  errorMessages,
   units,
   UserData,
 } from '../libraries/helpers';
 import SearchBarSlideUp from './searchbar';
 
 type Props = {};
-
-const MyButton = Platform.select({
-  ios: TouchableOpacity,
-  android: TouchableNativeFeedback,
-});
 
 const { vh, vw } = units;
 
@@ -108,6 +101,11 @@ class Favorites extends Component<Props> {
     const { contentList, refreshing } = this.state;
     return (
       <View style={styles.container}>
+        <NavigationEvents
+          onWillFocus={() => {
+            this.onRefresh();
+          }}
+        />
         <Header
           leftComponent={(
             <Button

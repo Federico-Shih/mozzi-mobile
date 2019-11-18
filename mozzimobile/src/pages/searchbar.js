@@ -165,7 +165,6 @@ export default class SearchBarSlideUp extends Component<Props> {
       >
         <NavigationEvents
           onWillFocus={(payload) => {
-            this.resetSearch();
             if (payload.action.type === 'Navigation/POP') {
               this.close();
               this.resetSearch();
