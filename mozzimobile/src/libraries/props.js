@@ -342,7 +342,7 @@ const RemoveIcon = (
 );
 
 export const BusinessButton = ({
-  item, navigation, onPress, deleteBusiness,
+  item, onPress, deleteBusiness,
 }) => {
   const {
     // eslint-disable-next-line react/prop-types

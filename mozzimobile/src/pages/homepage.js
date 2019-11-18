@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   TouchableNativeFeedback,
   FlatList,
+  RefreshControl,
 } from 'react-native';
 import React, { Component } from 'react';
 import {
@@ -19,6 +20,7 @@ import {
 import PropTypes from 'prop-types';
 import { ScrollView } from 'react-native-gesture-handler';
 import { connect } from 'react-redux';
+import Carousel from 'react-native-snap-carousel';
 
 import {
   errorMessages,
@@ -34,7 +36,7 @@ import {
   ADD_USER,
   REMOVE_USER,
 } from '../actions';
-import { SearchButton } from '../libraries/props';
+import { SearchButton, BusinessButton } from '../libraries/props';
 import styles from '../libraries/styles/styles';
 import { getStores, getCollections, getRandomBusinesses } from '../libraries/connect/business-calls';
 import { getProfile } from '../libraries/connect/auth';
@@ -47,7 +49,7 @@ const {
   vh, vw, vmax, vmin,
 } = units;
 
-const MyButton = Platform.select({
+const CustomButton = Platform.select({
   ios: TouchableOpacity,
   android: TouchableNativeFeedback,
 });
@@ -67,11 +69,15 @@ class Homepage extends Component<Props> {
     searchBarIsOpen: false,
     collections: [],
     recommended: [],
+    refreshing: false,
+    favoriteList: [],
+    recentList: [],
   };
 
   constructor(props) {
     super(props);
     this.searchModal = React.createRef();
+    this.navToStore = this.navToStore.bind(this);
   }
 
   async componentDidMount() {
@@ -98,13 +104,47 @@ class Homepage extends Component<Props> {
     }
 
     const collections = await getCollections({ token });
-    const recommended = await getRandomBusinesses({ token, limit: 5 });
-    this.setState({ collections, recommended });
+    let recommended = [];
+    const { user } = this.props;
+
+    const res = await getRandomBusinesses({ token, limit: 5 });
+    if (res) {
+      recommended = res;
+    }
+    const favoriteList = [];
+    // UserData.getFavorites(user.uuid).forEach(el => favoriteList.push(el));
+
+    const recentList = [];
+    UserData.getRecents(user.uuid).forEach(el => recentList.push(el));
+
+    this.setState({
+      collections, recommended, recentList, favoriteList,
+    });
   }
 
-  toggle() {
-    const { navigation } = this.props;
-    navigation.openDrawer();
+  navToStore = (uuid) => {
+    const { navigateToBusiness, navigation } = this.props;
+    navigateToBusiness(uuid);
+    navigation.navigate('Business');
+  };
+
+  onRefresh = async () => {
+    let recommended = [];
+    const { token, user } = this.props;
+    this.setState({ refreshing: true });
+    const res = await getRandomBusinesses({ token, limit: 5 });
+    if (res) {
+      recommended = res;
+    }
+    const favoriteList = [];
+    // UserData.getFavorites(user.uuid).forEach(el => favoriteList.push(el));
+
+    const recentList = [];
+    UserData.getRecents(user.uuid).forEach(el => recentList.push(el));
+
+    this.setState({
+      refreshing: false, favoriteList, recommended, recentList,
+    });
   }
 
   onPress = (uuid) => {
@@ -112,6 +152,11 @@ class Homepage extends Component<Props> {
     navigateToBusiness(uuid);
     navigation.navigate('Business');
   };
+
+  toggle() {
+    const { navigation } = this.props;
+    navigation.openDrawer();
+  }
 
   closeSearchBar() {
     const { current } = this.searchModal;
@@ -134,9 +179,81 @@ class Homepage extends Component<Props> {
     current.toggle();
   }
 
+  recommendedRender = ({ item }) => {
+    const { name, uuid, description } = item;
+    return (
+      <View style={{
+        height: 44 * vh,
+        width: 80 * vw,
+        justifyContent: 'center',
+        alignItems: 'center',
+        overflow: 'hidden',
+      }}
+      >
+        <CustomButton onPress={() => { this.navToStore(uuid); }}>
+          <View style={{
+            shadowColor: '#000',
+            borderRadius: 10,
+            shadowOffset: {
+              width: 0,
+              height: 4,
+            },
+            shadowOpacity: 0.32,
+            shadowRadius: 5.46,
+            elevation: 9,
+            backgroundColor: platformBackColor,
+            height: 39 * vh,
+            width: 75 * vw,
+            alignItems: 'center',
+          }}
+          >
+            <Image
+              source={{ uri: 'https://semantic-ui.com/images/wireframe/image.png' }}
+              style={{ width: 75 * vw, height: 28 * vh }}
+              resizeMode="cover"
+              containerStyle={{
+                width: 75 * vw,
+                height: 28 * vh,
+                borderTopRightRadius: 10,
+                borderTopLeftRadius: 10,
+                overflow: 'hidden',
+              }}
+            />
+            <Text
+              style={{
+                fontFamily: 'Nunito-SemiBold',
+                fontSize: 22,
+                color: 'black',
+                alignSelf: 'flex-start',
+                margin: 7,
+              }}
+              numberOfLines={2}
+            >
+              {name}
+            </Text>
+            <Text
+              style={{
+                fontFamily: 'Nunito-SemiBold',
+                fontSize: 15,
+                color: 'grey',
+                alignSelf: 'flex-start',
+                marginLeft: 4,
+              }}
+              numberOfLines={2}
+            >
+              {description}
+            </Text>
+          </View>
+        </CustomButton>
+      </View>
+    );
+  }
+
   render() {
     const { navigation, token, navigateToBusiness } = this.props;
-    const { collections, recommended } = this.state;
+    const {
+      collections, recommended, refreshing, recentList, favoriteList,
+    } = this.state;
     return (
       <View style={{ flex: 1 }}>
         <KeyboardAvoidingView style={styles.avoidContainer}>
@@ -158,7 +275,17 @@ class Homepage extends Component<Props> {
             }}
             placement="left"
           />
-          <ScrollView style={{ width: '100%', top: 5 }} scrollEnabled>
+          <ScrollView
+            style={{ width: '100%', top: 5 }}
+            scrollEnabled
+            refreshControl={(
+              <RefreshControl
+                colors={['#9Bd35A', '#689F38']}
+                refreshing={refreshing}
+                onRefresh={this.onRefresh}
+              />
+)}
+          >
             <View
               style={{
                 justifyContent: 'center',
@@ -196,6 +323,55 @@ class Homepage extends Component<Props> {
             >
                   Sugerencias
             </Text>
+            <Carousel
+              ref={c => this.slider1Ref = c}
+              data={recommended}
+              renderItem={this.recommendedRender}
+              sliderWidth={100 * vw}
+              itemWidth={80 * vw}
+            />
+            <View>
+              {
+                (recentList.length === 0) ? null : (
+                  <View>
+                    <Text style={{
+                      fontFamily: 'Nunito-SemiBold', fontSize: 20, color: '#000000', left: 20, marginTop: 20,
+                    }}
+                    >
+                      Recientes
+                    </Text>
+                    {
+                      recentList.map(item => (
+                        <BusinessButton
+                          key={item.uuid}
+                          item={item}
+                          navigation={navigation}
+                          onPress={() => {
+                            this.navToStore(item.uuid);
+                          }}
+                          deleteBusiness={this.deleteBusiness}
+                        />
+                      ))
+                    }
+                  </View>
+                )
+              }
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+        <SearchBarSlideUp
+          navigation={navigation}
+          token={token}
+          ref={this.searchModal}
+          navigateToBusiness={navigateToBusiness}
+        />
+      </View>
+    );
+  }
+}
+
+/*
+RECOMMENDED
             <View style={{ }}>
               {
                   recommended.map(({
@@ -247,21 +423,8 @@ class Homepage extends Component<Props> {
                   ))
                 }
             </View>
-          </ScrollView>
-        </KeyboardAvoidingView>
-        <SearchBarSlideUp
-          navigation={navigation}
-          token={token}
-          ref={this.searchModal}
-          navigateToBusiness={navigateToBusiness}
-        />
-      </View>
-    );
-  }
 }
-
-/*
-}
+COLLECTIONS
 <View
   style={{
     height: vh * 23,
@@ -325,6 +488,7 @@ function mapStateToProps(state) {
   return {
     loading: state.loading,
     token: state.token,
+    user: state.user,
   };
 }
 
