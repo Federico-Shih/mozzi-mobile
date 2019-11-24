@@ -29,6 +29,7 @@ import {
   errorMessages, sendPopup, newTime, units, Calendar, UserData,
 } from '../libraries/helpers';
 import noAppointmentsAvailable from '../assets/images/noAppointmentsAvailable.png';
+import Carousel from 'react-native-snap-carousel';
 
 const { vh, vw } = units;
 
@@ -395,19 +396,21 @@ class CalendarPage extends Component<Props> {
               height: vh * 15,
             }}
           >
-            <FlatList
+            <Carousel
+              ref={c => this.sliderRef = c}
               data={mapDates}
-              showsHorizontalScrollIndicator={false}
-              horizontal
-              style={{}}
-              renderItem={({ item }) => {
+              onSnapToItem={(index) => {
+                this.selectDate(mapDates[index]);
+              }}
+              renderItem={({ item, index }) => {
                 const style = item.selected
                   ? styles.dateStyleSelected
                   : styles.dateStyle;
                 return (
                   <CustomButton
-                    background={TouchableNativeFeedback.Ripple('#CCC')}
-                    onPress={() => this.selectDate(item)}
+                    onPress={() => {
+                      this.sliderRef.snapToItem(index);
+                    }}
                   >
                     <View style={style}>
                       <Box element={item} />
@@ -415,6 +418,8 @@ class CalendarPage extends Component<Props> {
                   </CustomButton>
                 );
               }}
+              sliderWidth={100 * vw}
+              itemWidth={20 * vw}
             />
           </View>
           <View style={{ flex: 1 }}>
@@ -623,3 +628,28 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps,
 )(CalendarPage);
+
+/* PREVIOUS DATE SELECTOR
+<FlatList
+              data={mapDates}
+              showsHorizontalScrollIndicator={false}
+              horizontal
+              style={{}}
+              renderItem={({ item }) => {
+                const style = item.selected
+                  ? styles.dateStyleSelected
+                  : styles.dateStyle;
+                return (
+                  <CustomButton
+                    background={TouchableNativeFeedback.Ripple('#CCC')}
+                    onPress={() => this.selectDate(item)}
+                  >
+                    <View style={style}>
+                      <Box element={item} />
+                    </View>
+                  </CustomButton>
+                );
+              }}
+            />
+
+*/

@@ -7,8 +7,9 @@ import {
   ActivityIndicator,
   BackHandler,
   ScrollView,
+  FlatList,
 } from 'react-native';
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import {
@@ -227,61 +228,65 @@ class Business extends Component<Props> {
               marginTop: 20,
               top: 20 * vw,
               width: '100%',
+              height: 66 * vh,
             }}
           >
-            <Text
-              style={{
-                fontSize: 20,
-                fontWeight: '800',
-                color: 'black',
-                marginLeft: 10,
-              }}
-            >
+            <FlatList
+              data={business.services}
+              keyExtractor={item => item.uuid}
+              renderItem={({ item: el, index }) => (
+                <Fragment key={el.uuid}>
+                  {(index === 0) ? (
+                    <Fragment>
+                      <Text
+                        style={{
+                          fontSize: 20,
+                          fontWeight: '800',
+                          color: 'black',
+                          marginLeft: 10,
+                        }}
+                      >
               Servicios
-            </Text>
-            <Divider
-              style={{
-                height: 1.5,
-                width: '90%',
-                marginTop: 5,
-                marginLeft: 10,
-                backgroundColor: 'grey',
-              }}
-            />
-
-            <ScrollView
-              style={{
-                width: '100%',
-              }}
-            >
-              {business.services.map(el => (
-                <ServiceButton
-                  key={newUUID()}
-                  background={Platform.select({
-                    android: TouchableNativeFeedback.Ripple('#DDD'),
-                  })}
-                  conta
-                  onPress={() => {
-                    this.navToCalendar(el.uuid, el.name);
-                  }}
-                >
-                  <View style={{}}>
-                    <View style={{ paddingVertical: 20, marginLeft: 20 }}>
-                      <Services el={el} />
+                      </Text>
+                      <Divider
+                        style={{
+                          height: 1.5,
+                          width: '90%',
+                          marginTop: 5,
+                          marginLeft: 10,
+                          backgroundColor: 'grey',
+                        }}
+                      />
+                    </Fragment>
+                  ) : null }
+                  <ServiceButton
+                    key={newUUID()}
+                    background={Platform.select({
+                      android: TouchableNativeFeedback.Ripple('#DDD'),
+                    })}
+                    onPress={() => {
+                      this.navToCalendar(el.uuid, el.name);
+                    }}
+                  >
+                    <View style={{}}>
+                      <View style={{ paddingVertical: 20, marginLeft: 20 }}>
+                        <Services el={el} />
+                      </View>
+                      <Divider
+                        style={{
+                          height: 1,
+                          width: '90%',
+                          backgroundColor: 'grey',
+                          marginLeft: 10,
+                        }}
+                      />
                     </View>
-                    <Divider
-                      style={{
-                        height: 1,
-                        width: '90%',
-                        backgroundColor: 'grey',
-                        marginLeft: 10,
-                      }}
-                    />
-                  </View>
-                </ServiceButton>
-              ))}
-            </ScrollView>
+                  </ServiceButton>
+                </Fragment>
+              )}
+            />
           </View>
+          <View style={{ flex: 1 }} />
         </View>
 
         {/* TITLE NAME AND DESCRIPTION */}
