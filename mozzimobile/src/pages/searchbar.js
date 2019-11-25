@@ -28,6 +28,7 @@ import {
   sendPopup, errorMessages, randomImage, units,
 } from '../libraries/helpers';
 import { platformBackColor } from '../libraries/styles/constants';
+import imageSource from '../assets/images/startSearch.png';
 
 const slideUpDuration = 300;
 
@@ -129,10 +130,21 @@ export default class SearchBarSlideUp extends Component<Props> {
   };
 
   searchResult = (searchStatus, searchResults) => {
-    console.log(searchStatus)
     if (searchStatus === NOT_YET_SEARCH) {
       return (
         <View style={{ flex: 1, justifyContent: 'center', height: 80 * vh }}>
+          <Image
+            source={imageSource}
+            style={{
+              alignSelf: 'center',
+              height: 30 * vw,
+              width: 60 * vw,
+              shadowColor: 'black',
+              shadowOffset: { width: 0, height: 0.5 * 1 },
+              shadowOpacity: 0.3,
+              shadowRadius: 0.8 * 1,
+            }}
+          />
           <Text style={{
             fontFamily: 'Nunito-SemiBold', fontSize: 20, color: 'black', alignSelf: 'center',
           }}
@@ -183,6 +195,7 @@ export default class SearchBarSlideUp extends Component<Props> {
         ))
       );
     }
+    return null;
   }
 
   addGoBackEvent() {
@@ -278,6 +291,7 @@ export default class SearchBarSlideUp extends Component<Props> {
           ref={(ref) => {
             this.textInput = ref;
           }}
+          onClear={() => { this.setState({ searchStatus: NOT_YET_SEARCH }); }}
           placeholder="Buscar..."
           onChangeText={text => this.updateSearch(text)}
           value={search}
@@ -298,11 +312,12 @@ export default class SearchBarSlideUp extends Component<Props> {
               } else {
                 this.setState({ searchResults: data.data.businessSearch, searchStatus: FOUND, loading: false });
               }
-            } else if (search.length === 1) {
+            } else if (search.length <= 1) {
               sendPopup(errorMessages.notEnoughLength);
             } else if (search.length > 25) {
               sendPopup(errorMessages.tooMuchLength);
             }
+            this.setState({ loading: false });
           }}
           containerStyle={{
             width: '90%',

@@ -3,7 +3,6 @@ import {
   View,
   Text,
   Dimensions,
-  KeyboardAvoidingView,
   Platform,
   Keyboard,
   SafeAreaView,
