@@ -19,7 +19,11 @@ import newUUID from 'uuid';
 
 import styles from '../libraries/styles/styles';
 import {
-  sendPopup, UserData, units, alphabetize,
+  sendPopup,
+  UserData,
+  units,
+  alphabetize,
+  randomImage,
 } from '../libraries/helpers';
 import {
   LOADING,
@@ -203,6 +207,8 @@ class Business extends Component<Props> {
       street, zone, number, postal,
     } = business;
 
+    const image = randomImage(business.name);
+
     // const alphabetizedList = alphabetize(business.services);
     return (
       <View style={styles.container}>
@@ -213,9 +219,7 @@ class Business extends Component<Props> {
           }}
         >
           <Image
-            source={{
-              uri: 'https://semantic-ui.com/images/wireframe/image.png',
-            }}
+            source={image}
             style={{
               width: 100 * vw,
               height: 20 * vh,
@@ -300,9 +304,7 @@ class Business extends Component<Props> {
           }}
         >
           <Image
-            source={{
-              uri: 'https://semantic-ui.com/images/wireframe/image.png',
-            }}
+            source={image}
             style={{
               resizeMode: 'cover',
               opacity: 0.9,

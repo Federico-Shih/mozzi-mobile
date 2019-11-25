@@ -24,16 +24,23 @@ import update from 'immutability-helper';
 
 import styles from '../libraries/styles/styles';
 import { getStores } from '../libraries/connect/business-calls';
-import { sendPopup, errorMessages } from '../libraries/helpers';
+import {
+  sendPopup, errorMessages, randomImage, units,
+} from '../libraries/helpers';
 import { platformBackColor } from '../libraries/styles/constants';
 
 const slideUpDuration = 300;
+
+const { vh, vw } = units;
 
 const MyButton = Platform.select({
   ios: TouchableOpacity,
   android: TouchableNativeFeedback,
 });
 
+const NOT_YET_SEARCH = 0;
+const FOUND = 1;
+const NOT_FOUND = 2;
 
 export default class SearchBarSlideUp extends Component<Props> {
   state = {
@@ -45,6 +52,7 @@ export default class SearchBarSlideUp extends Component<Props> {
     style: {
       underlineColor: '#C4C4C4',
     },
+    searchStatus: NOT_YET_SEARCH,
   };
 
   static propTypes = {
@@ -120,6 +128,63 @@ export default class SearchBarSlideUp extends Component<Props> {
     this.backHandler.remove();
   };
 
+  searchResult = (searchStatus, searchResults) => {
+    console.log(searchStatus)
+    if (searchStatus === NOT_YET_SEARCH) {
+      return (
+        <View style={{ flex: 1, justifyContent: 'center', height: 80 * vh }}>
+          <Text style={{
+            fontFamily: 'Nunito-SemiBold', fontSize: 20, color: 'black', alignSelf: 'center',
+          }}
+          >
+        Empezá a buscar!
+          </Text>
+        </View>
+      );
+    }
+    if (searchStatus === NOT_FOUND) {
+      return (
+        <View style={{
+          flex: 1, justifyContent: 'center', height: 80 * vh,
+        }}
+        >
+          <Text style={{
+            fontFamily: 'Nunito-SemiBold', fontSize: 20, color: 'black', alignSelf: 'center',
+          }}
+          >
+        No se ha encontrado negocios...
+          </Text>
+        </View>
+      );
+    }
+    if (searchStatus === FOUND) {
+      return (
+        searchResults.map(el => (
+          <View key={el.uuid}>
+            <MyButton
+              background={TouchableNativeFeedback.Ripple('#DDD')}
+              onPress={() => {
+                this.sendToPage(el.uuid);
+              }}
+            >
+              <View>
+                <SearchElement el={el} />
+              </View>
+            </MyButton>
+            <Divider
+              style={{
+                backgroundColor: '#DDDDDD',
+                width: 300,
+                height: 0.9,
+                alignSelf: 'flex-end',
+              }}
+            />
+          </View>
+        ))
+      );
+    }
+  }
+
   addGoBackEvent() {
     this.backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
@@ -148,7 +213,12 @@ export default class SearchBarSlideUp extends Component<Props> {
 
   render() {
     const {
-      anim, search, loading, searchResults, style,
+      anim,
+      search,
+      loading,
+      searchResults,
+      style,
+      searchStatus,
     } = this.state;
     const { token } = this.props;
     return (
@@ -222,18 +292,17 @@ export default class SearchBarSlideUp extends Component<Props> {
                 data.errors.forEach((el) => {
                   sendPopup(el.message);
                 });
-              } else if (data.data.businessSearch === null) {
-                this.setState({ searchResults: [] });
+                this.setState({ searchStatus: NOT_FOUND, loading: false });
+              } else if (data.data.businessSearch.length === 0) {
+                this.setState({ searchResults: [], searchStatus: NOT_FOUND, loading: false });
               } else {
-                this.setState({ searchResults: data.data.businessSearch });
+                this.setState({ searchResults: data.data.businessSearch, searchStatus: FOUND, loading: false });
               }
             } else if (search.length === 1) {
               sendPopup(errorMessages.notEnoughLength);
             } else if (search.length > 25) {
               sendPopup(errorMessages.tooMuchLength);
             }
-            // CHANGE WHEN API IS HERE
-            this.setState({ loading: false });
           }}
           containerStyle={{
             width: '90%',
@@ -268,28 +337,9 @@ export default class SearchBarSlideUp extends Component<Props> {
             marginTop: 10,
           }}
         >
-          {searchResults.map((el, o) => (
-            <View key={o}>
-              <MyButton
-                background={TouchableNativeFeedback.Ripple('#DDD')}
-                onPress={() => {
-                  this.sendToPage(el.uuid);
-                }}
-              >
-                <View>
-                  <SearchElement el={el} />
-                </View>
-              </MyButton>
-              <Divider
-                style={{
-                  backgroundColor: '#DDDDDD',
-                  width: 300,
-                  height: 0.9,
-                  alignSelf: 'flex-end',
-                }}
-              />
-            </View>
-          ))}
+          {
+            this.searchResult(searchStatus, searchResults)
+          }
         </ScrollView>
       </Animated.View>
     );
@@ -307,7 +357,7 @@ function SearchElement({ el }) {
       }}
     >
       <Image
-        source={{ uri: 'https://semantic-ui.com/images/wireframe/image.png' }}
+        source={randomImage(el.name)}
         style={{ width: 60, height: 60, borderRadius: 10 }}
       />
       <View style={{ flexDirection: 'column', paddingLeft: 20 }}>

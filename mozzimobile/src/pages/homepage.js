@@ -13,8 +13,6 @@ import {
   Button,
   Header,
   Icon,
-  Card,
-  ListItem,
   Image,
 } from 'react-native-elements';
 import PropTypes from 'prop-types';
@@ -27,6 +25,7 @@ import {
   sendPopup,
   units,
   UserData,
+  randomImage,
 } from '../libraries/helpers';
 import { platformBackColor } from '../libraries/styles/constants';
 import {
@@ -153,32 +152,6 @@ class Homepage extends Component<Props> {
     navigation.navigate('Business');
   };
 
-  toggle() {
-    const { navigation } = this.props;
-    navigation.openDrawer();
-  }
-
-  closeSearchBar() {
-    const { current } = this.searchModal;
-    const { navigation } = this.props;
-    navigation.setParams({
-      searchBarIsOpen: false,
-    });
-    this.setState({ searchBarIsOpen: false });
-    current.close();
-  }
-
-  toggleSearchBar() {
-    const { current } = this.searchModal;
-    const { navigation } = this.props;
-    const { searchBarIsOpen } = this.state;
-    navigation.setParams({
-      searchBarIsOpen: !searchBarIsOpen,
-    });
-    this.setState({ searchBarIsOpen: !searchBarIsOpen });
-    current.toggle();
-  }
-
   recommendedRender = ({ item }) => {
     const { name, uuid, description } = item;
     return (
@@ -208,7 +181,7 @@ class Homepage extends Component<Props> {
           }}
           >
             <Image
-              source={{ uri: 'https://semantic-ui.com/images/wireframe/image.png' }}
+              source={randomImage(name)}
               style={{ width: 75 * vw, height: 28 * vh }}
               resizeMode="cover"
               containerStyle={{
@@ -247,6 +220,38 @@ class Homepage extends Component<Props> {
         </CustomButton>
       </View>
     );
+  }
+
+  deleteBusiness(business) {
+    const { user } = this.props;
+    UserData.removeUserRecents({ uuid: user.uuid, business });
+    this.onRefresh();
+  }
+
+  toggle() {
+    const { navigation } = this.props;
+    navigation.openDrawer();
+  }
+
+  closeSearchBar() {
+    const { current } = this.searchModal;
+    const { navigation } = this.props;
+    navigation.setParams({
+      searchBarIsOpen: false,
+    });
+    this.setState({ searchBarIsOpen: false });
+    current.close();
+  }
+
+  toggleSearchBar() {
+    const { current } = this.searchModal;
+    const { navigation } = this.props;
+    const { searchBarIsOpen } = this.state;
+    navigation.setParams({
+      searchBarIsOpen: !searchBarIsOpen,
+    });
+    this.setState({ searchBarIsOpen: !searchBarIsOpen });
+    current.toggle();
   }
 
   render() {
@@ -343,6 +348,7 @@ class Homepage extends Component<Props> {
                     {
                       recentList.map(item => (
                         <BusinessButton
+                          disabled
                           key={item.uuid}
                           item={item}
                           navigation={navigation}

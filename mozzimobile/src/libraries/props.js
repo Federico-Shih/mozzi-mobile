@@ -16,7 +16,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Swipeout from 'react-native-swipeout';
 
-import { units } from './helpers';
+import { units, randomImage } from './helpers';
 import styles from './styles/styles';
 import buttonStyles from './styles/button-styles';
 import { REMOVE_TOKEN, REMOVE_USER } from '../actions';
@@ -342,7 +342,7 @@ const RemoveIcon = (
 );
 
 export const BusinessButton = ({
-  item, onPress, deleteBusiness,
+  item, onPress, deleteBusiness, disabled,
 }) => {
   const {
     // eslint-disable-next-line react/prop-types
@@ -353,6 +353,7 @@ export const BusinessButton = ({
       right={[{
         text: '', onPress: () => { deleteBusiness(item); }, type: 'delete', component: RemoveIcon,
       }]}
+      disabled={disabled}
       backgroundColor="#FFF"
     >
       <PressedElement onPress={onPress}>
@@ -367,7 +368,7 @@ export const BusinessButton = ({
           }}
         >
           <Image
-            source={{ uri: 'https://semantic-ui.com/images/wireframe/image.png' }}
+            source={randomImage(name)}
             style={{ width: 14 * vh, height: 14 * vh }}
           />
           <View

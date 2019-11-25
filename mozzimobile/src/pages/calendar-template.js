@@ -6,7 +6,7 @@ import {
   TouchableNativeFeedback,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  Alert,
+  ActivityIndicator,
   Modal,
 } from 'react-native';
 import React, { Component, Fragment } from 'react';
@@ -18,6 +18,7 @@ import {
 import keyUUID from 'uuid';
 import Timeline from 'react-native-timeline-feed';
 
+import Carousel from 'react-native-snap-carousel';
 import { platformBackColor } from '../libraries/styles/constants';
 import { REMOVE_SERVICE, LOADING } from '../actions';
 import styles from '../libraries/styles/styles';
@@ -29,7 +30,6 @@ import {
   errorMessages, sendPopup, newTime, units, Calendar, UserData,
 } from '../libraries/helpers';
 import noAppointmentsAvailable from '../assets/images/noAppointmentsAvailable.png';
-import Carousel from 'react-native-snap-carousel';
 
 const { vh, vw } = units;
 
@@ -125,6 +125,8 @@ class CalendarPage extends Component<Props> {
     data: [],
     selectedTime: '',
     show: false,
+    loading: false,
+    successful: false,
   };
 
   static propTypes = {
@@ -230,6 +232,7 @@ class CalendarPage extends Component<Props> {
     } = this.props;
     const { selectedDate, selectedTime } = this.state;
 
+    this.setState({ loading: true, show: false });
     const saved = await sendAppointment({
       token,
       slot: selectedTime.key,
@@ -248,8 +251,8 @@ class CalendarPage extends Component<Props> {
       endTime.setHours(parseInt(endTimeStrings[0], 10), parseInt(endTimeStrings[1], 10), 0);
 
       Calendar.saveEvent(business, { startDate: startTime.toISOString(), endDate: endTime.toISOString() });
-      this.setState({ show: false });
-      navigation.pop(2);
+      setTimeout(() => { this.setState({ successful: true }); }, 1500);
+      setTimeout(() => { this.setState({ successful: false, loading: false }); navigation.pop(2); }, 3500);
     } else {
       saved.data.errors.forEach((el) => {
         sendPopup(el.message);
@@ -280,16 +283,63 @@ class CalendarPage extends Component<Props> {
     this.setState({ show: false });
   }
 
+  dismissLoadingModal = () => {
+    this.setState({ loading: false });
+  }
+
   render() {
     const { navigation, serviceName } = this.props;
     const {
-      dates, data, show, selectedDate, selectedTime,
+      dates,
+      data,
+      show,
+      selectedDate,
+      selectedTime,
+      loading,
+      successful,
     } = this.state;
     const mapDates = dates instanceof Map ? Array.from(dates.values()) : [];
     const mapTimes = data instanceof Map ? Array.from(data.values()) : [];
     return (
       <Fragment>
         <View>
+          <Modal
+            animationType="fade"
+            visible={loading}
+            transparent
+          >
+            <TouchableWithoutFeedback
+              onPress={() => { this.dismissLoadingModal(); }}
+            >
+              <View style={{
+                height: 100 * vh,
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 100 * vw,
+                backgroundColor: (successful) ? '#01C789' : '#9868FF',
+              }}
+              >
+                {
+                  (successful)
+                    ? (
+                      <Fragment>
+                        <Icon
+                          name="check"
+                          color="white"
+                          size={80}
+                        />
+                        <Text style={{ color: 'white', fontSize: 20 }}> ¡Tu turno ya se ha confirmado! </Text>
+                      </Fragment>
+                    ) : (
+                      <Fragment>
+                        <ActivityIndicator size={80} color="white" />
+                        <Text style={{ color: 'white', fontSize: 20 }}> Procesando tu turno... </Text>
+                      </Fragment>
+                    )
+                }
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
           <Modal
             animationType="fade"
             visible={show}
@@ -403,13 +453,11 @@ class CalendarPage extends Component<Props> {
                 this.selectDate(mapDates[index]);
               }}
               renderItem={({ item, index }) => {
-                const style = item.selected
-                  ? styles.dateStyleSelected
-                  : styles.dateStyle;
+                const style = styles.dateStyle;
                 return (
                   <CustomButton
                     onPress={() => {
-                      this.sliderRef.snapToItem(index);
+                      setTimeout(() => this.sliderRef.snapToItem(index), 250);
                     }}
                   >
                     <View style={style}>

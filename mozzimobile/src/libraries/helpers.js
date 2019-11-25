@@ -1,14 +1,37 @@
 import { PermissionsAndroid, Platform, Dimensions } from 'react-native';
 import { EventRegister } from 'react-native-event-listeners';
 import RNCalendarEvents from 'react-native-calendar-events';
+import one from '../assets/1.jpg';
+import two from '../assets/2.jpg';
+import three from '../assets/3.jpg';
+import four from '../assets/4.jpg';
+import five from '../assets/5.jpg';
+import six from '../assets/6.jpg';
+import seven from '../assets/7.jpg';
+import eight from '../assets/8.jpg';
+import nine from '../assets/9.jpg';
+import ten from '../assets/10.jpg';
 
 const Realm = require('realm');
+
+const images = [one, two, three, four, five, six, seven, eight, nine, ten];
 
 // Validate that email is of the correct format
 export const validateEmail = function validateEmail(email) {
   const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(email);
 };
+
+function hashText(text) {
+  let hashValue = 0;
+  for (let i = 0; i < text.length; i += 1) {
+    hashValue += text.charCodeAt(i);
+  }
+  hashValue = hashValue.toString();
+  return parseInt((hashValue[hashValue.length - 1]), 10);
+}
+
+export const randomImage = text => images[hashText(text)];
 
 const temp = {
   vw: Dimensions.get('window').width / 100,
@@ -133,8 +156,8 @@ export const Calendar = {
       sendPopup('Calendar error');
     });
 
-    const initial = new Date(2019, 9, 1)
-    const end = new Date(2020, 1, 1)  
+    const initial = new Date(2019, 9, 1);
+    const end = new Date(2020, 1, 1);
 
     // const events = await RNCalendarEvents.fetchAllEvents(initial.toISOString(), end.toISOString());
     const events = await RNCalendarEvents.findEventById(res);
